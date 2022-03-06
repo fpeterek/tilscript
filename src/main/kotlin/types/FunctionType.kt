@@ -18,6 +18,9 @@ class FunctionType(
         }
     }
 
+    override val order
+        get() = argTypes.maxOfOrNull { it.order } ?: 1
+
     val arity
         get() = argTypes.size
 
@@ -30,15 +33,21 @@ class FunctionType(
     val isTernary
         get() = arity == 3
 
+    val nextArg: Type = when {
+        isConstant -> throw RuntimeException("Constant functions accept no arguments")
+        else -> argTypes.last()
+    }
+
     override fun matches(other: Type) = when (other) {
         is AtomicType -> isConstant && imageType.matches(other)
         is FunctionType -> imageType.matches(other.imageType) &&
                 argTypes.zip(other.argTypes).all { (t1, t2) -> t1.matches(t2) }
+        is ConstructionType -> false
     }
 
     fun apply(arg: Type) = when {
         isConstant -> throw RuntimeException("Cannot apply argument to constant function")
-        arg.matches(argTypes.first()) -> FunctionType(imageType, argTypes.drop(1))
+        arg.matches(nextArg) -> FunctionType(imageType, argTypes.dropLast(1))
         else -> throw RuntimeException("Type mismatch")
     }
 
