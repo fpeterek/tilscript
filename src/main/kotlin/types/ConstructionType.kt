@@ -7,10 +7,5 @@ class ConstructionType(override val order: Int) : Type() {
         }
     }
 
-    override fun matches(other: Type) = when (other) {
-        is ConstructionType -> order == other.order
-        else -> false
-    }
-
     override fun toString() = "*$order"
 }

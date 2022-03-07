@@ -8,5 +8,5 @@ class TilFunction(
     val name: String,
     val type: FunctionType,
 ) : Construction(ConstructionType(1)) {
-
+    override fun toString() = name
 }

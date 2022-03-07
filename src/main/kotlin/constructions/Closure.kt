@@ -5,4 +5,6 @@ class Closure(
     val construction: Construction,
 ) : Construction(construction.constructionType) {
 
+    override fun toString() = "${variables.joinToString(" ") { "\\$it" }} $construction"
+
 }

@@ -1,8 +1,8 @@
 package org.fpeterek.til.typechecking.types
 
 class FunctionType(
-    private val imageType: Type,
-    private val argTypes: List<Type>,
+    val imageType: Type,
+    val argTypes: List<Type>,
 ) : Type() {
 
     companion object {
@@ -36,13 +36,6 @@ class FunctionType(
     val nextArg: Type = when {
         isConstant -> throw RuntimeException("Constant functions accept no arguments")
         else -> argTypes.last()
-    }
-
-    override fun matches(other: Type) = when (other) {
-        is AtomicType -> isConstant && imageType.matches(other)
-        is FunctionType -> imageType.matches(other.imageType) &&
-                argTypes.zip(other.argTypes).all { (t1, t2) -> t1.matches(t2) }
-        is ConstructionType -> false
     }
 
     fun apply(arg: Type) = when {

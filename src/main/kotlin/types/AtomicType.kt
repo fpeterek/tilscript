@@ -31,11 +31,6 @@ class AtomicType private constructor(
             }
     }
 
-    override fun matches(other: Type) = when (other) {
-        is AtomicType -> other.shortName == shortName
-        else -> false
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

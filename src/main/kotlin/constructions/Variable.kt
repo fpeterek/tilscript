@@ -5,4 +5,6 @@ import org.fpeterek.til.typechecking.types.Type
 
 class Variable(val name: String, val type: Type) : Construction(ConstructionType(1)) {
 
+    override fun toString() = name
+
 }

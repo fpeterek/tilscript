@@ -5,4 +5,8 @@ import org.fpeterek.til.typechecking.types.ConstructionType
 class Composition(
     val function: TilFunction,
     val args: List<Construction>
-) : Construction(ConstructionType(args.maxOfOrNull { it.constructionType.order } ?: 1))
+) : Construction(ConstructionType(args.maxOfOrNull { it.constructionType.order } ?: 1)) {
+
+    override fun toString() = "[$function ${args.joinToString(" ")}]"
+
+}
