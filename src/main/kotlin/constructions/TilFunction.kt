@@ -1,12 +1,13 @@
 package org.fpeterek.til.typechecking.constructions
 
-import org.fpeterek.til.typechecking.types.ConstructionType
-import org.fpeterek.til.typechecking.types.FunctionType
+import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.Unknown
 
 
 class TilFunction(
     val name: String,
-    val type: FunctionType,
-) : Construction(ConstructionType(1)) {
+    val type: Type = Unknown,
+    constructionType: Type = Unknown
+) : Construction(constructionType) {
     override fun toString() = name
 }

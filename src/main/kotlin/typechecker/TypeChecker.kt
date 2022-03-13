@@ -1,9 +1,6 @@
 package org.fpeterek.til.typechecking.typechecker
 
-import org.fpeterek.til.typechecking.types.AtomicType
-import org.fpeterek.til.typechecking.types.ConstructionType
-import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.*
 
 class TypeChecker {
 
@@ -38,6 +35,7 @@ class TypeChecker {
         is AtomicType -> atomicTypeCheck(type1, type2)
         is ConstructionType -> constructionTypeCheck(type1, type2)
         is FunctionType -> functionTypeCheck(type1, type2)
+        is Unknown -> false
     }
 
 }

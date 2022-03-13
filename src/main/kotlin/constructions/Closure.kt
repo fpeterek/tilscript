@@ -1,10 +1,15 @@
 package org.fpeterek.til.typechecking.constructions
 
+import org.fpeterek.til.typechecking.greek.GreekAlphabet
+import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.Unknown
+
 class Closure(
     val variables: List<Variable>,
     val construction: Construction,
-) : Construction(construction.constructionType) {
+    constructionType: Type = Unknown
+) : Construction(constructionType) {
 
-    override fun toString() = "${variables.joinToString(" ") { "\\$it" }} $construction"
+    override fun toString() = "${variables.joinToString(", ", prefix=GreekAlphabet.lambda) } $construction"
 
 }

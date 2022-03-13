@@ -1,9 +1,12 @@
 package org.fpeterek.til.typechecking.constructions
 
-import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.Unknown
 
-class Variable(val name: String, val type: Type) : Construction(ConstructionType(1)) {
+class Variable(
+    val name: String,
+    val type: Type = Unknown,
+    constructionType: Type = Unknown) : Construction(constructionType) {
 
     override fun toString() = name
 

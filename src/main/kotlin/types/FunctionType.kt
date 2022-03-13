@@ -6,6 +6,7 @@ class FunctionType(
 ) : Type() {
 
     companion object {
+
         operator fun invoke(vararg signature: Type) = this(signature.toList())
 
         operator fun invoke(signature: List<Type>) = when {
@@ -33,21 +34,22 @@ class FunctionType(
     val isTernary
         get() = arity == 3
 
-    val nextArg: Type = when {
-        isConstant -> throw RuntimeException("Constant functions accept no arguments")
-        else -> argTypes.last()
-    }
+    val nextArg: Type
+        get() = when {
+            isConstant -> throw RuntimeException("Constant functions accept no arguments")
+            else -> argTypes.last()
+        }
 
-    fun apply(arg: Type) = when {
+    /*fun apply(arg: Type) = when {
         isConstant -> throw RuntimeException("Cannot apply argument to constant function")
-        arg.matches(nextArg) -> FunctionType(imageType, argTypes.dropLast(1))
+        // arg.matches(nextArg) -> FunctionType(imageType, argTypes.dropLast(1))
         else -> throw RuntimeException("Type mismatch")
     }
 
     fun apply() = when {
         !isConstant -> throw RuntimeException("Function is not constant")
         else -> imageType
-    }
+    }*/
 
     override fun toString() = "(" + imageType + argTypes.joinToString() + ")"
 }
