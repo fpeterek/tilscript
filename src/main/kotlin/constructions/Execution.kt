@@ -3,17 +3,17 @@ package org.fpeterek.til.typechecking.constructions
 import org.fpeterek.til.typechecking.types.Type
 
 class Execution(
-    private val construction: Construction,
-    private val order: Int,
+    val construction: Construction,
+    val executionOrder: Int,
     constructionType: Type
 ) : Construction(constructionType) {
 
     init {
-        if (order < 1) {
+        if (executionOrder < 1) {
             throw RuntimeException("Execution order must be 1 or greater")
         }
     }
 
-    override fun toString() = "$order^$construction"
+    override fun toString() = "$executionOrder^$construction"
 
 }

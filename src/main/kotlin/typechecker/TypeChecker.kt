@@ -1,41 +1,52 @@
 package org.fpeterek.til.typechecking.typechecker
 
-import org.fpeterek.til.typechecking.types.*
+import org.fpeterek.til.typechecking.constructions.Closure
+import org.fpeterek.til.typechecking.constructions.Composition
+import org.fpeterek.til.typechecking.constructions.Construction
+import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
+import org.fpeterek.til.typechecking.types.Unknown
+import org.fpeterek.til.typechecking.util.Util
 
-class TypeChecker {
+class TypeChecker private constructor(
+    val parent: TypeChecker?,
+    val repo: SymbolRepository = SymbolRepository()
+){
 
-    private fun atomicTypeCheck(type1: AtomicType, type2: Type) = when (type2) {
-        is AtomicType -> type1 == type2
-        else -> false
+    companion object TypeChecker {
+        fun process(construction: Construction, symbolRepository: SymbolRepository) =
+            TypeChecker(null, symbolRepository).process(construction)
     }
 
-    private fun constructionTypeCheck(type1: ConstructionType, type2: Type) = when (type2) {
-        is ConstructionType -> type1.order == type2.order
-        else -> false
+    private fun processComposition(composition: Composition) = composition
+
+    private fun processClosure(closure: Closure) = with(closure) {
+        variables.forEach {
+            repo.add(it)
+        }
+
+        val composition = when (construction) {
+            is Composition -> processComposition(construction)
+            else -> throw RuntimeException("A closure must be an abstraction over a composition")
+        }
+
+        val vars = variables.map {
+            it.assignType(repo[it.name] ?: Unknown)
+        }
+
+        assignType(vars, composition)
     }
 
-    private fun fnArityCheck(fn1: FunctionType, fn2: FunctionType) = fn1.arity == fn2.arity
+    fun process(construction: Construction): Construction {
 
-    private fun fnImageCheck(fn1: FunctionType, fn2: FunctionType) =
-        typesMatch(fn1.imageType, fn2.imageType)
+        when (construction) {
+            is Closure -> processClosure(construction)
+            else -> Util.w
+        }
 
-    private fun fnArgsCheck(fn1: FunctionType, fn2: FunctionType) = fn1.argTypes.asSequence()
-        .zip(fn2.argTypes.asSequence())
-        .all { (t1, t2) -> typesMatch(t1, t2) }
 
-    private fun twoFunctionsTypeCheck(fn1: FunctionType, fn2: FunctionType) =
-        fnArityCheck(fn1, fn2) && fnImageCheck(fn1, fn2) && fnArgsCheck(fn1, fn2)
 
-    private fun functionTypeCheck(type1: FunctionType, type2: Type) = when (type2) {
-        is FunctionType -> twoFunctionsTypeCheck(type1, type2)
-        else -> false
-    }
-
-    fun typesMatch(type1: Type, type2: Type): Boolean = when (type1) {
-        is AtomicType -> atomicTypeCheck(type1, type2)
-        is ConstructionType -> constructionTypeCheck(type1, type2)
-        is FunctionType -> functionTypeCheck(type1, type2)
-        is Unknown -> false
+        // TODO: Return something useful
+        return Util.w
     }
 
 }

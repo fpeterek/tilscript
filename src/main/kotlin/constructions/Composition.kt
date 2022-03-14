@@ -6,6 +6,7 @@ import org.fpeterek.til.typechecking.types.Unknown
 class Composition(
     val function: Construction,
     val args: List<Construction>,
+    val constructsType: Type = Unknown,
     constructionType: Type = Unknown
 ) : Construction(constructionType) {
 
