@@ -1,11 +1,12 @@
 package org.fpeterek.til.typechecking.constructions
 
 import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.Unknown
 
 class Execution(
     val construction: Construction,
     val executionOrder: Int,
-    constructionType: Type
+    constructionType: Type = Unknown
 ) : Construction(constructionType) {
 
     init {

@@ -1,22 +1,41 @@
 package org.fpeterek.til.typechecking.typechecker
 
-import org.fpeterek.til.typechecking.constructions.Closure
-import org.fpeterek.til.typechecking.constructions.Composition
-import org.fpeterek.til.typechecking.constructions.Construction
+import org.fpeterek.til.typechecking.constructions.*
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
+import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.Util
+import org.fpeterek.til.typechecking.util.Util.incrementOrder
+import org.fpeterek.til.typechecking.util.Util.trivialize
 
 class TypeChecker private constructor(
     val parent: TypeChecker?,
     val repo: SymbolRepository = SymbolRepository()
 ){
 
-    companion object TypeChecker {
+    companion object {
         fun process(construction: Construction, symbolRepository: SymbolRepository) =
             TypeChecker(null, symbolRepository).process(construction)
+
+        private fun process(construction: Construction, parent: TypeChecker) =
+            TypeChecker(parent).process(construction)
     }
 
+    private fun processTrivialization(trivialization: Trivialization) =
+        process(trivialization.construction, this).trivialize().assignType()
+
+    private fun processExecution(execution: Execution) = with(execution) {
+
+        if (construction !is Composition) {
+            throw RuntimeException("Only compositions can be executed")
+        }
+
+        // TODO: Double execution
+
+        Execution(process(construction), executionOrder).assignType()
+    }
+
+    // TODO: Implement
     private fun processComposition(composition: Composition) = composition
 
     private fun processClosure(closure: Closure) = with(closure) {
@@ -40,6 +59,9 @@ class TypeChecker private constructor(
 
         when (construction) {
             is Closure -> processClosure(construction)
+            is Composition -> processComposition(construction)
+            is Trivialization -> processTrivialization(construction)
+            is Execution -> processExecution(construction)
             else -> Util.w
         }
 

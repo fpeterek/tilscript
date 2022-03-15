@@ -2,12 +2,16 @@ package org.fpeterek.til.typechecking.util
 
 import org.fpeterek.til.typechecking.constructions.*
 import org.fpeterek.til.typechecking.types.AtomicType
+import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
+import org.fpeterek.til.typechecking.types.Type
 
 object Util {
 
     val w = Variable("w", AtomicType.Omega)
     val t = Variable("t", AtomicType.Tau)
+
+    fun Type.incrementOrder() = ConstructionType(order+1)
 
     fun FunctionType.intensionalize() =
         FunctionType(FunctionType(this, AtomicType.Tau), AtomicType.Omega)

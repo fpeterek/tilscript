@@ -1,12 +1,10 @@
 package org.fpeterek.til.typechecking.typechecker
 
 import org.fpeterek.til.typechecking.constructions.*
-import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.util.Util.incrementOrder
 
 object TypeAssignment {
-
-    private fun Type.incrementOrder() = ConstructionType(order+1)
 
     /* Variables, trivializations and executions increase order */
     /* Compositions and closures retain order                   */
