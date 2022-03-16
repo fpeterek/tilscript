@@ -1,6 +1,8 @@
 package org.fpeterek.til.typechecking.typechecker
 
 import org.fpeterek.til.typechecking.constructions.*
+import org.fpeterek.til.typechecking.types.ConstructionType
+import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.util.Util.incrementOrder
 
@@ -20,4 +22,7 @@ object TypeAssignment {
 
     fun Closure.assignType(variables: List<Variable>, construction: Construction) =
         Closure(variables, construction, construction.constructionType)
+
+    fun TilFunction.assignType(type: FunctionType) =
+        TilFunction(name, type, ConstructionType(order=1))
 }

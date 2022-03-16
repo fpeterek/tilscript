@@ -3,6 +3,8 @@ package org.fpeterek.til.typechecking.typechecker
 import org.fpeterek.til.typechecking.constructions.*
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
 import org.fpeterek.til.typechecking.types.ConstructionType
+import org.fpeterek.til.typechecking.types.FunctionType
+import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.Util
 import org.fpeterek.til.typechecking.util.Util.incrementOrder
@@ -21,8 +23,21 @@ class TypeChecker private constructor(
             TypeChecker(parent).process(construction)
     }
 
+    // TODO: Handle trivialization bound variables properly
+
+    // Search in local repo first
+    // If symbol is not found, search in parent repo
+    // If symbol is not found ever still, and we have reached the outmost scope,
+    // return Unknown and hope the type can be inferred
+    private fun findSymbolType(symbol: String): Type =
+        repo[symbol] ?: parent?.findSymbolType(symbol) ?: Unknown
+
+    // TODO: Handle trivialization bound variables properly
     private fun processTrivialization(trivialization: Trivialization) =
         process(trivialization.construction, this).trivialize().assignType()
+
+    private fun processVariable(variable: Variable) =
+        variable.assignType(findSymbolType(variable.name))
 
     private fun processExecution(execution: Execution) = with(execution) {
 
@@ -32,7 +47,19 @@ class TypeChecker private constructor(
 
         // TODO: Double execution
 
-        Execution(process(construction), executionOrder).assignType()
+        val firstExecution = Execution(process(construction), executionOrder).assignType()
+
+        if (executionOrder == 1) {
+            firstExecution
+        } else {
+            throw UnsupportedOperationException("Double execution is not supported yet")
+            firstExecution.construction as Composition
+            if (firstExecution.construction.constructsType !is ConstructionType) {
+                throw RuntimeException("")
+            }
+        }
+
+        firstExecution
     }
 
     // TODO: Implement
@@ -55,20 +82,22 @@ class TypeChecker private constructor(
         assignType(vars, composition)
     }
 
-    fun process(construction: Construction): Construction {
+    private fun processFunction(function: TilFunction) = findSymbolType(function.name).let { type ->
 
-        when (construction) {
-            is Closure -> processClosure(construction)
-            is Composition -> processComposition(construction)
-            is Trivialization -> processTrivialization(construction)
-            is Execution -> processExecution(construction)
-            else -> Util.w
+        if (type !is FunctionType) {
+            throw RuntimeException("${function.name} is not a function")
         }
 
+        function.assignType(type)
+    }
 
-
-        // TODO: Return something useful
-        return Util.w
+    fun process(construction: Construction): Construction = when (construction) {
+        is Closure -> processClosure(construction)
+        is Composition -> processComposition(construction)
+        is Trivialization -> processTrivialization(construction)
+        is Execution -> processExecution(construction)
+        is Variable -> processVariable(construction)
+        is TilFunction -> processFunction(construction)
     }
 
 }

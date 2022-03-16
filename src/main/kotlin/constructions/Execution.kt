@@ -10,8 +10,8 @@ class Execution(
 ) : Construction(constructionType) {
 
     init {
-        if (executionOrder < 1) {
-            throw RuntimeException("Execution order must be 1 or greater")
+        if (executionOrder < 1 || executionOrder > 2) {
+            throw RuntimeException("Execution order must be either 1 or 2")
         }
     }
 
