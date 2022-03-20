@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.constructions
 
+import org.fpeterek.til.typechecking.constructions.isexecutable.Executable
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
@@ -8,15 +9,16 @@ import org.fpeterek.til.typechecking.types.Unknown
 class Closure(
     val variables: List<Variable>,
     val construction: Construction,
+    constructedType: Type = Unknown,
     constructionType: Type = Unknown
-) : Construction(constructionType) {
+) : Construction(constructedType, constructionType), Executable {
 
     val functionType = when {
-        construction !is Composition           -> Unknown
-        construction.constructsType == Unknown -> Unknown
-        variables.any { it.type == Unknown }   -> Unknown
+        construction !is Composition            -> Unknown
+        construction.constructedType == Unknown -> Unknown
+        variables.any { it.type == Unknown }    -> Unknown
 
-        else -> FunctionType(construction.constructsType, variables.map { it.type })
+        else -> FunctionType(construction.constructedType, variables.map { it.type })
     }
 
     override fun toString() = "${variables.joinToString(", ", prefix=GreekAlphabet.lambda) } $construction"

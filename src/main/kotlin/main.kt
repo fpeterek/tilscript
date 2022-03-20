@@ -69,4 +69,8 @@ fun main() {
     println(CommonTypes.setOfSets)
     println(jePani)
 
+    println(whale.isExecutable)
+    println(mammalWhales.isExecutable)
+    println(varW.isExecutable)
+
 }

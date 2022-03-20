@@ -54,7 +54,7 @@ class TypeChecker private constructor(
         } else {
             throw UnsupportedOperationException("Double execution is not supported yet")
             firstExecution.construction as Composition
-            if (firstExecution.construction.constructsType !is ConstructionType) {
+            if (firstExecution.construction.constructedType !is ConstructionType) {
                 throw RuntimeException("")
             }
         }
@@ -63,7 +63,27 @@ class TypeChecker private constructor(
     }
 
     // TODO: Implement
-    private fun processComposition(composition: Composition) = composition
+    private fun execute(construction: Construction) = when (construction) {
+        is Literal -> throw RuntimeException("Literals cannot be executed.")
+        is TilFunction -> throw RuntimeException("Functions cannot be executed.")
+        is Trivialization -> Unit
+        else -> Unit
+    }
+
+    // TODO: Implement
+    private fun processComposition(composition: Composition) = with(composition) {
+
+        val fn = process(function)
+
+        when {
+            fn is TilFunction ->
+                throw RuntimeException("Functions cannot be executed, did you forget a trivialization ('${fn.name})?")
+            fn.constructedType !is FunctionType ->
+                throw RuntimeException("Only functions can be applied on arguments using a composition")
+        }
+
+        this
+    }
 
     private fun processClosure(closure: Closure) = with(closure) {
         variables.forEach {
@@ -91,6 +111,9 @@ class TypeChecker private constructor(
         function.assignType(type)
     }
 
+    // Identity function, no action is necessary now, though that may change in the future
+    private fun processLiteral(literal: Literal) = literal
+
     fun process(construction: Construction): Construction = when (construction) {
         is Closure -> processClosure(construction)
         is Composition -> processComposition(construction)
@@ -98,6 +121,7 @@ class TypeChecker private constructor(
         is Execution -> processExecution(construction)
         is Variable -> processVariable(construction)
         is TilFunction -> processFunction(construction)
+        is Literal -> processLiteral(construction)
     }
 
 }
