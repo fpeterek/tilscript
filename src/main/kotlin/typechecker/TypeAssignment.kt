@@ -14,8 +14,11 @@ object TypeAssignment {
     fun Variable.assignType(type: Type) =
         Variable(this.name, type, type.incrementOrder())
 
-    fun Trivialization.assignType() =
-        Trivialization(construction, construction.constructionType.incrementOrder())
+    fun Trivialization.assignType(type: Type) = Trivialization(
+        construction=construction,
+        constructedType=type,
+        constructionType=construction.constructionType.incrementOrder()
+    )
 
     fun Execution.assignType() =
         Execution(construction, executionOrder, construction.constructionType.incrementOrder())
@@ -24,5 +27,5 @@ object TypeAssignment {
         Closure(variables, construction, construction.constructionType)
 
     fun TilFunction.assignType(type: FunctionType) =
-        TilFunction(name, type, ConstructionType(order=1))
+        TilFunction(name, type)
 }

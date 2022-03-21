@@ -6,35 +6,56 @@ import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
-import org.fpeterek.til.typechecking.util.Util
-import org.fpeterek.til.typechecking.util.Util.incrementOrder
 import org.fpeterek.til.typechecking.util.Util.trivialize
 
 class TypeChecker private constructor(
-    val parent: TypeChecker?,
-    val repo: SymbolRepository = SymbolRepository()
-){
+    private val parent: TypeChecker?,
+    private val repo: SymbolRepository = SymbolRepository()
+) {
 
     companion object {
         fun process(construction: Construction, symbolRepository: SymbolRepository) =
             TypeChecker(null, symbolRepository).process(construction)
 
-        private fun process(construction: Construction, parent: TypeChecker) =
+        private fun process(construction: Construction, parent: TypeChecker?) =
             TypeChecker(parent).process(construction)
     }
 
-    // TODO: Handle trivialization bound variables properly
-
     // Search in local repo first
     // If symbol is not found, search in parent repo
-    // If symbol is not found ever still, and we have reached the outmost scope,
+    // If symbol is not found ever still, and we have reached the outermost scope,
     // return Unknown and hope the type can be inferred
     private fun findSymbolType(symbol: String): Type =
         repo[symbol] ?: parent?.findSymbolType(symbol) ?: Unknown
 
-    // TODO: Handle trivialization bound variables properly
-    private fun processTrivialization(trivialization: Trivialization) =
-        process(trivialization.construction, this).trivialize().assignType()
+    private val outermostRepo: SymbolRepository
+        get() = parent?.outermostRepo ?: repo
+
+    private fun processTrivialization(trivialization: Trivialization): Trivialization {
+
+        val processed = when (trivialization.construction) {
+            is Variable, is TilFunction, is Literal ->
+                process(trivialization.construction, this)
+
+            // Binding by trivialization -> variables from the outside
+            // are inaccessible
+            else -> process(trivialization.construction, outermostRepo)
+        }.trivialize()
+
+        // We use constructedType to store the type of literals and functions
+        // even though literals (i.e. values from base) and functions themselves do not
+        // construct anything
+        // To clarify, functions must be applied onto (zero or more) arguments using compositions,
+        // to construct anything
+        val type = when (trivialization.construction) {
+            is Literal, is TilFunction -> trivialization.construction.constructedType
+
+            // Otherwise, trivialization constructs a construction of a certain order
+            else -> trivialization.construction.constructionType
+        }
+
+        return processed.assignType(type)
+    }
 
     private fun processVariable(variable: Variable) =
         variable.assignType(findSymbolType(variable.name))
@@ -62,27 +83,53 @@ class TypeChecker private constructor(
         firstExecution
     }
 
-    // TODO: Implement
     private fun execute(construction: Construction) = when (construction) {
         is Literal -> throw RuntimeException("Literals cannot be executed.")
         is TilFunction -> throw RuntimeException("Functions cannot be executed.")
-        is Trivialization -> Unit
-        else -> Unit
+        else -> process(construction)
     }
 
-    // TODO: Implement
-    private fun processComposition(composition: Composition) = with(composition) {
-
-        val fn = process(function)
-
+    private fun processCompositionFn(fn: Construction) = process(fn).let { processed ->
         when {
-            fn is TilFunction ->
-                throw RuntimeException("Functions cannot be executed, did you forget a trivialization ('${fn.name})?")
-            fn.constructedType !is FunctionType ->
+            processed is TilFunction ->
+                throw RuntimeException(
+                    "Functions cannot be executed, did you forget a trivialization ('${processed.name})?")
+            processed.constructedType !is FunctionType ->
                 throw RuntimeException("Only functions can be applied on arguments using a composition")
         }
 
-        this
+        processed
+    }
+
+    private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) =
+        args.zip(expected).map { (cons, expType) ->
+            val processed = execute(cons)
+
+            if (expType != processed.constructedType) {
+                throw RuntimeException("Function argument type mismatch. " +
+                        "Expected '${expType}', Got '${processed.constructedType}'")
+            }
+
+            processed
+        }
+
+    private fun processComposition(composition: Composition) = with(composition) {
+
+        val fn = processCompositionFn(function)
+        val fnType = fn.constructedType as FunctionType
+        val fnArgs = fnType.argTypes
+
+        val processedArgs = processCompositionArgs(args, fnArgs)
+
+        val argsMaxType = processedArgs.maxByOrNull { it.constructionType.order }?.constructionType
+
+        val consType = when {
+            argsMaxType == null -> fn.constructionType
+            argsMaxType.order > fn.constructionType.order -> argsMaxType
+            else -> fn.constructionType
+        }
+
+        Composition(fn, processedArgs, fnType.imageType, consType)
     }
 
     private fun processClosure(closure: Closure) = with(closure) {

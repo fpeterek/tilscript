@@ -51,5 +51,9 @@ class FunctionType(
         else -> imageType
     }*/
 
+    override fun equals(other: Any?) =
+        other != null && other is FunctionType && other.imageType == this.imageType &&
+                other.argTypes == this.argTypes
+
     override fun toString() = "(" + imageType + argTypes.joinToString() + ")"
 }

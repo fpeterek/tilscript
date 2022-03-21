@@ -7,5 +7,12 @@ class ConstructionType(override val order: Int) : Type() {
         }
     }
 
+    override fun equals(other: Any?) =
+        other != null && other is ConstructionType && order == other.order
+
+    override fun hashCode(): Int {
+        return order
+    }
+
     override fun toString() = "*$order"
 }
