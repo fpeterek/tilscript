@@ -4,7 +4,7 @@ import org.fpeterek.til.typechecking.util.Util.compose
 import org.fpeterek.til.typechecking.util.Util.extensionalize
 import org.fpeterek.til.typechecking.util.Util.trivialize
 import org.fpeterek.til.typechecking.constructions.*
-import org.fpeterek.til.typechecking.typechecker.SymbolRepository
+import org.fpeterek.til.typechecking.util.SymbolRepository
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.util.CommonTypes

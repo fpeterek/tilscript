@@ -6,6 +6,7 @@ import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
+import org.fpeterek.til.typechecking.util.SymbolRepository
 import org.fpeterek.til.typechecking.util.Util.trivialize
 
 class TypeChecker private constructor(
@@ -101,17 +102,43 @@ class TypeChecker private constructor(
         processed
     }
 
+    private fun storeVarType(variable: Variable) {
+        if (variable.name in repo) {
+            repo.add(variable)
+        } else {
+            parent?.storeVarType(variable)
+        }
+    }
+
+    private fun assignVarType(variable: Variable, type: Type) = variable.assignType(type).apply {
+    }
+
     private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) =
         args.zip(expected).map { (cons, expType) ->
             val processed = execute(cons)
 
-            if (expType != processed.constructedType) {
+            if (expType !is Unknown && expType != processed.constructedType) {
                 throw RuntimeException("Function argument type mismatch. " +
                         "Expected '${expType}', Got '${processed.constructedType}'")
             }
 
-            processed
+            if (processed.constructedType is Unknown) {
+                when (processed) {
+                    is Variable -> assignVarType()
+                }
+            } else {
+                processed
+            }
         }
+
+    private fun inferTypes(actualArgs: List<Construction>, fnArgs: List<Type>) =
+        fnArgs.zip(actualArgs).map { (arg, received) ->
+            when (arg) {
+                is Unknown -> received.constructedType
+                else -> arg
+            }
+        }
+
 
     private fun processComposition(composition: Composition) = with(composition) {
 
@@ -122,6 +149,8 @@ class TypeChecker private constructor(
         val processedArgs = processCompositionArgs(args, fnArgs)
 
         val argsMaxType = processedArgs.maxByOrNull { it.constructionType.order }?.constructionType
+
+        val inferredTypes = inferTypes(processedArgs, fnArgs)
 
         val consType = when {
             argsMaxType == null -> fn.constructionType
@@ -142,6 +171,15 @@ class TypeChecker private constructor(
             else -> throw RuntimeException("A closure must be an abstraction over a composition")
         }
 
+        // We assume the variable types might have been inferred when processing
+        // the composition, thus we look through the local repo and check whether
+        // the types of lambda parameters are known already
+        // We only check the local repo, which should only contains variables introduced
+        // by the current lambda abstraction, as they were added a couple of lines earlier
+        // in this very function
+        // Lambda abstractions can shadow variables introduced earlier and if we were
+        // to check parent repositories, we could accidentally reassign the type of a completely
+        // different variable
         val vars = variables.map {
             it.assignType(repo[it.name] ?: Unknown)
         }

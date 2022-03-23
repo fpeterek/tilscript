@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.typechecker
+package org.fpeterek.til.typechecking.util
 
 import org.fpeterek.til.typechecking.constructions.TilFunction
 import org.fpeterek.til.typechecking.constructions.Variable
@@ -15,8 +15,10 @@ class SymbolRepository {
         }
     }
 
-    fun add(variable: Variable) = add(variable.name, variable.type)
+    fun add(variable: Variable) = add(variable.name, variable.constructedType)
     fun add(function: TilFunction) = add(function.name, function.type)
+
+    operator fun contains(name: String) = name in types
 
     operator fun get(name: String) = types[name]
 
