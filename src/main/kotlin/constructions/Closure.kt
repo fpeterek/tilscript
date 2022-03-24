@@ -14,11 +14,11 @@ class Closure(
 ) : Construction(constructedType, constructionType), Executable {
 
     val functionType = when {
-        construction !is Composition            -> Unknown
-        construction.constructedType == Unknown -> Unknown
-        variables.any { it.type == Unknown }    -> Unknown
+        construction !is Composition                       -> Unknown
+        construction.constructedType == Unknown            -> Unknown
+        variables.any { it.constructedType == Unknown }    -> Unknown
 
-        else -> FunctionType(construction.constructedType, variables.map { it.type })
+        else -> FunctionType(construction.constructedType, variables.map { it.constructedType })
     }
 
     override fun toString() = "${variables.joinToString(", ", prefix=GreekAlphabet.lambda) } $construction"

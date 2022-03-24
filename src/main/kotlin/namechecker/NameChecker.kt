@@ -9,15 +9,15 @@ class NameChecker private constructor(
 
     companion object {
         fun checkSymbols(construction: Construction, repository: SymbolRepository) =
-            NameChecker(symbolRepository = repository).check(construction)
+            NameChecker(symbolRepository = repository).process(construction)
 
         private fun checkSymbols(construction: Construction, parent: NameChecker) =
-            NameChecker(SymbolRepository(), parent).check(construction)
+            NameChecker(SymbolRepository(), parent).process(construction)
     }
 
     constructor(symbolRepository: SymbolRepository) : this(
         SymbolRepository(),
-        // We want to avoid modifying the original repo
+        // We want to avoid modifying the original repo,
         parent=NameChecker(symbolRepository, parent=null)
     )
 
@@ -27,43 +27,40 @@ class NameChecker private constructor(
     private fun findSymbol(name: String): Boolean =
         (name in symbolRepository) || (parent?.findSymbol(name) ?: false)
 
-    private fun processClosure(cl: Closure) {
+    private fun processClosure(cl: Closure): Unit {
         cl.variables.forEach {
             symbolRepository.add(it)
         }
 
-        checkSymbols(cl.construction, this)
+        processNewScope(cl.construction)
     }
 
-    private fun processComposition(composition: Composition) {
-        checkSymbols(composition.function, this)
+    private fun processComposition(composition: Composition): Unit {
+        process(composition.function)
 
         composition.args.forEach {
-            checkSymbols(it, this)
+            process(it)
         }
     }
 
-    private fun processTrivialization(trivialization: Trivialization) =
+    private fun processTrivialization(trivialization: Trivialization): Unit =
         when (trivialization.construction) {
-            is Variable, is TilFunction -> check(trivialization.construction)
+            is Variable, is TilFunction -> process(trivialization.construction)
             else -> checkSymbols(trivialization.construction, outermostParent)
         }
 
-    private fun processExecution(execution: Execution) {
-        check(execution.construction)
-    }
+    private fun processExecution(execution: Execution): Unit = process(execution.construction)
 
-
-    private fun processSymbol(symbol: String) {
+    private fun processSymbol(symbol: String): Unit {
         if (!findSymbol(symbol)) {
             throw RuntimeException("Undefined symbol '${symbol}'")
         }
     }
 
-    private fun processVariable(variable: Variable) = processSymbol(variable.name)
-    private fun processFunction(fn: TilFunction) = processSymbol(fn.name)
+    private fun processVariable(variable: Variable): Unit = processSymbol(variable.name)
+    private fun processFunction(fn: TilFunction): Unit = processSymbol(fn.name)
 
-    fun process(construction: Construction): Unit = when (construction) {
+    private fun process(construction: Construction): Unit = when (construction) {
         is Closure -> processClosure(construction)
         is Composition -> processComposition(construction)
         is Trivialization -> processTrivialization(construction)
@@ -73,9 +70,7 @@ class NameChecker private constructor(
         is Literal -> Unit
     }
 
-    fun check(construction: Construction): Unit {
-
-    }
+    private fun processNewScope(construction: Construction): Unit = checkSymbols(construction, this)
 
 
 }

@@ -123,9 +123,10 @@ class TypeChecker private constructor(
             }
 
             if (processed.constructedType is Unknown) {
-                when (processed) {
-                    is Variable -> assignVarType()
-                }
+                //when (processed) {
+                //    is Variable -> assignVarType()
+                //}
+                processed
             } else {
                 processed
             }
