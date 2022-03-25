@@ -110,8 +110,8 @@ class TypeChecker private constructor(
         }
     }
 
-    private fun assignVarType(variable: Variable, type: Type) = variable.assignType(type).apply {
-    }
+    private fun assignVarType(variable: Variable, type: Type) =
+        variable.assignType(type).apply(::storeVarType)
 
     private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) =
         args.zip(expected).map { (cons, expType) ->
@@ -123,10 +123,10 @@ class TypeChecker private constructor(
             }
 
             if (processed.constructedType is Unknown) {
-                //when (processed) {
-                //    is Variable -> assignVarType()
-                //}
-                processed
+                when (processed) {
+                    is Variable -> assignVarType(processed, expType)
+                    else -> throw NotImplementedError()
+                }
             } else {
                 processed
             }

@@ -22,6 +22,21 @@ class FunctionType(
     override val order
         get() = argTypes.maxOfOrNull { it.order } ?: 1
 
+    private val Type.isKnown
+        get() = when (imageType) {
+            is FunctionType -> imageType.fullyTyped
+            else -> imageType !is Unknown
+        }
+
+    private val imgTypeIsKnown
+        get() = imageType.isKnown
+
+    private val argTypesAreKnown
+        get() = argTypes.all { it.isKnown }
+
+    val fullyTyped: Boolean
+        get() = imgTypeIsKnown && argTypesAreKnown
+
     val arity
         get() = argTypes.size
 

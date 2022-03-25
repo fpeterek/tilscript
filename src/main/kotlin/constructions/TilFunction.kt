@@ -7,11 +7,16 @@ import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 
 
-class TilFunction(
+class TilFunction private constructor(
     val name: String,
-    val type: Type = Unknown,
-) : Construction(constructedType=Unknown, constructionType=ConstructionType(order=1)), NonExecutable {
+    type: Type = Unknown,
+) : Construction(constructedType=type, constructionType=ConstructionType(order=1)),
+    NonExecutable {
+
     override fun toString() = name
+
+    val fullyTyped: Boolean
+        get() = constructedType is FunctionType && constructedType.fullyTyped
 
     init {
         when (type) {
