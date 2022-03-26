@@ -7,6 +7,7 @@ import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SymbolRepository
+import org.fpeterek.til.typechecking.util.Util.incrementOrder
 import org.fpeterek.til.typechecking.util.Util.trivialize
 
 class TypeChecker private constructor(
@@ -67,21 +68,24 @@ class TypeChecker private constructor(
             throw RuntimeException("Only compositions can be executed")
         }
 
-        // TODO: Double execution
-
-        val firstExecution = Execution(process(construction), executionOrder).assignType()
+        val processedConstruction = process(construction)
+        val firstExecution = Execution(processedConstruction, executionOrder).assignType()
 
         if (executionOrder == 1) {
             firstExecution
         } else {
-            throw UnsupportedOperationException("Double execution is not supported yet")
             firstExecution.construction as Composition
             if (firstExecution.construction.constructedType !is ConstructionType) {
                 throw RuntimeException("")
             }
+            // Unknown type as we may not be able to determine the type constructed
+            // by the constructed construction
+            // Yes, things start to get somewhat convoluted at this point
+            Execution(
+                processedConstruction,
+                2,
+                constructionType=processedConstruction.constructionType.incrementOrder())
         }
-
-        firstExecution
     }
 
     private fun execute(construction: Construction) = when (construction) {
