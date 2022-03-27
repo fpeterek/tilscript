@@ -27,7 +27,7 @@ class NameChecker private constructor(
     private fun findSymbol(name: String): Boolean =
         (name in symbolRepository) || (parent?.findSymbol(name) ?: false)
 
-    private fun processClosure(cl: Closure): Unit {
+    private fun processClosure(cl: Closure) {
         cl.variables.forEach {
             symbolRepository.add(it)
         }
@@ -35,7 +35,7 @@ class NameChecker private constructor(
         processNewScope(cl.construction)
     }
 
-    private fun processComposition(composition: Composition): Unit {
+    private fun processComposition(composition: Composition) {
         process(composition.function)
 
         composition.args.forEach {
@@ -51,7 +51,7 @@ class NameChecker private constructor(
 
     private fun processExecution(execution: Execution): Unit = process(execution.construction)
 
-    private fun processSymbol(symbol: String): Unit {
+    private fun processSymbol(symbol: String) {
         if (!findSymbol(symbol)) {
             throw RuntimeException("Undefined symbol '${symbol}'")
         }
@@ -71,7 +71,6 @@ class NameChecker private constructor(
     }
 
     private fun processNewScope(construction: Construction): Unit = checkSymbols(construction, this)
-
 
 }
 

@@ -7,6 +7,7 @@ import org.fpeterek.til.typechecking.util.Util.intensionalize
 
 object CommonTypes {
     val office = AtomicType.Iota.intensionalize()
+    val proposition = AtomicType.Omicron.intensionalize()
     val extensionProperty = FunctionType(AtomicType.Omicron, AtomicType.Iota)
     val property = extensionProperty.intensionalize()
     val setOfSets = FunctionType(

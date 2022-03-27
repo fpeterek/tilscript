@@ -7,11 +7,4 @@ import org.fpeterek.til.typechecking.types.Unknown
 
 sealed class Construction(
     open val constructedType: Type = Unknown,
-    constructionType: Type = Unknown) : IsExecutable {
-
-    val constructionType = when (constructionType) {
-        is ConstructionType, is Unknown -> constructionType
-        else -> throw RuntimeException("Construction type must by of type ConstructionType or Unknown")
-    }
-
-}
+    val constructionType: Type = Unknown) : IsExecutable

@@ -12,23 +12,27 @@ import org.fpeterek.til.typechecking.util.Util.trivialize
 
 class TypeChecker private constructor(
     private val parent: TypeChecker?,
-    private val repo: SymbolRepository = SymbolRepository()
+    private val repo: SymbolRepository = SymbolRepository(),
+    private val lambdaBound: SymbolRepository = SymbolRepository(),
 ) {
 
     companion object {
-        fun process(construction: Construction, symbolRepository: SymbolRepository) =
-            TypeChecker(null, symbolRepository).process(construction)
+        fun process(construction: Construction, symbolRepository: SymbolRepository,
+                    lambdaBound: SymbolRepository) =
+            TypeChecker(null, symbolRepository, lambdaBound).process(construction)
 
-        private fun process(construction: Construction, parent: TypeChecker?) =
-            TypeChecker(parent).process(construction)
+        private fun process(construction: Construction, parent: TypeChecker) =
+            TypeChecker(parent, lambdaBound=parent.lambdaBound).process(construction)
     }
 
     // Search in local repo first
     // If symbol is not found, search in parent repo
     // If symbol is not found ever still, and we have reached the outermost scope,
-    // return Unknown and hope the type can be inferred
+    // return Unknown
     private fun findSymbolType(symbol: String): Type =
         repo[symbol] ?: parent?.findSymbolType(symbol) ?: Unknown
+
+    private fun lambdaBoundType(symbol: String) = lambdaBound[symbol] ?: Unknown
 
     private val outermostRepo: SymbolRepository
         get() = parent?.outermostRepo ?: repo
@@ -41,7 +45,7 @@ class TypeChecker private constructor(
 
             // Binding by trivialization -> variables from the outside
             // are inaccessible
-            else -> process(trivialization.construction, outermostRepo)
+            else -> process(trivialization.construction, outermostRepo, lambdaBound)
         }.trivialize()
 
         // We use constructedType to store the type of literals and functions
@@ -76,7 +80,7 @@ class TypeChecker private constructor(
         } else {
             firstExecution.construction as Composition
             if (firstExecution.construction.constructedType !is ConstructionType) {
-                throw RuntimeException("")
+                throw RuntimeException("Objects from object base cannot be executed")
             }
             // Unknown type as we may not be able to determine the type constructed
             // by the constructed construction
@@ -114,36 +118,19 @@ class TypeChecker private constructor(
         }
     }
 
-    private fun assignVarType(variable: Variable, type: Type) =
-        variable.assignType(type).apply(::storeVarType)
-
     private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) =
         args.zip(expected).map { (cons, expType) ->
             val processed = execute(cons)
 
             if (expType !is Unknown && expType != processed.constructedType) {
+                println(processed)
+                println(repo["Milda"])
                 throw RuntimeException("Function argument type mismatch. " +
                         "Expected '${expType}', Got '${processed.constructedType}'")
             }
 
-            if (processed.constructedType is Unknown) {
-                when (processed) {
-                    is Variable -> assignVarType(processed, expType)
-                    else -> throw NotImplementedError()
-                }
-            } else {
-                processed
-            }
+            processed
         }
-
-    private fun inferTypes(actualArgs: List<Construction>, fnArgs: List<Type>) =
-        fnArgs.zip(actualArgs).map { (arg, received) ->
-            when (arg) {
-                is Unknown -> received.constructedType
-                else -> arg
-            }
-        }
-
 
     private fun processComposition(composition: Composition) = with(composition) {
 
@@ -155,8 +142,6 @@ class TypeChecker private constructor(
 
         val argsMaxType = processedArgs.maxByOrNull { it.constructionType.order }?.constructionType
 
-        val inferredTypes = inferTypes(processedArgs, fnArgs)
-
         val consType = when {
             argsMaxType == null -> fn.constructionType
             argsMaxType.order > fn.constructionType.order -> argsMaxType
@@ -167,29 +152,22 @@ class TypeChecker private constructor(
     }
 
     private fun processClosure(closure: Closure) = with(closure) {
-        variables.forEach {
-            repo.add(it)
-        }
 
-        val composition = when (construction) {
-            is Composition -> processComposition(construction)
-            else -> throw RuntimeException("A closure must be an abstraction over a composition")
-        }
-
-        // We assume the variable types might have been inferred when processing
-        // the composition, thus we look through the local repo and check whether
-        // the types of lambda parameters are known already
-        // We only check the local repo, which should only contains variables introduced
-        // by the current lambda abstraction, as they were added a couple of lines earlier
-        // in this very function
-        // Lambda abstractions can shadow variables introduced earlier and if we were
-        // to check parent repositories, we could accidentally reassign the type of a completely
-        // different variable
         val vars = variables.map {
-            it.assignType(repo[it.name] ?: Unknown)
+
+            val typed = it.assignType(lambdaBoundType(it.name))
+            if (typed.constructedType is Unknown) {
+                throw RuntimeException("Undefined lambda bound variable '${typed.name}'")
+            }
+            repo.add(typed)
+
+            typed
         }
 
-        assignType(vars, composition)
+        val abstracted = process(construction, this@TypeChecker)
+
+        Closure(vars, abstracted, constructionType=abstracted.constructionType)
+            .assignType()
     }
 
     private fun processFunction(function: TilFunction) = findSymbolType(function.name).let { type ->

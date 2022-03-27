@@ -9,7 +9,7 @@ import org.fpeterek.til.typechecking.types.Unknown
 class Literal(
     val value: String,
     type: Type = Unknown
-) : Construction(constructedType=type, constructionType=ConstructionType(order=1)), NonExecutable {
+) : Construction(constructedType=type, constructionType=type), NonExecutable {
 
     init {
         when (type) {
@@ -17,5 +17,7 @@ class Literal(
             else -> throw RuntimeException("Literal type must be either AtomicType or Unknown")
         }
     }
+
+    override fun toString() = value
 
 }

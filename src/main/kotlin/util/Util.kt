@@ -23,7 +23,11 @@ object Util {
         Closure(listOf(w), Closure(listOf(t), this))
 
     fun <T : Construction> T.trivialize() =
-        Trivialization(this, this.constructionType.incrementOrder())
+        Trivialization(
+            construction=this,
+            constructedType=this.constructionType,
+            constructionType=this.constructionType.incrementOrder(),
+        )
 
     fun Composition.extensionalize(w: Construction, t: Construction) =
         this.compose(w).compose(t)

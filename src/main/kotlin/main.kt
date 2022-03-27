@@ -5,6 +5,7 @@ import org.fpeterek.til.typechecking.util.Util.extensionalize
 import org.fpeterek.til.typechecking.util.Util.trivialize
 import org.fpeterek.til.typechecking.constructions.*
 import org.fpeterek.til.typechecking.namechecker.NameChecker
+import org.fpeterek.til.typechecking.typechecker.TypeChecker
 import org.fpeterek.til.typechecking.util.SymbolRepository
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
@@ -15,18 +16,19 @@ import org.fpeterek.til.typechecking.util.Util.intensionalize
 fun main() {
 
 
-    val milda = Variable("Milda", AtomicType.Iota)
+    val milda = Literal("Milda", AtomicType.Iota)
     val varW = Variable("w", AtomicType.Omega)
     val varT = Variable("t", AtomicType.Tau)
+    val alkoholik = Variable("alkoholik", AtomicType.Iota)
     val presCr = TilFunction("President_CR", CommonTypes.office)
     val eq = TilFunction("=", FunctionType(AtomicType.Omicron, AtomicType.Iota, AtomicType.Iota))
 
     val and = TilFunction("and", CommonTypes.binaryOmicron)
     val or = TilFunction("or", CommonTypes.binaryOmicron)
 
-    val zena = TilFunction("Zena", CommonTypes.office)
-    val vdana = TilFunction("Vdana", CommonTypes.office)
-    val maTitul = TilFunction("MaTitul", CommonTypes.office)
+    val zena = TilFunction("Zena", CommonTypes.property)
+    val vdana = TilFunction("Vdana", CommonTypes.property)
+    val maTitul = TilFunction("MaTitul", CommonTypes.property)
 
     val varX = Variable("x", type=AtomicType.Iota)
 
@@ -46,6 +48,13 @@ fun main() {
         milda.trivialize()
     )
 
+    // TODO: The following TIL construction may be improper due to a type mismatch,
+    //       but the program reports an incorrect error
+    val alkoholikEqPresident = eq.trivialize().compose(
+        presCr.extensionalize(varW, varT),
+        alkoholik.trivialize(),
+    )
+
     val whale = TilFunction("Whale", CommonTypes.property)
     val mammal = TilFunction("Mammal", CommonTypes.property)
     val all = TilFunction("All", CommonTypes.setOfSets)
@@ -54,21 +63,24 @@ fun main() {
         .compose(whale.extensionalize(varW, varT))
         .compose(mammal.extensionalize(varW, varT))
 
-    val symbolRepository = SymbolRepository()
+    val symbolRepository = SymbolRepository(
+        presCr,
+        milda,
+        eq,
+        all,
+        whale,
+        mammal,
+        and,
+        or,
+        zena,
+        vdana,
+        maTitul,
+        varW,
+        varT,
+        alkoholik,
+    )
 
-    symbolRepository.add(presCr)
-    symbolRepository.add(milda)
-    symbolRepository.add(varW)
-    symbolRepository.add(varT)
-    symbolRepository.add(eq)
-    symbolRepository.add(all)
-    symbolRepository.add(whale)
-    symbolRepository.add(mammal)
-    symbolRepository.add(and)
-    symbolRepository.add(or)
-    symbolRepository.add(zena)
-    symbolRepository.add(vdana)
-    symbolRepository.add(maTitul)
+    val lambdaBound = SymbolRepository(varW, varT, varX)
 
     println(emanEqPresident)
     println(mammalWhales)
@@ -82,5 +94,26 @@ fun main() {
     NameChecker.checkSymbols(emanEqPresident, symbolRepository)
     NameChecker.checkSymbols(mammalWhales, symbolRepository)
     NameChecker.checkSymbols(jePani, symbolRepository)
+    NameChecker.checkSymbols(alkoholikEqPresident, symbolRepository)
 
+    printRes(milda.trivialize(), symbolRepository, lambdaBound)
+    printRes(emanEqPresident, symbolRepository, lambdaBound)
+    printRes(alkoholikEqPresident, symbolRepository, lambdaBound)
+    printRes(mammalWhales, symbolRepository, lambdaBound)
+    printRes(jePani, symbolRepository, lambdaBound)
+
+}
+
+fun printRes(cons: Construction, repo: SymbolRepository, lambdaBound: SymbolRepository) {
+    val analyzed = TypeChecker.process(cons, repo, lambdaBound)
+
+    val asStr = analyzed.toString()
+
+    println("-".repeat(asStr.length))
+    println(asStr)
+    println()
+    println("Construction type: ${analyzed.constructionType}")
+    println("Constructs: ${analyzed.constructedType}")
+    println("-".repeat(asStr.length))
+    println()
 }
