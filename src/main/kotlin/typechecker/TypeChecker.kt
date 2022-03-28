@@ -40,10 +40,9 @@ class TypeChecker private constructor(
     private fun processTrivialization(trivialization: Trivialization): Trivialization {
 
         val processed = when (trivialization.construction) {
-            is Variable, is TilFunction, is Literal ->
-                process(trivialization.construction, this)
+            is TilFunction, is Literal -> process(trivialization.construction, this)
 
-            // Binding by trivialization -> variables from the outside
+            // Binding by trivialization -> variables from outer scopes
             // are inaccessible
             else -> process(trivialization.construction, outermostRepo, lambdaBound)
         }.trivialize()
@@ -124,7 +123,7 @@ class TypeChecker private constructor(
 
             if (expType !is Unknown && expType != processed.constructedType) {
                 println(processed)
-                println(repo["Milda"])
+                println(repo["alkoholik"])
                 throw RuntimeException("Function argument type mismatch. " +
                         "Expected '${expType}', Got '${processed.constructedType}'")
             }
@@ -179,8 +178,8 @@ class TypeChecker private constructor(
         function.assignType(type)
     }
 
-    // Identity function, no action is necessary now, though that may change in the future
-    private fun processLiteral(literal: Literal) = literal
+    private fun processLiteral(literal: Literal) =
+        literal.assignType(findSymbolType(literal.value))
 
     fun process(construction: Construction): Construction = when (construction) {
         is Closure -> processClosure(construction)

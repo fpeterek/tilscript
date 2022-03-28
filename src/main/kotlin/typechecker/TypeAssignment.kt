@@ -49,6 +49,8 @@ object TypeAssignment {
         function, args, type, constructionType
     )
 
+    fun Literal.assignType(type: Type) = Literal(value, type)
+
     fun TilFunction.assignType(type: FunctionType) =
         TilFunction(name, type)
 }

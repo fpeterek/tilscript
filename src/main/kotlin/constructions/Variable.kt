@@ -9,6 +9,13 @@ class Variable(
     type: Type = Unknown,
     constructionType: Type = Unknown) : Construction(type, constructionType), Executable {
 
+    init {
+        // TODO: Construction types may prove to be problematic
+        if (constructionType is Unknown) {
+            throw RuntimeException("Construction orders of variables must be known")
+        }
+    }
+
     override fun toString() = name
 
 }

@@ -50,6 +50,7 @@ fun main() {
 
     // TODO: The following TIL construction may be improper due to a type mismatch,
     //       but the program reports an incorrect error
+    //       The problem is caused by improper handling of construction type orders
     val alkoholikEqPresident = eq.trivialize().compose(
         presCr.extensionalize(varW, varT),
         alkoholik.trivialize(),
