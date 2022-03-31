@@ -53,7 +53,7 @@ fun main() {
     //       The problem is caused by improper handling of construction type orders
     val alkoholikEqPresident = eq.trivialize().compose(
         presCr.extensionalize(varW, varT),
-        alkoholik.trivialize(),
+        alkoholik//.trivialize(),
     )
 
     val whale = TilFunction("Whale", CommonTypes.property)

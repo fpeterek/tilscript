@@ -122,8 +122,6 @@ class TypeChecker private constructor(
             val processed = execute(cons)
 
             if (expType !is Unknown && expType != processed.constructedType) {
-                println(processed)
-                println(repo["alkoholik"])
                 throw RuntimeException("Function argument type mismatch. " +
                         "Expected '${expType}', Got '${processed.constructedType}'")
             }
@@ -154,7 +152,11 @@ class TypeChecker private constructor(
 
         val vars = variables.map {
 
-            val typed = it.assignType(lambdaBoundType(it.name))
+            val typed = when (it.constructedType) {
+                !is Unknown -> it
+                else -> it.assignType(lambdaBoundType(it.name))
+            }
+
             if (typed.constructedType is Unknown) {
                 throw RuntimeException("Undefined lambda bound variable '${typed.name}'")
             }
@@ -169,7 +171,7 @@ class TypeChecker private constructor(
             .assignType()
     }
 
-    private fun processFunction(function: TilFunction) = findSymbolType(function.name).let { type ->
+    private fun assignFnType(function: TilFunction) = findSymbolType(function.name).let { type ->
 
         if (type !is FunctionType) {
             throw RuntimeException("${function.name} is not a function")
@@ -178,8 +180,15 @@ class TypeChecker private constructor(
         function.assignType(type)
     }
 
-    private fun processLiteral(literal: Literal) =
-        literal.assignType(findSymbolType(literal.value))
+    private fun processFunction(fn: TilFunction) = when (fn.constructedType) {
+        !is Unknown -> fn
+        else -> assignFnType(fn)
+    }
+
+    private fun processLiteral(literal: Literal) = when (literal.constructedType) {
+        !is Unknown -> literal
+        else -> literal.assignType(findSymbolType(literal.value))
+    }
 
     fun process(construction: Construction): Construction = when (construction) {
         is Closure -> processClosure(construction)

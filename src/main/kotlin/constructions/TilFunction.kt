@@ -10,7 +10,7 @@ import org.fpeterek.til.typechecking.types.Unknown
 class TilFunction(
     val name: String,
     type: Type = Unknown,
-) : Construction(constructedType=type, constructionType=type),
+) : Construction(constructedType=type, constructionType=ConstructionType(order=1)),
     NonExecutable {
 
     override fun toString() = name
