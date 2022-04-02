@@ -1,19 +1,40 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'antlr'
     id 'java'
 }
 
 group 'org.fpeterek.til'
 version '1.0'
 
+sourceCompatibility = 1.8
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+
+    antlr 'org.antlr:antlr4:4.9.3'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+compileKotlin {
+    dependsOn(generateGrammarSource)
+}
+
+sourceSets {
+    main {
+        java {
+            //srcDir generateGrammarSource.outputDirectory
+        }
+        kotlin {
+            srcDir generateGrammarSource.outputDirectory
+        }
+    }
 }
 
 test {
