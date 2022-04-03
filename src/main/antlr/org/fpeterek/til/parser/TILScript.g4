@@ -24,7 +24,7 @@ construction : (trivialization | variable | closure | nExecution | composition) 
 globalVarDef : variableName (COMMA variableName) ARROW dataType;
 
 
-dataType : (builtinType | listType | tupleType | userType | enclosedDataType) '@tw'?;
+dataType : (builtinType | listType | tupleType | userType | compoundType) '@tw'?;
 
 builtinType : 'Bool'
             | 'Indiv'
@@ -43,7 +43,7 @@ tupleType : 'Tuple' OPEN_PAR dataType CLOSE_PAR;
 
 userType : typeName;
 
-enclosedDataType : OPEN_PAR dataType (WS dataType)* CLOSE_PAR;
+compoundType : OPEN_PAR dataType (WS dataType)* CLOSE_PAR;
 
 variable : variableName;
 

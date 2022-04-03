@@ -7,8 +7,8 @@ import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.util.Util.compose
 import org.fpeterek.til.typechecking.util.Util.extensionalize
 import org.fpeterek.til.typechecking.util.Util.trivialize
-import org.fpeterek.til.typechecking.constructions.*
 import org.fpeterek.til.typechecking.namechecker.NameChecker
+import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
 import org.fpeterek.til.typechecking.util.SymbolRepository
 import org.fpeterek.til.typechecking.types.AtomicType
@@ -21,7 +21,6 @@ fun main() {
     val stream = CharStreams.fromString("TestString")
 
     val lexer = TILScriptLexer(stream)
-    val tokenStream = CommonTokenStream(lexer)
     val parser = TILScriptParser(CommonTokenStream(lexer))
 
 

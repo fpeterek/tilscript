@@ -1,9 +1,9 @@
 package org.fpeterek.til.typechecking.util
 
-import org.fpeterek.til.typechecking.constructions.Construction
-import org.fpeterek.til.typechecking.constructions.Literal
-import org.fpeterek.til.typechecking.constructions.TilFunction
-import org.fpeterek.til.typechecking.constructions.Variable
+import org.fpeterek.til.typechecking.sentence.Construction
+import org.fpeterek.til.typechecking.sentence.Literal
+import org.fpeterek.til.typechecking.sentence.TilFunction
+import org.fpeterek.til.typechecking.sentence.Variable
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 

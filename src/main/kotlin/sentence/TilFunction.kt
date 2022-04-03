@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.constructions
+package org.fpeterek.til.typechecking.sentence
 
-import org.fpeterek.til.typechecking.constructions.isexecutable.NonExecutable
+import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type

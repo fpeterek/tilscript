@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.constructions
+package org.fpeterek.til.typechecking.sentence
 
-import org.fpeterek.til.typechecking.constructions.isexecutable.Executable
+import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
@@ -14,7 +14,7 @@ class Closure(
 ) : Construction(constructedType, constructionType), Executable {
 
     val functionType = when {
-        construction !is Composition                       -> Unknown
+        construction !is Composition -> Unknown
         construction.constructedType == Unknown            -> Unknown
         variables.any { it.constructedType == Unknown }    -> Unknown
 

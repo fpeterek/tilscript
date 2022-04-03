@@ -1,7 +1,6 @@
 package org.fpeterek.til.typechecking.typechecker
 
-import org.fpeterek.til.typechecking.constructions.*
-import org.fpeterek.til.typechecking.types.ConstructionType
+import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
