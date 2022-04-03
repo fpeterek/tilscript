@@ -1,6 +1,8 @@
 package org.fpeterek.til.typechecking
 
-import org.antlr.runtime.ANTLRInputStream
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.CharStreams
+import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.util.Util.compose
 import org.fpeterek.til.typechecking.util.Util.extensionalize
@@ -16,9 +18,11 @@ import org.fpeterek.til.typechecking.util.Util.intensionalize
 
 
 fun main() {
-    val stream = ANTLRInputStream("TestString".byteInputStream())
+    val stream = CharStreams.fromString("TestString")
 
-    val parser = TILScriptParser(stream)
+    val lexer = TILScriptLexer(stream)
+    val tokenStream = CommonTokenStream(lexer)
+    val parser = TILScriptParser(CommonTokenStream(lexer))
 
 
     val milda = Literal("Milda", AtomicType.Iota)

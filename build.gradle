@@ -28,9 +28,6 @@ compileKotlin {
 
 sourceSets {
     main {
-        java {
-            //srcDir generateGrammarSource.outputDirectory
-        }
         kotlin {
             srcDir generateGrammarSource.outputDirectory
         }
