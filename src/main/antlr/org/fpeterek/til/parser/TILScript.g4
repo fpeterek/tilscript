@@ -19,12 +19,12 @@ typeDefinition : 'TypeDef' WS typeName ASSIGNTYPE dataType;
 
 entityDefinition : entityName (COMMA entityName)* SLASH dataType;
 
-construction : (trivialization | variable | closure | nExecution | composition) '@wt'?;
+construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
 globalVarDef : variableName (COMMA variableName) ARROW dataType;
 
 
-dataType : (builtinType | listType | tupleType | userType | compoundType) '@tw'?;
+dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
 builtinType : 'Bool'
             | 'Indiv'
@@ -126,6 +126,9 @@ ASSIGNTYPE : OPT_WS ':=' OPT_WS;
 COMMA: OPT_WS ',' OPT_WS;
 COLON : OPT_WS ':' OPT_WS;
 SLASH: OPT_WS '/' OPT_WS;
+
+WT: '@wt';
+TW: '@tw';
 
 WS : WS_CHARS+ -> skip;
 fragment OPT_WS : WS_CHARS*;
