@@ -18,10 +18,6 @@ class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         return super.visitSentenceContent(ctx)
     }
 
-    override fun visitTerminator(ctx: TILScriptParser.TerminatorContext): IntermediateResult {
-        return super.visitTerminator(ctx)
-    }
-
     override fun visitTypeDefinition(ctx: TILScriptParser.TypeDefinitionContext): IntermediateResult {
         return super.visitTypeDefinition(ctx)
     }
@@ -30,41 +26,66 @@ class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         return super.visitEntityDefinition(ctx)
     }
 
-    override fun visitConstruction(ctx: TILScriptParser.ConstructionContext): IntermediateResult {
-        return super.visitConstruction(ctx)
+    // TODO: Modify all classes which only hold references to Construction
+    //       to store such references as Construction instances rather than
+    //       IntermediateResult instances
+    override fun visitConstruction(ctx: TILScriptParser.ConstructionContext): Construction = when {
+        ctx.variable()       != null -> visitVariable(ctx.variable())
+        ctx.closure()        != null -> visitClosure(ctx.closure())
+        ctx.nExecution()     != null -> visitNExecution(ctx.nExecution())
+        ctx.composition()    != null -> visitComposition(ctx.composition())
+        ctx.trivialization() != null -> visitTrivialization(ctx.trivialization())
+
+        else -> throw RuntimeException("Invalid parser state")
+    }.let {
+        when (ctx.WT()) {
+            null -> it
+            else -> it.extensionalize()
+        }
     }
 
-    override fun visitGlobalVarDef(ctx: TILScriptParser.GlobalVarDefContext): IntermediateResult {
-        return super.visitGlobalVarDef(ctx)
+    override fun visitGlobalVarDef(ctx: TILScriptParser.GlobalVarDefContext) = GlobalVarDef(
+        ctx.variableName().map { visitVariableName(it) },
+        visitDataType(ctx.dataType())
+    )
+
+    // TODO: Modify all classes which only hold references to DataTypes
+    //       to store such references as DataType instances rather than
+    //       IntermediateResult instances
+    override fun visitDataType(ctx: TILScriptParser.DataTypeContext): DataType = when {
+        ctx.builtinType()  != null -> visitBuiltinType(ctx.builtinType())
+        ctx.listType()     != null -> visitListType(ctx.listType())
+        ctx.tupleType()    != null -> visitTupleType(ctx.tupleType())
+        ctx.userType()     != null -> visitUserType(ctx.userType())
+        ctx.compoundType() != null -> visitCompoundType(ctx.compoundType())
+
+        else -> throw RuntimeException("Invalid parser state")
+    }.let {
+        when (ctx.TW()) {
+            null -> it
+            else -> it.intensionalize()
+        }
     }
 
-    override fun visitDataType(ctx: TILScriptParser.DataTypeContext): IntermediateResult {
-        return super.visitDataType(ctx)
-    }
+    override fun visitBuiltinType(ctx: TILScriptParser.BuiltinTypeContext) =
+        DataType.PrimitiveType(TypeName(ctx.text))
 
-    override fun visitBuiltinType(ctx: TILScriptParser.BuiltinTypeContext): IntermediateResult {
-        return super.visitBuiltinType(ctx)
-    }
+    override fun visitListType(ctx: TILScriptParser.ListTypeContext) =
+        DataType.Collection.List(visitDataType(ctx.dataType()))
 
-    override fun visitListType(ctx: TILScriptParser.ListTypeContext): IntermediateResult {
-        return super.visitListType(ctx)
-    }
+    override fun visitTupleType(ctx: TILScriptParser.TupleTypeContext) =
+        DataType.Collection.Tuple(visitDataType(ctx.dataType()))
 
-    override fun visitTupleType(ctx: TILScriptParser.TupleTypeContext): IntermediateResult {
-        return super.visitTupleType(ctx)
-    }
-
-    override fun visitUserType(ctx: TILScriptParser.UserTypeContext): IntermediateResult {
-        return super.visitUserType(ctx)
-    }
+    override fun visitUserType(ctx: TILScriptParser.UserTypeContext) =
+        DataType.PrimitiveType(visitTypeName(ctx.typeName()))
 
     override fun visitCompoundType(ctx: TILScriptParser.CompoundTypeContext) =
-        ClassType(ctx.dataType().map { visitDataType(it) })
+        DataType.ClassType(ctx.dataType().map { visitDataType(it) })
 
     override fun visitVariable(ctx: TILScriptParser.VariableContext) =
-        VarRef(visitVariableName(ctx.variableName()))
+        Construction.VarRef(visitVariableName(ctx.variableName()))
 
-    override fun visitTrivialization(ctx: TILScriptParser.TrivializationContext) = Execution(
+    override fun visitTrivialization(ctx: TILScriptParser.TrivializationContext) = Construction.Execution(
         order=0,
         construction = when {
             ctx.entity() != null -> visitEntity(ctx.entity())
@@ -73,12 +94,12 @@ class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         }
     )
 
-    override fun visitComposition(ctx: TILScriptParser.CompositionContext) = Composition(
+    override fun visitComposition(ctx: TILScriptParser.CompositionContext) = Construction.Composition(
         visitConstruction(ctx.construction(0)),
         ctx.construction().asSequence().drop(1).map { visitConstruction(it) }.toList()
     )
 
-    override fun visitClosure(ctx: TILScriptParser.ClosureContext) = Closure(
+    override fun visitClosure(ctx: TILScriptParser.ClosureContext) = Construction.Closure(
         visitLambdaVariables(ctx.lambdaVariables()),
         visitConstruction(ctx.construction())
     )
@@ -86,17 +107,14 @@ class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     override fun visitLambdaVariables(ctx: TILScriptParser.LambdaVariablesContext) =
         visitTypedVariables(ctx.typedVariables())
 
-    override fun visitNExecution(ctx: TILScriptParser.NExecutionContext): Execution {
-        val order = ctx.EXEC().text.drop(1).takeWhile { it.isDigit() }.toInt()
-
-        val construction = when {
+    override fun visitNExecution(ctx: TILScriptParser.NExecutionContext) = Construction.Execution(
+        order=ctx.EXEC().text.drop(1).takeWhile { it.isDigit() }.toInt(),
+        construction=when {
             ctx.entity() != null -> visitEntity(ctx.entity())
             ctx.construction() != null -> visitConstruction(ctx.construction())
             else -> throw RuntimeException("Invalid parser state")
         }
-
-        return Execution(order, construction)
-    }
+    )
 
     override fun visitTypedVariables(ctx: TILScriptParser.TypedVariablesContext) =
         TypedVars(ctx.typedVariable().map(::visitTypedVariable))
