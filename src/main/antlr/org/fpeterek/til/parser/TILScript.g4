@@ -130,7 +130,7 @@ SLASH: OPT_WS '/' OPT_WS;
 WT: '@wt';
 TW: '@tw';
 
-WS : WS_CHARS+ -> skip;
+WS : WS_CHARS+;
 fragment OPT_WS : WS_CHARS*;
 
 WS_CHARS : ('\r' | '\n' | '\t' | ' ');

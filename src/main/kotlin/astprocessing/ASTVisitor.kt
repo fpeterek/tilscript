@@ -6,29 +6,31 @@ import org.fpeterek.til.typechecking.astprocessing.result.*
 
 class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
-    override fun visitStart(ctx: TILScriptParser.StartContext): IntermediateResult {
-        return super.visitStart(ctx)
+    override fun visitStart(ctx: TILScriptParser.StartContext) =
+        Sentences(ctx.sentence().map(::visitSentence))
+
+    override fun visitSentence(ctx: TILScriptParser.SentenceContext) =
+        visitSentenceContent(ctx.sentenceContent())
+
+    override fun visitSentenceContent(ctx: TILScriptParser.SentenceContentContext) = when {
+        ctx.construction()     != null -> visitConstruction(ctx.construction())
+        ctx.globalVarDef()     != null -> visitGlobalVarDef(ctx.globalVarDef())
+        ctx.typeDefinition()   != null -> visitTypeDefinition(ctx.typeDefinition())
+        ctx.entityDefinition() != null -> visitEntityDefinition(ctx.entityDefinition())
+
+        else -> throw RuntimeException("Invalid parser state")
     }
 
-    override fun visitSentence(ctx: TILScriptParser.SentenceContext): IntermediateResult {
-        return super.visitSentence(ctx)
-    }
+    override fun visitTypeDefinition(ctx: TILScriptParser.TypeDefinitionContext) = TypeAlias(
+        name=visitTypeName(ctx.typeName()),
+        type=visitDataType(ctx.dataType())
+    )
 
-    override fun visitSentenceContent(ctx: TILScriptParser.SentenceContentContext): IntermediateResult {
-        return super.visitSentenceContent(ctx)
-    }
+    override fun visitEntityDefinition(ctx: TILScriptParser.EntityDefinitionContext) = EntityDef(
+        names=ctx.entityName().map { visitEntityName(it).name },
+        type=visitDataType(ctx.dataType()),
+    )
 
-    override fun visitTypeDefinition(ctx: TILScriptParser.TypeDefinitionContext): IntermediateResult {
-        return super.visitTypeDefinition(ctx)
-    }
-
-    override fun visitEntityDefinition(ctx: TILScriptParser.EntityDefinitionContext): IntermediateResult {
-        return super.visitEntityDefinition(ctx)
-    }
-
-    // TODO: Modify all classes which only hold references to Construction
-    //       to store such references as Construction instances rather than
-    //       IntermediateResult instances
     override fun visitConstruction(ctx: TILScriptParser.ConstructionContext): Construction = when {
         ctx.variable()       != null -> visitVariable(ctx.variable())
         ctx.closure()        != null -> visitClosure(ctx.closure())

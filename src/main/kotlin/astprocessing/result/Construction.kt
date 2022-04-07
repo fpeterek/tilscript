@@ -14,15 +14,15 @@ sealed class Construction : IntermediateResult() {
         constructor(varName: VarName) : this(varName.name)
     }
 
-    class Closure(val vars: List<TypedVar>, val construction: IntermediateResult) :
+    class Closure(val vars: List<TypedVar>, val construction: Construction) :
         Construction() {
-        constructor(vars: TypedVars, construction: IntermediateResult) :
+        constructor(vars: TypedVars, construction: Construction) :
                 this(vars.vars, construction)
     }
 
     class Execution(val order: Int, val construction: IntermediateResult) :
         Construction()
 
-    class Composition(val fn: IntermediateResult, val args: List<IntermediateResult>) :
+    class Composition(val fn: IntermediateResult, val args: List<Construction>) :
         Construction()
 }
