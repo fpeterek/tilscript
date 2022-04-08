@@ -50,11 +50,9 @@ variable : variableName;
 
 trivialization : TRIVIALIZE (construction | entity );
 
-// TODO: Perhaps figure out a way to make WS optional in the following two
-//       constructions
-composition : OPEN_BRA construction (WS construction)+ CLOSE_BRA;
+composition : OPEN_BRA construction (construction | (WS construction))+ CLOSE_BRA;
 
-closure : OPEN_BRA lambdaVariables WS construction CLOSE_BRA;
+closure : OPEN_BRA lambdaVariables (construction | (WS construction)) CLOSE_BRA;
 
 lambdaVariables : LAMBDA typedVariables;
 
