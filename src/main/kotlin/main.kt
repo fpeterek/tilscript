@@ -26,6 +26,7 @@ fun main() {
     val parser = TILScriptParser(CommonTokenStream(lexer))
 
     val sentences = ASTVisitor().visit(parser.start())
+    sentences.hashCode()
 
 
     val milda = Literal("Milda", AtomicType.Iota)

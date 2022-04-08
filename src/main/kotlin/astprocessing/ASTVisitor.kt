@@ -154,8 +154,6 @@ class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
     override fun visitKeyword(ctx: TILScriptParser.KeywordContext) = Symbol(ctx.text)
 
-    override fun visitAny(ctx: TILScriptParser.AnyContext) = Symbol(ctx.text)
-
     override fun visitSymbol(ctx: TILScriptParser.SymbolContext) = Symbol(ctx.text)
 
     override fun visitNumber(ctx: TILScriptParser.NumberContext) = Numeric(ctx.text)

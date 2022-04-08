@@ -17,16 +17,17 @@ terminator : TERMINATOR;
 
 typeDefinition : 'TypeDef' WS typeName ASSIGNTYPE dataType;
 
-entityDefinition : entityName (COMMA entityName)* SLASH dataType;
+entityDefinition : entityName (COMMA entityName)* FS dataType;
 
 construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
-globalVarDef : variableName (COMMA variableName) ARROW dataType;
+globalVarDef : variableName (COMMA variableName)* ARROW dataType;
 
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
-builtinType : 'Bool'
+builtinType : BUILTIN_TYPE | ASTERISK;
+/*builtinType : 'Bool'
             | 'Indiv'
             | 'Time'
             | 'String'
@@ -34,7 +35,7 @@ builtinType : 'Bool'
             | 'Real'
             | 'Int'
             | any
-            | '*';
+            | '*';*/
 
 listType : 'List' OPEN_PAR dataType CLOSE_PAR;
 
@@ -93,25 +94,37 @@ keyword : 'ForAll'
         | 'UndefP'
         | 'ToInt';
 
-any : 'Any' DIGIT*;
 
-symbol : SYMBOLS;
+symbol : SYMBOLS | ASTERISK | FS;
 
-number : DIGIT DIGIT*
-       | DIGIT DIGIT* '.' DIGIT DIGIT*;
+number : NUMBER;
 
-ucname : UPPERCASE (LOWERCASE | UPPERCASE | '_' | DIGIT)*;
-lcname : LOWERCASE (LOWERCASE | UPPERCASE | '_' | DIGIT)*;
+NUMBER : DIGIT DIGIT*
+        | DIGIT DIGIT* '.' DIGIT DIGIT*;
 
-DIGIT : (ZERO | NONZERO);
+ucname : UCNAME;
+lcname : LCNAME;
+
+UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
+LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
+
+DIGIT : [0-9];
 ZERO : '0';
 NONZERO : [1-9];
 
-LOWERCASE : [a-zěščřýáďéíňóúůťž];
 
-UPPERCASE : [A-ZĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ];
+BUILTIN_TYPE : 'Bool'
+             | 'Indiv'
+             | 'Time'
+             | 'String'
+             | 'World'
+             | 'Real'
+             | 'Int'
+             | ANY;
 
-SYMBOLS : ('+' | '-' | '*' | '/' | '=');
+SYMBOLS : ('+' | '-' | '=');
+
+ANY : 'Any' DIGIT*;
 
 EXEC : '^' NONZERO OPT_WS;
 LAMBDA : '\\' OPT_WS;
@@ -119,16 +132,17 @@ TRIVIALIZE : '\'' OPT_WS;
 OPEN_BRA : '[' OPT_WS;
 CLOSE_BRA : OPT_WS ']';
 OPEN_PAR : OPT_WS '(' OPT_WS;
-CLOSE_PAR : OPT_WS ')';
+CLOSE_PAR : OPT_WS ')' OPT_WS;
 ARROW : OPT_WS '->' OPT_WS;
 TERMINATOR : OPT_WS '.' OPT_WS;
 ASSIGNTYPE : OPT_WS ':=' OPT_WS;
 COMMA: OPT_WS ',' OPT_WS;
 COLON : OPT_WS ':' OPT_WS;
-SLASH: OPT_WS '/' OPT_WS;
+FS : OPT_WS '/' OPT_WS;
+ASTERISK : '*';
 
-WT: '@wt';
-TW: '@tw';
+WT: OPT_WS '@wt';
+TW: OPT_WS '@tw';
 
 WS : WS_CHARS+;
 fragment OPT_WS : WS_CHARS*;

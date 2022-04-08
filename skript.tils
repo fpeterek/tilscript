@@ -3,9 +3,9 @@ Tilman/Indiv.
 Seek / ( Bool Indiv *) @tw.  
 Lastdec/(Int Real).
 Pi/Real.
-[\w: World [\t:Time['Seek@wt 'Tilman '['Lastdec 'Pi]]]].
+[\w: World [\t:Time ['Seek@wt 'Tilman '['Lastdec 'Pi]]]].
 DruhaMocnina/(Int Int).
-[\y:Int[\x:Int['+ y  x]]].
+[\y:Int [\x:Int ['+ y  x]]].
 ['DruhaMocnina '2].
 
 
