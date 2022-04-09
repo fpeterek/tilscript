@@ -23,6 +23,6 @@ sealed class Construction : IntermediateResult() {
     class Execution(val order: Int, val construction: IntermediateResult) :
         Construction()
 
-    class Composition(val fn: IntermediateResult, val args: List<Construction>) :
+    class Composition(val fn: Construction, val args: List<Construction>) :
         Construction()
 }

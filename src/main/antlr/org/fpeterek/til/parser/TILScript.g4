@@ -27,15 +27,6 @@ globalVarDef : variableName (COMMA variableName)* ARROW dataType;
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
 builtinType : BUILTIN_TYPE | ASTERISK;
-/*builtinType : 'Bool'
-            | 'Indiv'
-            | 'Time'
-            | 'String'
-            | 'World'
-            | 'Real'
-            | 'Int'
-            | any
-            | '*';*/
 
 listType : 'List' OPEN_PAR dataType CLOSE_PAR;
 

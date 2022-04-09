@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.CharStreams
 import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
-import org.fpeterek.til.typechecking.astprocessing.ASTVisitor
+import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
 import org.fpeterek.til.typechecking.util.Util.compose
 import org.fpeterek.til.typechecking.util.Util.extensionalize
 import org.fpeterek.til.typechecking.util.Util.trivialize
@@ -16,7 +16,6 @@ import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.util.CommonTypes
 import org.fpeterek.til.typechecking.util.Util.intensionalize
-import java.io.File
 
 
 fun main() {
@@ -25,7 +24,7 @@ fun main() {
     val lexer = TILScriptLexer(stream)
     val parser = TILScriptParser(CommonTokenStream(lexer))
 
-    val sentences = ASTVisitor().visit(parser.start())
+    val sentences = AntlrVisitor.visit(parser.start())
     sentences.hashCode()
 
 

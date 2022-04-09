@@ -4,7 +4,7 @@ import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.result.*
 
-class ASTVisitor : TILScriptBaseVisitor<IntermediateResult>() {
+object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
     override fun visitStart(ctx: TILScriptParser.StartContext) =
         Sentences(ctx.sentence().map(::visitSentence))
