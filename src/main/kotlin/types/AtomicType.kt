@@ -19,10 +19,10 @@ class AtomicType private constructor(
             types[type.shortName] = type
         }
 
-        val Omicron = AtomicType(GreekAlphabet.omicron, "Omicron", "Truth values")
-        val Iota = AtomicType(GreekAlphabet.iota, "Iota", "Individuals")
-        val Tau = AtomicType(GreekAlphabet.tau, "Tau", "Real numbers/timestamps")
-        val Omega = AtomicType(GreekAlphabet.omega, "Omega", "Worlds")
+        val Omicron = AtomicType(GreekAlphabet.omicron, "Bool", "Truth values")
+        val Iota = AtomicType(GreekAlphabet.iota, "Indiv", "Individuals")
+        val Tau = AtomicType(GreekAlphabet.tau, "Real", "Real numbers/timestamps")
+        val Omega = AtomicType(GreekAlphabet.omega, "World", "Worlds")
         val Nu = AtomicType(GreekAlphabet.nu, "Nu", "Whole numbers")
 
         operator fun invoke(shortName: String, name: String, description: String): AtomicType =
