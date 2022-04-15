@@ -5,9 +5,9 @@ sealed class DataType : IntermediateResult() {
     fun intensionalize() = ClassType(listOf(
         ClassType(listOf(
             this,
-            TypeName("Time")
+            PrimitiveType(TypeName("Time"))
         )),
-        TypeName("World")
+        PrimitiveType(TypeName("World"))
     ))
 
     sealed class Collection(val type: DataType) : DataType() {
@@ -16,5 +16,5 @@ sealed class DataType : IntermediateResult() {
     }
 
     class PrimitiveType(val typeName: TypeName) : DataType()
-    class ClassType(val signature: List<IntermediateResult>) : DataType()
+    class ClassType(val signature: List<DataType>) : DataType()
 }

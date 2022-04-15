@@ -6,6 +6,8 @@ import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.TypeRepository
+import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
 import org.fpeterek.til.typechecking.sentence.Construction as TilConstruction
 import org.fpeterek.til.typechecking.sentence.Execution as TilExecution
 import org.fpeterek.til.typechecking.sentence.Composition as TilComposition
@@ -22,6 +24,8 @@ class ASTConverter private constructor() {
 
     private val lits = mutableSetOf<String>()
     private val fns = mutableSetOf<String>()
+
+    private val repo = TypeRepository()
 
     private fun convert(sentences: Sentences) {
         sentences.sentences.map(::convertSentence)
@@ -59,7 +63,13 @@ class ASTConverter private constructor() {
     }
 
     private fun convertTypeAlias(typeAlias: TypeAlias) =
-        TypeDefinition(typeAlias.name, convertDataType(typeAlias.type))
+        TypeDefinition(
+            TilTypeAlias(
+                shortName="",
+                name=typeAlias.name,
+                type=convertDataType(typeAlias.type)
+            ).let { repo.process(it) }
+        )
 
     private fun convertClosure(closure: Closure): TilClosure = TilClosure(
         variables=closure.vars.map(::convertTypedVar),
@@ -68,8 +78,7 @@ class ASTConverter private constructor() {
 
     private fun convertTypedVar(typedVar: TypedVar) = TilVariable(
         typedVar.name,
-        // TODO: Type resolution
-        //typedVar.type
+        repo[typedVar.name] ?: throw RuntimeException("Unknown type: ${typedVar.name}")
     )
 
     private fun convertComposition(composition: Composition) = TilComposition(
@@ -107,8 +116,18 @@ class ASTConverter private constructor() {
         }
     }
 
-    private fun convertVarRef(varRef: VarRef): TilVariable = TODO()
+    private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name)
 
-    private fun convertDataType(type: DataType): Type = TODO()
+    // TODO: Finish type conversion
+    private fun convertDataType(type: DataType): Type = when (type) {
+        is DataType.ClassType -> convertFnType(type)
+        is DataType.Collection.List -> TODO()
+        is DataType.Collection.Tuple -> TODO()
+        is DataType.PrimitiveType -> TODO()
+    }
+
+    private fun convertFnType(classType: DataType.ClassType) = FunctionType(
+        classType.signature.map { convertDataType(it) }
+    )
 
 }

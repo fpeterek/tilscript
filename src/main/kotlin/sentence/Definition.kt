@@ -1,6 +1,7 @@
 package org.fpeterek.til.typechecking.sentence
 
 import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.typechecking.types.TypeAlias
 
 
 sealed class Definition : Sentence()
@@ -11,8 +12,7 @@ class LiteralDefinition(
 ) : Definition()
 
 class TypeDefinition(
-    val alias: String,
-    val type: Type,
+    val alias: TypeAlias
 ) : Definition()
 
 class VariableDefinition(

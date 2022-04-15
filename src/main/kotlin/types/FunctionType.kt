@@ -19,13 +19,10 @@ class FunctionType(
         }
     }
 
-    override val order
-        get() = argTypes.maxOfOrNull { it.order } ?: 1
-
     private val Type.isKnown
-        get() = when (imageType) {
-            is FunctionType -> imageType.fullyTyped
-            else -> imageType !is Unknown
+        get() = when (this) {
+            is FunctionType -> this.fullyTyped
+            else -> this !is Unknown
         }
 
     private val imgTypeIsKnown
