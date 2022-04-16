@@ -1,10 +1,19 @@
 package org.fpeterek.til.typechecking.astprocessing
 
+import org.antlr.v4.runtime.tree.ParseTree
 import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.result.*
 
 object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
+
+    private fun invalidState(): Nothing = throw RuntimeException("Invalid parser state")
+
+    override fun visit(tree: ParseTree?) = when (tree) {
+        null -> invalidState()
+        !is TILScriptParser.StartContext -> invalidState()
+        else -> visitStart(tree)
+    }
 
     override fun visitStart(ctx: TILScriptParser.StartContext) =
         Sentences(ctx.sentence().map(::visitSentence))
@@ -18,7 +27,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         ctx.typeDefinition()   != null -> visitTypeDefinition(ctx.typeDefinition())
         ctx.entityDefinition() != null -> visitEntityDefinition(ctx.entityDefinition())
 
-        else -> throw RuntimeException("Invalid parser state")
+        else -> invalidState()
     }
 
     override fun visitTypeDefinition(ctx: TILScriptParser.TypeDefinitionContext) = TypeAlias(
@@ -38,7 +47,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         ctx.composition()    != null -> visitComposition(ctx.composition())
         ctx.trivialization() != null -> visitTrivialization(ctx.trivialization())
 
-        else -> throw RuntimeException("Invalid parser state")
+        else -> invalidState()
     }.let {
         when (ctx.WT()) {
             null -> it
@@ -61,7 +70,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         ctx.userType()     != null -> visitUserType(ctx.userType())
         ctx.compoundType() != null -> visitCompoundType(ctx.compoundType())
 
-        else -> throw RuntimeException("Invalid parser state")
+        else -> invalidState()
     }.let {
         when (ctx.TW()) {
             null -> it
@@ -92,7 +101,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         construction = when {
             ctx.entity() != null -> visitEntity(ctx.entity())
             ctx.construction() != null -> visitConstruction(ctx.construction())
-            else -> throw RuntimeException("Invalid parser state")
+            else -> invalidState()
         }
     )
 
@@ -114,7 +123,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         construction=when {
             ctx.entity() != null -> visitEntity(ctx.entity())
             ctx.construction() != null -> visitConstruction(ctx.construction())
-            else -> throw RuntimeException("Invalid parser state")
+            else -> invalidState()
         }
     )
 
@@ -139,7 +148,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
             ctx.keyword() != null -> visitKeyword(ctx.keyword())
             ctx.number() != null -> visitNumber(ctx.number())
             ctx.symbol() != null -> visitSymbol(ctx.symbol())
-            else -> throw RuntimeException("Parser error: All entity children are null.")
+            else -> invalidState()
         }
     )
 

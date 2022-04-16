@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.CharStreams
 import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
+import org.fpeterek.til.typechecking.astprocessing.ASTConverter
 import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
 import org.fpeterek.til.typechecking.util.Util.compose
 import org.fpeterek.til.typechecking.util.Util.extensionalize
@@ -25,8 +26,12 @@ fun main() {
     val parser = TILScriptParser(CommonTokenStream(lexer))
 
     val sentences = AntlrVisitor.visit(parser.start())
-    sentences.hashCode()
 
+    val script = ASTConverter.convert(sentences)
+
+    script.sentences.forEach(::println)
+
+    repeat(3) { println() }
 
     val milda = Literal("Milda", AtomicType.Iota)
     val varW = Variable("w", AtomicType.Omega)

@@ -15,6 +15,9 @@ sealed class DataType : IntermediateResult() {
         class List(type: DataType) : Collection(type)
     }
 
-    class PrimitiveType(val typeName: TypeName) : DataType()
+    class PrimitiveType(val typeName: TypeName) : DataType() {
+        val name get() = typeName.name
+    }
+
     class ClassType(val signature: List<DataType>) : DataType()
 }

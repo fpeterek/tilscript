@@ -14,9 +14,9 @@ class Closure(
 ) : Construction(constructedType, constructionType), Executable {
 
     val functionType = when {
-        construction !is Composition -> Unknown
-        construction.constructedType == Unknown            -> Unknown
-        variables.any { it.constructedType == Unknown }    -> Unknown
+        construction !is Composition                    -> Unknown
+        construction.constructedType == Unknown         -> Unknown
+        variables.any { it.constructedType == Unknown } -> Unknown
 
         else -> FunctionType(construction.constructedType, variables.map { it.constructedType })
     }

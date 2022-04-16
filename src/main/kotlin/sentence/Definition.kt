@@ -9,13 +9,25 @@ sealed class Definition : Sentence()
 class LiteralDefinition(
     val names: List<String>,
     val type: Type,
-) : Definition()
+) : Definition() {
+
+    override fun toString() = "${names.joinToString(separator=", ")}/$type"
+
+}
 
 class TypeDefinition(
     val alias: TypeAlias
-) : Definition()
+) : Definition() {
+
+    override fun toString() = "${alias.shortName} := ${alias.type}"
+
+}
 
 class VariableDefinition(
     val variables: List<String>,
     val type: Type,
-) : Definition()
+) : Definition() {
+
+    override fun toString() = "${variables.joinToString(separator=", ")} -> $type"
+
+}

@@ -7,10 +7,3 @@ Pi/Real.
 DruhaMocnina/(Int Int).
 [\y:Int[\x:Int['+ y  x]]].
 ['DruhaMocnina '2].
-
-
-
- 
-
-
-

@@ -67,5 +67,5 @@ class FunctionType(
         other != null && other is FunctionType && other.imageType == this.imageType &&
                 other.argTypes == this.argTypes
 
-    override fun toString() = "(" + imageType + argTypes.joinToString() + ")"
+    override fun toString() = "($imageType${argTypes.joinToString(separator="")})"
 }

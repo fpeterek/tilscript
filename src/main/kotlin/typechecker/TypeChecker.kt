@@ -7,7 +7,6 @@ import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SymbolRepository
-import org.fpeterek.til.typechecking.util.Util.incrementOrder
 import org.fpeterek.til.typechecking.util.Util.trivialize
 
 class TypeChecker private constructor(
@@ -87,7 +86,7 @@ class TypeChecker private constructor(
             Execution(
                 processedConstruction,
                 2,
-                constructionType=processedConstruction.constructionType.incrementOrder())
+                constructionType=ConstructionType)
         }
     }
 
@@ -137,15 +136,7 @@ class TypeChecker private constructor(
 
         val processedArgs = processCompositionArgs(args, fnArgs)
 
-        val argsMaxType = processedArgs.maxByOrNull { it.constructionType.order }?.constructionType
-
-        val consType = when {
-            argsMaxType == null -> fn.constructionType
-            argsMaxType.order > fn.constructionType.order -> argsMaxType
-            else -> fn.constructionType
-        }
-
-        Composition(fn, processedArgs, fnType.imageType, consType)
+        Composition(fn, processedArgs, fnType.imageType)
     }
 
     private fun processClosure(closure: Closure) = with(closure) {

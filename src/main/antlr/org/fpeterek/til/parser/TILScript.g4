@@ -23,7 +23,6 @@ construction : (trivialization | variable | closure | nExecution | composition) 
 
 globalVarDef : variableName (COMMA variableName)* ARROW dataType;
 
-
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
 builtinType : BUILTIN_TYPE | ASTERISK;
@@ -31,7 +30,6 @@ builtinType : BUILTIN_TYPE | ASTERISK;
 listType : 'List' OPEN_PAR dataType CLOSE_PAR;
 
 tupleType : 'Tuple' OPEN_PAR dataType CLOSE_PAR;
-
 
 userType : typeName;
 
@@ -88,17 +86,17 @@ symbol : SYMBOLS | ASTERISK | FS;
 
 number : NUMBER;
 
-NUMBER : DIGIT DIGIT*
-        | DIGIT DIGIT* '.' DIGIT DIGIT*;
-
 ucname : UCNAME;
 lcname : LCNAME;
+
+NUMBER : DIGIT DIGIT*
+       | DIGIT DIGIT* '.' DIGIT DIGIT*;
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 
-DIGIT : [0-9];
-ZERO : '0';
+DIGIT   : [0-9];
+ZERO    : '0';
 NONZERO : [1-9];
 
 
@@ -115,25 +113,25 @@ SYMBOLS : ('+' | '-' | '=');
 
 ANY : 'Any' DIGIT*;
 
-EXEC : '^' NONZERO OPT_WS;
-LAMBDA : '\\' OPT_WS;
+EXEC       : '^' NONZERO OPT_WS;
+LAMBDA     : '\\' OPT_WS;
 TRIVIALIZE : '\'' OPT_WS;
-OPEN_BRA : '[' OPT_WS;
-CLOSE_BRA : OPT_WS ']';
-OPEN_PAR : OPT_WS '(' OPT_WS;
-CLOSE_PAR : OPT_WS ')' OPT_WS;
-ARROW : OPT_WS '->' OPT_WS;
+OPEN_BRA   : '[' OPT_WS;
+CLOSE_BRA  : OPT_WS ']';
+OPEN_PAR   : OPT_WS '(' OPT_WS;
+CLOSE_PAR  : OPT_WS ')' OPT_WS;
+ARROW      : OPT_WS '->' OPT_WS;
 TERMINATOR : OPT_WS '.' OPT_WS;
 ASSIGNTYPE : OPT_WS ':=' OPT_WS;
-COMMA: OPT_WS ',' OPT_WS;
-COLON : OPT_WS ':' OPT_WS;
-FS : OPT_WS '/' OPT_WS;
-ASTERISK : '*';
+COMMA      : OPT_WS ',' OPT_WS;
+COLON      : OPT_WS ':' OPT_WS;
+FS         : OPT_WS '/' OPT_WS;
+ASTERISK   : '*';
 
-WT: OPT_WS '@wt';
-TW: OPT_WS '@tw';
+WT : OPT_WS '@wt';
+TW : OPT_WS '@tw';
 
-WS : WS_CHARS+;
+WS              : WS_CHARS+;
 fragment OPT_WS : WS_CHARS*;
 
 WS_CHARS : ('\r' | '\n' | '\t' | ' ');

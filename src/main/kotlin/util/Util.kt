@@ -11,8 +11,6 @@ object Util {
     val w = Variable("w", AtomicType.Omega)
     val t = Variable("t", AtomicType.Tau)
 
-    fun Type.incrementOrder() = ConstructionType(order+1)
-
     fun FunctionType.intensionalize() =
         FunctionType(FunctionType(this, AtomicType.Tau), AtomicType.Omega)
 
@@ -26,7 +24,7 @@ object Util {
         Trivialization(
             construction=this,
             constructedType=this.constructionType,
-            constructionType=this.constructionType.incrementOrder(),
+            constructionType=ConstructionType
         )
 
     fun Composition.extensionalize(w: Construction, t: Construction) =

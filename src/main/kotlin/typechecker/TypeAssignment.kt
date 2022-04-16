@@ -1,10 +1,10 @@
 package org.fpeterek.til.typechecking.typechecker
 
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
-import org.fpeterek.til.typechecking.util.Util.incrementOrder
 
 object TypeAssignment {
 
@@ -12,16 +12,16 @@ object TypeAssignment {
     /* Compositions and closures retain order                   */
 
     fun Variable.assignType(type: Type) =
-        Variable(this.name, type, type.incrementOrder())
+        Variable(this.name, type)
 
     fun Trivialization.assignType(type: Type) = Trivialization(
         construction=construction,
         constructedType=type,
-        constructionType=construction.constructionType.incrementOrder()
+        constructionType=ConstructionType
     )
 
     fun Execution.assignType() =
-        Execution(construction, executionOrder, construction.constructionType.incrementOrder())
+        Execution(construction, executionOrder, ConstructionType)
 
     fun Closure.assignType() = Closure(
         variables,
@@ -31,7 +31,7 @@ object TypeAssignment {
     )
 
     private fun Closure.performAssignment(vars: List<Type>) = Closure(
-        variables.zip(vars).map { (orig, type) -> Variable(orig.name, type, orig.constructionType) },
+        variables.zip(vars).map { (orig, type) -> Variable(orig.name, type) },
         construction,
         Unknown,
         constructionType
@@ -45,7 +45,7 @@ object TypeAssignment {
 
 
     fun Composition.assignType(type: Type) = Composition(
-        function, args, type, constructionType
+        function, args, type
     )
 
     fun Literal.assignType(type: Type) = Literal(value, type)

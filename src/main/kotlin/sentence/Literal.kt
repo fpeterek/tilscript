@@ -9,7 +9,7 @@ import org.fpeterek.til.typechecking.types.Unknown
 class Literal(
     val value: String,
     type: Type = Unknown
-) : Construction(constructedType=type, constructionType=ConstructionType(order=1)), NonExecutable {
+) : Construction(constructedType=type, constructionType=ConstructionType), NonExecutable {
 
     init {
         when (type) {

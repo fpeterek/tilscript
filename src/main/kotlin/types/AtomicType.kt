@@ -2,33 +2,23 @@ package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
 
-class AtomicType private constructor(
+class AtomicType(
     val shortName: String,
     val name: String,
     val description: String = "",
 ) : Type() {
 
     companion object {
-
-        private val types = mutableMapOf<String, AtomicType>()
-
-        private fun addType(type: AtomicType) {
-            if (type.shortName in types) {
-                throw RuntimeException("Type '${type.shortName}' already exists")
-            }
-            types[type.shortName] = type
-        }
-
         val Omicron = AtomicType(GreekAlphabet.omicron, "Bool", "Truth values")
         val Iota = AtomicType(GreekAlphabet.iota, "Indiv", "Individuals")
-        val Tau = AtomicType(GreekAlphabet.tau, "Real", "Real numbers/timestamps")
+        val Tau = AtomicType(GreekAlphabet.tau, "Time", "Timestamps")
         val Omega = AtomicType(GreekAlphabet.omega, "World", "Worlds")
-        val Nu = AtomicType(GreekAlphabet.nu, "Nu", "Whole numbers")
+        val Eta = AtomicType(GreekAlphabet.eta, "Real", "Real numbers")
+        val Nu = AtomicType(GreekAlphabet.nu, "Int", "Whole numbers")
 
-        operator fun invoke(shortName: String, name: String, description: String): AtomicType =
-            AtomicType(shortName, name, description).apply {
-                addType(this)
-            }
+        val defaultTypes = listOf(
+            Omicron, Iota, Tau, Omega, Eta, Nu
+        )
     }
 
     override fun equals(other: Any?) = other != null && other is AtomicType &&

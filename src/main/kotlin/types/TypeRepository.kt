@@ -12,7 +12,6 @@ class TypeRepository {
             'd' to GreekAlphabet.delta,
             'e' to GreekAlphabet.epsilon,
             'z' to GreekAlphabet.zeta,
-            'h' to GreekAlphabet.eta,
             't' to GreekAlphabet.theta,
             'k' to GreekAlphabet.kappa,
             'm' to GreekAlphabet.mu,
@@ -32,11 +31,7 @@ class TypeRepository {
     private val types = mutableMapOf<String, Type>()
 
     init {
-        addType(AtomicType.Nu)
-        addType(AtomicType.Iota)
-        addType(AtomicType.Tau)
-        addType(AtomicType.Omega)
-        addType(AtomicType.Omicron)
+        AtomicType.defaultTypes.forEach(::addType)
     }
 
     private fun addType(type: AtomicType) {
@@ -78,18 +73,20 @@ class TypeRepository {
 
     fun process(type: AtomicType) = when {
         type.shortName.isNotBlank() -> type
+        type.name in types -> types[type.name]!! as AtomicType
         else -> storeAtomic(type)
     }
 
     fun process(alias: TypeAlias) = when {
         alias.shortName.isNotBlank() -> alias
+        alias.name in types -> types[alias.name]!! as TypeAlias
         else -> storeAlias(alias)
     }
 
     fun process(type: Type) = when (type) {
-        is Unknown, is FunctionType, is ConstructionType -> type
         is TypeAlias -> process(type)
         is AtomicType -> process(type)
+        else -> type
     }
 
     operator fun get(name: String) = types[name]

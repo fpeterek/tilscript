@@ -3,10 +3,8 @@ package org.fpeterek.til.typechecking.astprocessing
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.types.AtomicType
-import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.TypeRepository
+import org.fpeterek.til.typechecking.tilscript.ScriptContext
+import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
 import org.fpeterek.til.typechecking.sentence.Construction as TilConstruction
 import org.fpeterek.til.typechecking.sentence.Execution as TilExecution
@@ -27,9 +25,10 @@ class ASTConverter private constructor() {
 
     private val repo = TypeRepository()
 
-    private fun convert(sentences: Sentences) {
-        sentences.sentences.map(::convertSentence)
-    }
+    private fun convert(sentences: Sentences) = ScriptContext(
+        sentences=sentences.sentences.map(::convertSentence),
+        types=repo,
+    )
 
     private fun convertSentence(sentence: IntermediateResult) = when (sentence) {
         is Construction -> convertConstruction(sentence)
@@ -48,7 +47,7 @@ class ASTConverter private constructor() {
     }
 
     private fun convertGlobalVarDef(def: GlobalVarDef) = VariableDefinition(
-        def.vars.map { it.toString() },
+        def.vars.map { it.name },
         convertDataType(def.type)
     )
 
@@ -62,14 +61,13 @@ class ASTConverter private constructor() {
         }
     }
 
-    private fun convertTypeAlias(typeAlias: TypeAlias) =
-        TypeDefinition(
-            TilTypeAlias(
-                shortName="",
-                name=typeAlias.name,
-                type=convertDataType(typeAlias.type)
-            ).let { repo.process(it) }
-        )
+    private fun processTypeAlias(typeAlias: TypeAlias) = TilTypeAlias(
+        shortName="",
+        name=typeAlias.name,
+        type=convertDataType(typeAlias.type)
+    ).let { repo.process(it) }
+
+    private fun convertTypeAlias(typeAlias: TypeAlias) = TypeDefinition(processTypeAlias(typeAlias))
 
     private fun convertClosure(closure: Closure): TilClosure = TilClosure(
         variables=closure.vars.map(::convertTypedVar),
@@ -78,7 +76,7 @@ class ASTConverter private constructor() {
 
     private fun convertTypedVar(typedVar: TypedVar) = TilVariable(
         typedVar.name,
-        repo[typedVar.name] ?: throw RuntimeException("Unknown type: ${typedVar.name}")
+        repo[typedVar.type] ?: throw RuntimeException("Unknown type: ${typedVar.name}")
     )
 
     private fun convertComposition(composition: Composition) = TilComposition(
@@ -118,13 +116,41 @@ class ASTConverter private constructor() {
 
     private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name)
 
-    // TODO: Finish type conversion
     private fun convertDataType(type: DataType): Type = when (type) {
         is DataType.ClassType -> convertFnType(type)
-        is DataType.Collection.List -> TODO()
-        is DataType.Collection.Tuple -> TODO()
-        is DataType.PrimitiveType -> TODO()
+        is DataType.Collection.List -> convertList(type)
+        is DataType.Collection.Tuple -> convertTuple(type)
+        is DataType.PrimitiveType -> convertPrimitiveType(type)
     }
+
+    private fun convertList(list: DataType.Collection.List) =
+        TilList(convertDataType(list.type))
+
+    private fun convertTuple(tuple: DataType.Collection.Tuple) =
+        TilTuple(convertDataType(tuple.type))
+
+    // The original grammar grouped Any type among built-in primitives
+    // This approach is fine from a grammar perspective, I, however, do not like
+    // it from a programming perspective, and thus a slight change of grammar
+    // may be desirable if I ever find the time
+    private fun convertPrimitiveType(type: DataType.PrimitiveType) = when {
+        type.isGenericType -> convertGenericType(type)
+        // The following case handles aliases as well as already processed atomics
+        type.name == "*" -> ConstructionType
+        type.name in repo -> repo[type.name]!!
+        else -> convertAtomicType(type)
+    }
+
+    private fun convertAtomicType(type: DataType.PrimitiveType) = AtomicType(shortName="", name=type.name)
+        .apply { repo.process(this) }
+
+    private val DataType.PrimitiveType.isGenericType
+        get() = name.startsWith("Any") &&
+                    name.asSequence().drop(3).all { it.isDigit() }
+
+    private fun convertGenericType(type: DataType.PrimitiveType) = GenericType(
+        type.name.drop(3).toInt()
+    )
 
     private fun convertFnType(classType: DataType.ClassType) = FunctionType(
         classType.signature.map { convertDataType(it) }

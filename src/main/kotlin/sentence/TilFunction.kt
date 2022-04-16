@@ -10,7 +10,7 @@ import org.fpeterek.til.typechecking.types.Unknown
 class TilFunction(
     val name: String,
     type: Type = Unknown,
-) : Construction(constructedType=type, constructionType=ConstructionType(order=1)),
+) : Construction(constructedType=type, constructionType=ConstructionType),
     NonExecutable {
 
     override fun toString() = name
@@ -19,9 +19,8 @@ class TilFunction(
         get() = constructedType is FunctionType && constructedType.fullyTyped
 
     init {
-        when (type) {
-            is Unknown, is FunctionType -> Unit
-            else -> throw RuntimeException("Type of TilFunction must be Unknown or FunctionType")
+        if (type !is Unknown && type !is FunctionType) {
+            throw RuntimeException("Type of TilFunction must be Unknown or FunctionType")
         }
     }
 
