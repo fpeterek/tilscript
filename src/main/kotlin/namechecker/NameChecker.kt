@@ -1,7 +1,7 @@
 package org.fpeterek.til.typechecking.namechecker
 
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.util.SymbolRepository
+import org.fpeterek.til.typechecking.types.SymbolRepository
 
 class NameChecker private constructor(
     private val symbolRepository: SymbolRepository,

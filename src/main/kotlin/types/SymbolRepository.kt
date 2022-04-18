@@ -1,11 +1,9 @@
-package org.fpeterek.til.typechecking.util
+package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.sentence.Variable
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.Unknown
 
 class SymbolRepository(vararg symbols: Construction) {
 
@@ -35,6 +33,8 @@ class SymbolRepository(vararg symbols: Construction) {
         is Literal -> add(construction)
         else -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
     }
+
+    fun addAll(constructions: Iterable<Construction>) = constructions.forEach(::add)
 
     operator fun contains(name: String) = name in types
 

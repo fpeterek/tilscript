@@ -1,10 +1,6 @@
-package org.fpeterek.til.typechecking.util
+package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.types.AtomicType
-import org.fpeterek.til.typechecking.types.ConstructionType
-import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.Type
 
 object Util {
 

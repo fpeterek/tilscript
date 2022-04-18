@@ -2,26 +2,32 @@ package org.fpeterek.til.typechecking.typechecker
 
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
-import org.fpeterek.til.typechecking.types.ConstructionType
-import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.Unknown
-import org.fpeterek.til.typechecking.util.SymbolRepository
-import org.fpeterek.til.typechecking.util.Util.trivialize
+import org.fpeterek.til.typechecking.types.*
+import org.fpeterek.til.typechecking.types.SymbolRepository
+import org.fpeterek.til.typechecking.types.Util.trivialize
 
 class TypeChecker private constructor(
     private val parent: TypeChecker?,
     private val repo: SymbolRepository = SymbolRepository(),
     private val lambdaBound: SymbolRepository = SymbolRepository(),
+    private val typeRepo: TypeRepository = TypeRepository(),
 ) {
 
     companion object {
         fun process(construction: Construction, symbolRepository: SymbolRepository,
-                    lambdaBound: SymbolRepository) =
-            TypeChecker(null, symbolRepository, lambdaBound).process(construction)
+                    lambdaBound: SymbolRepository, typeRepo: TypeRepository = TypeRepository()
+        ) =
+            TypeChecker(null, symbolRepository, lambdaBound, typeRepo).processConstruction(construction)
 
-        private fun process(construction: Construction, parent: TypeChecker) =
-            TypeChecker(parent, lambdaBound=parent.lambdaBound).process(construction)
+        private fun process(construction: Construction, parent: TypeChecker, typeRepo: TypeRepository) =
+            TypeChecker(parent, lambdaBound=parent.lambdaBound, typeRepo=typeRepo).processConstruction(construction)
+
+        fun process(
+            sentences: Iterable<Sentence>,
+            symbolRepository: SymbolRepository = SymbolRepository(),
+            lambdaBound: SymbolRepository = SymbolRepository(),
+            typeRepo: TypeRepository = TypeRepository(),
+        ) = TypeChecker(null, symbolRepository, lambdaBound, typeRepo).process(sentences)
     }
 
     // Search in local repo first
@@ -36,14 +42,18 @@ class TypeChecker private constructor(
     private val outermostRepo: SymbolRepository
         get() = parent?.outermostRepo ?: repo
 
+    private val typeMatcher = TypeMatcher(typeRepo)
+
+    private fun match(l: Type, r: Type) = typeMatcher.match(l, r)
+
     private fun processTrivialization(trivialization: Trivialization): Trivialization {
 
         val processed = when (trivialization.construction) {
-            is TilFunction, is Literal -> process(trivialization.construction, this)
+            is TilFunction, is Literal -> process(trivialization.construction, this, typeRepo)
 
             // Binding by trivialization -> variables from outer scopes
             // are inaccessible
-            else -> process(trivialization.construction, outermostRepo, lambdaBound)
+            else -> process(trivialization.construction, outermostRepo, lambdaBound, typeRepo)
         }.trivialize()
 
         // We use constructedType to store the type of literals and functions
@@ -54,11 +64,11 @@ class TypeChecker private constructor(
         val type = when (trivialization.construction) {
             is Literal, is TilFunction -> trivialization.construction.constructedType
 
-            // Otherwise, trivialization constructs a construction of a certain order
-            else -> trivialization.construction.constructionType
+            // Otherwise, trivialization constructs a construction
+            else -> ConstructionType
         }
 
-        return processed.assignType(type)
+        return processed.assignType(typeRepo.process(type))
     }
 
     private fun processVariable(variable: Variable) =
@@ -70,7 +80,7 @@ class TypeChecker private constructor(
             throw RuntimeException("Only compositions can be executed")
         }
 
-        val processedConstruction = process(construction)
+        val processedConstruction = processConstruction(construction)
         val firstExecution = Execution(processedConstruction, executionOrder).assignType()
 
         if (executionOrder == 1) {
@@ -93,10 +103,10 @@ class TypeChecker private constructor(
     private fun execute(construction: Construction) = when (construction) {
         is Literal -> throw RuntimeException("Literals cannot be executed.")
         is TilFunction -> throw RuntimeException("Functions cannot be executed.")
-        else -> process(construction)
+        else -> processConstruction(construction)
     }
 
-    private fun processCompositionFn(fn: Construction) = process(fn).let { processed ->
+    private fun processCompositionFn(fn: Construction) = processConstruction(fn).let { processed ->
         when {
             processed is TilFunction ->
                 throw RuntimeException(
@@ -108,19 +118,16 @@ class TypeChecker private constructor(
         processed
     }
 
-    private fun storeVarType(variable: Variable) {
-        if (variable.name in repo) {
-            repo.add(variable)
-        } else {
-            parent?.storeVarType(variable)
-        }
+    private fun storeVarType(variable: Variable): Unit = when (variable.name) {
+        in repo -> repo.add(variable)
+        else -> parent?.storeVarType(variable) ?: Unit
     }
 
     private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) =
         args.zip(expected).map { (cons, expType) ->
             val processed = execute(cons)
 
-            if (expType !is Unknown && expType != processed.constructedType) {
+            if (expType !is Unknown && match(expType, processed.constructedType)) {
                 throw RuntimeException("Function argument type mismatch. " +
                         "Expected '${expType}', Got '${processed.constructedType}'")
             }
@@ -131,7 +138,7 @@ class TypeChecker private constructor(
     private fun processComposition(composition: Composition) = with(composition) {
 
         val fn = processCompositionFn(function)
-        val fnType = fn.constructedType as FunctionType
+        val fnType = typeRepo.process(fn.constructedType as FunctionType)
         val fnArgs = fnType.argTypes
 
         val processedArgs = processCompositionArgs(args, fnArgs)
@@ -145,7 +152,7 @@ class TypeChecker private constructor(
 
             val typed = when (it.constructedType) {
                 !is Unknown -> it
-                else -> it.assignType(lambdaBoundType(it.name))
+                else -> it.assignType(typeRepo.process(lambdaBoundType(it.name)))
             }
 
             if (typed.constructedType is Unknown) {
@@ -156,7 +163,7 @@ class TypeChecker private constructor(
             typed
         }
 
-        val abstracted = process(construction, this@TypeChecker)
+        val abstracted = process(construction, this@TypeChecker, typeRepo)
 
         Closure(vars, abstracted, constructionType=abstracted.constructionType)
             .assignType()
@@ -181,7 +188,7 @@ class TypeChecker private constructor(
         else -> literal.assignType(findSymbolType(literal.value))
     }
 
-    fun process(construction: Construction): Construction = when (construction) {
+    private fun processConstruction(construction: Construction): Construction = when (construction) {
         is Closure -> processClosure(construction)
         is Composition -> processComposition(construction)
         is Trivialization -> processTrivialization(construction)
@@ -190,5 +197,50 @@ class TypeChecker private constructor(
         is TilFunction -> processFunction(construction)
         is Literal -> processLiteral(construction)
     }
+
+    private fun addLiteral(lit: Literal) = Literal(
+        lit.value,
+        typeRepo.process(lit.constructedType),
+    ).apply {
+        repo.add(this)
+    }
+
+    private fun processSingleDef(lit: Literal) = when (lit.value) {
+        in repo -> throw RuntimeException("Redefinition of symbol '${lit.value}'")
+        else -> addLiteral(lit)
+    }
+
+    private fun processLiteralDefinition(def: LiteralDefinition) = def.apply {
+        def.literals.forEach(::processSingleDef)
+    }
+
+    private fun processTypeDefinition(def: TypeDefinition) = def.apply {
+        when (alias.name) {
+            in typeRepo -> throw RuntimeException("Redefinition of type '${def.alias.name}'")
+            else -> typeRepo.process(def.alias)
+        }
+    }
+
+    private fun processSingleDef(variable: Variable) = when (variable.name) {
+        in repo -> throw RuntimeException("Redefinition of symbol '${variable.name}'")
+        else -> repo.add(variable)
+    }
+
+    private fun processVariableDefinition(def: VariableDefinition) = def.apply {
+        def.variables.forEach(::processSingleDef)
+    }
+
+    private fun processDefinition(definition: Definition): Definition = when (definition) {
+        is LiteralDefinition -> processLiteralDefinition(definition)
+        is TypeDefinition -> processTypeDefinition(definition)
+        is VariableDefinition -> processVariableDefinition(definition)
+    }
+
+    private fun process(sentence: Sentence): Sentence = when (sentence) {
+        is Definition -> processDefinition(sentence)
+        is Construction -> processConstruction(sentence)
+    }
+
+    fun process(sentences: Iterable<Sentence>): List<Sentence> = sentences.map(::process)
 
 }

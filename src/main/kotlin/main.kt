@@ -6,17 +6,17 @@ import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.ASTConverter
 import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
-import org.fpeterek.til.typechecking.util.Util.compose
-import org.fpeterek.til.typechecking.util.Util.extensionalize
-import org.fpeterek.til.typechecking.util.Util.trivialize
+import org.fpeterek.til.typechecking.types.Util.compose
+import org.fpeterek.til.typechecking.types.Util.extensionalize
+import org.fpeterek.til.typechecking.types.Util.trivialize
 import org.fpeterek.til.typechecking.namechecker.NameChecker
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
-import org.fpeterek.til.typechecking.util.SymbolRepository
+import org.fpeterek.til.typechecking.types.SymbolRepository
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.util.CommonTypes
-import org.fpeterek.til.typechecking.util.Util.intensionalize
+import org.fpeterek.til.typechecking.types.CommonTypes
+import org.fpeterek.til.typechecking.types.Util.intensionalize
 
 
 fun main() {
@@ -30,6 +30,8 @@ fun main() {
     val script = ASTConverter.convert(sentences)
 
     script.sentences.forEach(::println)
+
+    TypeChecker.process(script.sentences)
 
     repeat(3) { println() }
 

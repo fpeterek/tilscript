@@ -72,16 +72,21 @@ class TypeRepository {
     ).apply(::addAlias)
 
     fun process(type: AtomicType) = when {
+        type.shortName.isNotBlank() && type.shortName !in types -> type.apply(::addType)
         type.shortName.isNotBlank() -> type
-        type.name in types -> types[type.name]!! as AtomicType
         else -> storeAtomic(type)
     }
 
     fun process(alias: TypeAlias) = when {
+        alias.shortName.isNotBlank() && alias.shortName !in types -> alias.apply(::addAlias)
         alias.shortName.isNotBlank() -> alias
-        alias.name in types -> types[alias.name]!! as TypeAlias
         else -> storeAlias(alias)
     }
+
+    fun process(functionType: FunctionType): FunctionType = FunctionType(
+        process(functionType.imageType),
+        functionType.argTypes.map(::process)
+    )
 
     fun process(type: Type) = when (type) {
         is TypeAlias -> process(type)

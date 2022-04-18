@@ -6,28 +6,30 @@ import org.fpeterek.til.typechecking.types.TypeAlias
 
 sealed class Definition : Sentence()
 
-class LiteralDefinition(
-    val names: List<String>,
-    val type: Type,
-) : Definition() {
+class LiteralDefinition(val literals: List<Literal>) : Definition() {
+
+    val type
+        get() = literals.first().constructedType
+    val names
+        get() = literals.asSequence().map { it.value }
+
+    constructor(names: List<String>, type: Type) : this(names.map { Literal(it, type) })
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
-
 }
 
-class TypeDefinition(
-    val alias: TypeAlias
-) : Definition() {
-
+class TypeDefinition(val alias: TypeAlias) : Definition() {
     override fun toString() = "${alias.shortName} := ${alias.type}"
-
 }
 
-class VariableDefinition(
-    val variables: List<String>,
-    val type: Type,
-) : Definition() {
+class VariableDefinition(val variables: List<Variable>) : Definition() {
 
-    override fun toString() = "${variables.joinToString(separator=", ")} -> $type"
+    val type
+        get() = variables.first().constructedType
+    val names
+        get() = variables.asSequence().map { it.name }
 
+    constructor(variables: List<String>, type: Type) : this(variables.map { Variable(it, type) })
+
+    override fun toString() = "${names.joinToString(separator=", ")} -> $type"
 }
