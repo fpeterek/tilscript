@@ -3,8 +3,8 @@ package org.fpeterek.til.typechecking.types
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
 
 class AtomicType(
-    val shortName: String,
-    val name: String,
+    override val shortName: String,
+    override val name: String,
     val description: String = "",
 ) : Type() {
 

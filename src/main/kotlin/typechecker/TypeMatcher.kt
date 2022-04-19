@@ -14,29 +14,35 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     private fun matchTuples(l: TilTuple, r: TilTuple) = match(l.type, r.type)
     private fun matchLists(l: TilList, r: TilList) = match(l.type, r.type)
 
-    private fun matchGenerics(l: GenericType, r: Type): Boolean {
-        val exp = generics.getOrPut(l.name) { r }
-        return match(r, exp)
-    }
+    private fun matchGenerics(l: GenericType, r: Type) = match(r, generics.getOrPut(l.name) { r })
 
-    // TODO: Continue
+    private fun matchFunctions(l: FunctionType, r: FunctionType) =
+        l.arity == r.arity &&
+            l.signature
+                .zip(r.signature)
+                .all { (left, right) -> match(left, right) }
+
+    private fun matchAtomics(l: AtomicType, r: AtomicType) = l.name == r.name
+
+    private fun matchAlias(alias: TypeAlias, other: Type) = match(alias.type, other)
 
     private fun matchInternal(l: Type, r: Type) = when (l) {
-        is AtomicType -> TODO()
-        ConstructionType -> true
-        is FunctionType -> TODO()
-        is GenericType -> throw RuntimeException("Error: Invalid state")
+        is AtomicType -> matchAtomics(l, r as AtomicType)
+        is FunctionType -> matchFunctions(l, r as FunctionType)
         is TilList -> matchLists(l, r as TilList)
         is TilTuple -> matchTuples(l, r as TilTuple)
-        is TypeAlias -> TODO()
-        Unknown -> true
+
+        ConstructionType, Unknown -> true
+
+        is GenericType, is TypeAlias -> throw RuntimeException("Error: Invalid state")
     }
 
     fun match(l: Type, r: Type): Boolean = when {
-        l.javaClass != r.javaClass -> false
-        l is GenericType && r is GenericType -> l.argNumber == r.argNumber
         l is GenericType -> matchGenerics(l, r)
         r is GenericType -> matchGenerics(r, l)
+        l is TypeAlias -> matchAlias(l, r)
+        r is TypeAlias -> matchAlias(r, l)
+        l.javaClass != r.javaClass -> false
         else -> matchInternal(l, r)
     }
 

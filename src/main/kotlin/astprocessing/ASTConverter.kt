@@ -33,7 +33,7 @@ class ASTConverter private constructor() {
     private fun convertSentence(sentence: IntermediateResult) = when (sentence) {
         is Construction -> convertConstruction(sentence)
         is GlobalVarDef -> convertGlobalVarDef(sentence)
-        is EntityDef    -> convertLiteralDef(sentence)
+        is EntityDef    -> convertEntityDef(sentence)
         is TypeAlias    -> convertTypeAlias(sentence)
 
         else -> throw RuntimeException("Invalid parser state")
@@ -51,13 +51,16 @@ class ASTConverter private constructor() {
         convertDataType(def.type)
     )
 
-    private fun convertLiteralDef(entityDef: EntityDef) = LiteralDefinition(
-        entityDef.names,
-        convertDataType(entityDef.type)
-    ).apply {
-        when (type) {
-            is FunctionType -> fns.addAll(names)
-            else -> lits.addAll(names)
+    private fun convertEntityDef(entityDef: EntityDef) = convertDataType(entityDef.type).let { type ->
+        when {
+            type is FunctionType || repo.isFunction(type.name) -> FunctionDefinition(entityDef.names, type)
+            else -> LiteralDefinition(entityDef.names, type)
+        }
+    }.apply {
+        when (this) {
+            is FunctionDefinition -> fns.addAll(names)
+            is LiteralDefinition -> lits.addAll(names)
+            else -> throw RuntimeException("Invalid state")
         }
     }
 

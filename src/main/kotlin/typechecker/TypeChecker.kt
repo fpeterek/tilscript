@@ -42,9 +42,7 @@ class TypeChecker private constructor(
     private val outermostRepo: SymbolRepository
         get() = parent?.outermostRepo ?: repo
 
-    private val typeMatcher = TypeMatcher(typeRepo)
-
-    private fun match(l: Type, r: Type) = typeMatcher.match(l, r)
+    private fun match(l: Type, r: Type) = TypeMatcher.match(l, r, typeRepo)
 
     private fun processTrivialization(trivialization: Trivialization): Trivialization {
 
@@ -230,10 +228,20 @@ class TypeChecker private constructor(
         def.variables.forEach(::processSingleDef)
     }
 
+    private fun processSingleDef(fn: TilFunction) = when (fn.name) {
+        in repo -> throw RuntimeException("Redefinition of symbol '${fn.name}'")
+        else -> repo.add(fn)
+    }
+
+    private fun processFunctionDefinition(def: FunctionDefinition) = def.apply {
+        def.functions.forEach(::processSingleDef)
+    }
+
     private fun processDefinition(definition: Definition): Definition = when (definition) {
         is LiteralDefinition -> processLiteralDefinition(definition)
         is TypeDefinition -> processTypeDefinition(definition)
         is VariableDefinition -> processVariableDefinition(definition)
+        is FunctionDefinition -> processFunctionDefinition(definition)
     }
 
     private fun process(sentence: Sentence): Sentence = when (sentence) {

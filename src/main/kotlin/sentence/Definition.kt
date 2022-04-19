@@ -33,3 +33,17 @@ class VariableDefinition(val variables: List<Variable>) : Definition() {
 
     override fun toString() = "${names.joinToString(separator=", ")} -> $type"
 }
+
+class FunctionDefinition(val functions: List<TilFunction>) : Definition() {
+
+    val type
+        get() = functions.first().constructedType
+
+    val names
+        get() = functions.asSequence().map { it.name }
+
+    constructor(fns: List<String>, type: Type) : this(fns.map { TilFunction(it, type) })
+
+    override fun toString() = "${names.joinToString(separator=", ")}/$type"
+
+}

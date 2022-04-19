@@ -19,11 +19,20 @@ class FunctionType(
         }
     }
 
+    override val name
+        get() = "(${imageType.name}${argTypes.joinToString(separator="") { it.name }})"
+                
+    override val shortName
+        get() = "(${imageType.shortName}${argTypes.joinToString(separator="") { it.shortName }})"
+
     private val Type.isKnown
         get() = when (this) {
             is FunctionType -> this.fullyTyped
             else -> this !is Unknown
         }
+
+    val signature: List<Type>
+        get() = listOf(imageType) + argTypes
 
     private val imgTypeIsKnown
         get() = imageType.isKnown
@@ -67,5 +76,5 @@ class FunctionType(
         other != null && other is FunctionType && other.imageType == this.imageType &&
                 other.argTypes == this.argTypes
 
-    override fun toString() = "($imageType${argTypes.joinToString(separator="")})"
+    override fun toString() = shortName
 }

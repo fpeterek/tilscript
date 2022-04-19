@@ -4,10 +4,10 @@ import org.fpeterek.til.typechecking.greek.GreekAlphabet
 
 class GenericType(val argNumber: Int) : Type() {
 
-    val name
+    override val name
         get() = "Any$argNumber"
 
-    val shortName
+    override val shortName
         get() = "${GreekAlphabet.alpha}$argNumber"
 
     override fun toString() = shortName

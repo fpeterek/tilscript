@@ -97,4 +97,18 @@ class TypeRepository {
     operator fun get(name: String) = types[name]
     operator fun contains(name: String) = name in types
 
+    fun isFunction(name: String): Boolean = when (types[name]) {
+        null -> false
+        is FunctionType -> true
+        is TypeAlias -> isFunction((types[name]!! as TypeAlias).name)
+        else -> false
+    }
+
+    fun isAtomic(name: String): Boolean = when (types[name]) {
+        null -> false
+        is AtomicType -> true
+        is TypeAlias -> isAtomic((types[name]!! as TypeAlias).name)
+        else -> false
+    }
+
 }
