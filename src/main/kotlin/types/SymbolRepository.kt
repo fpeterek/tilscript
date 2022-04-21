@@ -11,6 +11,7 @@ class SymbolRepository(vararg symbols: Construction) {
 
     init {
         symbols.forEach(::add)
+        TilFunction.builtins.forEach(::add)
     }
 
     fun add(name: String, type: Type) {

@@ -59,8 +59,8 @@ class TypeChecker private constructor(
         // construct anything
         // To clarify, functions must be applied onto (zero or more) arguments using compositions,
         // to construct anything
-        val type = when (trivialization.construction) {
-            is Literal, is TilFunction -> trivialization.construction.constructedType
+        val type = when (processed.construction) {
+            is Literal, is TilFunction -> processed.construction.constructedType
 
             // Otherwise, trivialization constructs a construction
             else -> ConstructionType
@@ -109,8 +109,11 @@ class TypeChecker private constructor(
             processed is TilFunction ->
                 throw RuntimeException(
                     "Functions cannot be executed, did you forget a trivialization ('${processed.name})?")
-            processed.constructedType !is FunctionType ->
+            processed.constructedType !is FunctionType -> {
+                println(processed)
+                println("Recieved: ${processed.constructedType}")
                 throw RuntimeException("Only functions can be applied on arguments using a composition")
+            }
         }
 
         processed
@@ -125,7 +128,7 @@ class TypeChecker private constructor(
         args.zip(expected).map { (cons, expType) ->
             val processed = execute(cons)
 
-            if (expType !is Unknown && match(expType, processed.constructedType)) {
+            if (expType !is Unknown && !match(expType, processed.constructedType)) {
                 throw RuntimeException("Function argument type mismatch. " +
                         "Expected '${expType}', Got '${processed.constructedType}'")
             }
