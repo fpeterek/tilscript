@@ -14,7 +14,10 @@ class Literal(
     init {
         when (type) {
             is AtomicType, Unknown -> Unit
-            else -> throw RuntimeException("Literal type must be either AtomicType or Unknown")
+            else -> {
+                println(value)
+                throw RuntimeException("Literal type must be either AtomicType or Unknown")
+            }
         }
     }
 

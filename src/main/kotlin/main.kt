@@ -11,11 +11,12 @@ import org.fpeterek.til.typechecking.types.Util.extensionalize
 import org.fpeterek.til.typechecking.types.Util.trivialize
 import org.fpeterek.til.typechecking.namechecker.NameChecker
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
 import org.fpeterek.til.typechecking.types.SymbolRepository
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.CommonTypes
+import org.fpeterek.til.typechecking.tilscript.CommonTypes
 import org.fpeterek.til.typechecking.types.Util.intensionalize
 
 
@@ -35,12 +36,12 @@ fun main() {
 
     repeat(3) { println() }
 
-    val milda = Literal("Milda", AtomicType.Iota)
-    val varW = Variable("w", AtomicType.Omega)
-    val varT = Variable("t", AtomicType.Tau)
-    val alkoholik = Variable("alkoholik", AtomicType.Iota)
+    val milda = Literal("Milda", Builtins.Iota)
+    val varW = Variable("w", Builtins.Omega)
+    val varT = Variable("t", Builtins.Tau)
+    val alkoholik = Variable("alkoholik", Builtins.Iota)
     val presCr = TilFunction("President_CR", CommonTypes.office)
-    val eq = TilFunction("=", FunctionType(AtomicType.Omicron, AtomicType.Iota, AtomicType.Iota))
+    val eq = TilFunction("=", FunctionType(Builtins.Omicron, Builtins.Iota, Builtins.Iota))
 
     val and = TilFunction("and", CommonTypes.binaryOmicron)
     val or = TilFunction("or", CommonTypes.binaryOmicron)
@@ -49,7 +50,7 @@ fun main() {
     val vdana = TilFunction("Vdana", CommonTypes.property)
     val maTitul = TilFunction("MaTitul", CommonTypes.property)
 
-    val varX = Variable("x", type=AtomicType.Iota)
+    val varX = Variable("x", type=Builtins.Iota)
 
     val jePani = Closure(
         listOf(varX),

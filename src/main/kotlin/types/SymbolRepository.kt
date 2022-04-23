@@ -4,6 +4,7 @@ import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.sentence.Variable
+import org.fpeterek.til.typechecking.tilscript.Builtins
 
 class SymbolRepository(vararg symbols: Construction) {
 
@@ -11,7 +12,7 @@ class SymbolRepository(vararg symbols: Construction) {
 
     init {
         symbols.forEach(::add)
-        TilFunction.builtins.forEach(::add)
+        Builtins.builtinFunctions.forEach(::add)
     }
 
     fun add(name: String, type: Type) {
@@ -19,7 +20,7 @@ class SymbolRepository(vararg symbols: Construction) {
 
         when {
             current == null || current is Unknown -> types[name] = type
-            current != type -> throw RuntimeException("Symbol '$name' is already with a different type")
+            current != type -> throw RuntimeException("Symbol '$name' is already defined with a different type")
             else -> Unit
         }
     }

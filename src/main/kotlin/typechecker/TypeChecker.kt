@@ -142,6 +142,7 @@ class TypeChecker private constructor(
         val fnType = typeRepo.process(fn.constructedType as FunctionType)
         val fnArgs = fnType.argTypes
 
+        println(composition)
         val processedArgs = processCompositionArgs(args, fnArgs)
 
         Composition(fn, processedArgs, fnType.imageType)

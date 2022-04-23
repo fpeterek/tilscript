@@ -3,6 +3,7 @@ package org.fpeterek.til.typechecking.astprocessing
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.tilscript.ScriptContext
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
@@ -24,6 +25,10 @@ class ASTConverter private constructor() {
     private val fns = mutableSetOf<String>()
 
     private val repo = TypeRepository()
+
+    init {
+        fns.addAll(Builtins.builtinFunctions.asSequence().map { it.name })
+    }
 
     private fun convert(sentences: Sentences) = ScriptContext(
         sentences=sentences.sentences.map(::convertSentence),
@@ -110,7 +115,7 @@ class ASTConverter private constructor() {
     )
 
     private fun convertEntityRef(entity: Entity): TilConstruction = when (entity) {
-        is Entity.Number -> Literal(entity.value, AtomicType.Tau)
+        is Entity.Number -> Literal(entity.value, Builtins.Eta)
         is Entity.FnOrEntity -> when (entity.value) {
             in fns -> TilFunction(entity.value)
             else -> Literal(entity.value)

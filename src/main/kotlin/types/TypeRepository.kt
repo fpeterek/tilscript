@@ -1,6 +1,7 @@
 package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import kotlin.math.abs
 
 class TypeRepository {
@@ -31,7 +32,7 @@ class TypeRepository {
     private val types = mutableMapOf<String, Type>()
 
     init {
-        AtomicType.defaultTypes.forEach(::addType)
+        Builtins.builtinTypes.forEach(::addType)
     }
 
     private fun addType(type: AtomicType) {

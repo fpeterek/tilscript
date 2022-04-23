@@ -1,17 +1,18 @@
 package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.tilscript.Builtins
 
 object Util {
 
-    val w = Variable("w", AtomicType.Omega)
-    val t = Variable("t", AtomicType.Tau)
+    val w = Variable("w", Builtins.Omega)
+    val t = Variable("t", Builtins.Tau)
 
     fun FunctionType.intensionalize() =
-        FunctionType(FunctionType(this, AtomicType.Tau), AtomicType.Omega)
+        FunctionType(FunctionType(this, Builtins.Tau), Builtins.Omega)
 
     fun AtomicType.intensionalize() =
-        FunctionType(FunctionType(this, AtomicType.Tau), AtomicType.Omega)
+        FunctionType(FunctionType(this, Builtins.Tau), Builtins.Omega)
 
     fun Closure.intensionalize() =
         Closure(listOf(w), Closure(listOf(t), this))
