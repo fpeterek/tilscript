@@ -6,13 +6,21 @@ import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.sentence.Variable
 import org.fpeterek.til.typechecking.tilscript.Builtins
 
-class SymbolRepository(vararg symbols: Construction) {
+
+class SymbolRepository(vararg symbols: Construction, loadBuiltins: Boolean = false) {
+
+    companion object {
+        fun withBuiltins() = SymbolRepository(loadBuiltins=true)
+    }
 
     private val types = mutableMapOf<String, Type>()
 
     init {
         symbols.forEach(::add)
-        Builtins.builtinFunctions.forEach(::add)
+        if (loadBuiltins) {
+            Builtins.builtinFunctions.forEach(::add)
+            Builtins.builtinValues.forEach(::add)
+        }
     }
 
     fun add(name: String, type: Type) {
@@ -20,7 +28,7 @@ class SymbolRepository(vararg symbols: Construction) {
 
         when {
             current == null || current is Unknown -> types[name] = type
-            current != type -> throw RuntimeException("Symbol '$name' is already defined with a different type")
+            type !is Unknown -> throw RuntimeException("Redefinition of symbol '$name'")
             else -> Unit
         }
     }

@@ -4,7 +4,7 @@ import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import kotlin.math.abs
 
-class TypeRepository {
+class TypeRepository(withBuiltins: Boolean = false) {
 
     companion object {
         private val mapping = mapOf(
@@ -25,6 +25,8 @@ class TypeRepository {
             'c' to GreekAlphabet.chi,
             'i' to GreekAlphabet.psi,
         )
+
+        fun withBuiltins() = TypeRepository(withBuiltins=true)
     }
 
     private val counters = mapping.map { Pair(it.key, 0) }.toMap().toMutableMap()
@@ -32,7 +34,9 @@ class TypeRepository {
     private val types = mutableMapOf<String, Type>()
 
     init {
-        Builtins.builtinTypes.forEach(::addType)
+        if (withBuiltins) {
+            Builtins.builtinTypes.forEach(::addType)
+        }
     }
 
     private fun addType(type: AtomicType) {

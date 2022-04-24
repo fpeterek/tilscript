@@ -24,10 +24,11 @@ class ASTConverter private constructor() {
     private val lits = mutableSetOf<String>()
     private val fns = mutableSetOf<String>()
 
-    private val repo = TypeRepository()
+    private val repo = TypeRepository.withBuiltins()
 
     init {
         fns.addAll(Builtins.builtinFunctions.asSequence().map { it.name })
+        lits.addAll(Builtins.builtinValues.asSequence().map { it.value })
     }
 
     private fun convert(sentences: Sentences) = ScriptContext(
@@ -115,11 +116,16 @@ class ASTConverter private constructor() {
     )
 
     private fun convertEntityRef(entity: Entity): TilConstruction = when (entity) {
-        is Entity.Number -> Literal(entity.value, Builtins.Eta)
+        is Entity.Number -> convertNumLiteral(entity)
         is Entity.FnOrEntity -> when (entity.value) {
             in fns -> TilFunction(entity.value)
             else -> Literal(entity.value)
         }
+    }
+
+    private fun convertNumLiteral(entity: Entity.Number) = when {
+        entity.value.all { it.isDigit() } -> Literal(entity.value, Builtins.Nu)
+        else -> Literal(entity.value, Builtins.Eta)
     }
 
     private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name)

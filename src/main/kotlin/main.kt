@@ -14,9 +14,9 @@ import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
 import org.fpeterek.til.typechecking.types.SymbolRepository
-import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.tilscript.CommonTypes
+import org.fpeterek.til.typechecking.types.TypeRepository
 import org.fpeterek.til.typechecking.types.Util.intensionalize
 
 
@@ -32,7 +32,11 @@ fun main() {
 
     script.sentences.forEach(::println)
 
-    TypeChecker.process(script.sentences)
+    TypeChecker.process(
+        script.sentences,
+        symbolRepository = SymbolRepository.withBuiltins(),
+        typeRepo = TypeRepository.withBuiltins()
+    )
 
     repeat(3) { println() }
 
@@ -41,10 +45,10 @@ fun main() {
     val varT = Variable("t", Builtins.Tau)
     val alkoholik = Variable("alkoholik", Builtins.Iota)
     val presCr = TilFunction("President_CR", CommonTypes.office)
-    val eq = TilFunction("=", FunctionType(Builtins.Omicron, Builtins.Iota, Builtins.Iota))
+    val eq = TilFunction("=")
 
-    val and = TilFunction("and", CommonTypes.binaryOmicron)
-    val or = TilFunction("or", CommonTypes.binaryOmicron)
+    val and = TilFunction("And")
+    val or = TilFunction("Or")
 
     val zena = TilFunction("Zena", CommonTypes.property)
     val vdana = TilFunction("Vdana", CommonTypes.property)
@@ -99,6 +103,7 @@ fun main() {
         varW,
         varT,
         alkoholik,
+        loadBuiltins = true
     )
 
     val lambdaBound = SymbolRepository(varW, varT, varX)

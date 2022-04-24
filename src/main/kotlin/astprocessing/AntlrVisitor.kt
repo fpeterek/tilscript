@@ -145,9 +145,9 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     override fun visitEntity(ctx: TILScriptParser.EntityContext) = Entity.from(
         when {
             ctx.entityName() != null -> visitEntityName(ctx.entityName())
-            ctx.keyword() != null    -> visitKeyword(ctx.keyword())
-            ctx.number() != null     -> visitNumber(ctx.number())
-            ctx.symbol() != null     -> visitSymbol(ctx.symbol())
+            ctx.keyword()    != null -> visitKeyword(ctx.keyword())
+            ctx.number()     != null -> visitNumber(ctx.number())
+            ctx.symbol()     != null -> visitSymbol(ctx.symbol())
 
             else -> invalidState()
         }

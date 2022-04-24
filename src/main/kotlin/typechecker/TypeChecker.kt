@@ -1,6 +1,7 @@
 package org.fpeterek.til.typechecking.typechecker
 
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.types.SymbolRepository
@@ -14,10 +15,12 @@ class TypeChecker private constructor(
 ) {
 
     companion object {
-        fun process(construction: Construction, symbolRepository: SymbolRepository,
-                    lambdaBound: SymbolRepository, typeRepo: TypeRepository = TypeRepository()
-        ) =
-            TypeChecker(null, symbolRepository, lambdaBound, typeRepo).processConstruction(construction)
+        fun process(
+            construction: Construction,
+            symbolRepository: SymbolRepository,
+            lambdaBound: SymbolRepository,
+            typeRepo: TypeRepository = TypeRepository()
+        ) = TypeChecker(null, symbolRepository, lambdaBound, typeRepo).processConstruction(construction)
 
         private fun process(construction: Construction, parent: TypeChecker, typeRepo: TypeRepository) =
             TypeChecker(parent, lambdaBound=parent.lambdaBound, typeRepo=typeRepo).processConstruction(construction)
@@ -29,6 +32,8 @@ class TypeChecker private constructor(
             typeRepo: TypeRepository = TypeRepository(),
         ) = TypeChecker(null, symbolRepository, lambdaBound, typeRepo).process(sentences)
     }
+
+    private fun fork() = TypeChecker(this)
 
     // Search in local repo first
     // If symbol is not found, search in parent repo
@@ -110,8 +115,6 @@ class TypeChecker private constructor(
                 throw RuntimeException(
                     "Functions cannot be executed, did you forget a trivialization ('${processed.name})?")
             processed.constructedType !is FunctionType -> {
-                println(processed)
-                println("Recieved: ${processed.constructedType}")
                 throw RuntimeException("Only functions can be applied on arguments using a composition")
             }
         }
@@ -119,36 +122,82 @@ class TypeChecker private constructor(
         processed
     }
 
-    private fun storeVarType(variable: Variable): Unit = when (variable.name) {
-        in repo -> repo.add(variable)
-        else -> parent?.storeVarType(variable) ?: Unit
-    }
+    private fun processOperatorArgs(args: List<Construction>) = when {
+        args.isEmpty() -> throw RuntimeException("No arguments supplied")
 
-    private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) =
-        args.zip(expected).map { (cons, expType) ->
-            val processed = execute(cons)
-
-            if (expType !is Unknown && !match(expType, processed.constructedType)) {
-                throw RuntimeException("Function argument type mismatch. " +
-                        "Expected '${expType}', Got '${processed.constructedType}'")
+        else -> {
+            val isInt = match(execute(args.first()).constructedType, Builtins.Nu)
+            val expType = when {
+                isInt -> Builtins.Nu
+                else -> Builtins.Eta
             }
 
-            processed
+            processCompositionArgs(args, listOf(expType, expType))
+        }
+    }
+
+
+    private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) = when {
+        args.size > expected.size -> throw RuntimeException("Too many arguments (expected ${expected.size}, received ${args.size})")
+        args.size < expected.size -> throw RuntimeException("Too few arguments (expected ${expected.size}, received ${args.size})")
+
+       else -> args.zip(expected).map { (cons, expType) ->
+                val processed = execute(cons)
+
+                if (expType !is Unknown && !match(expType, processed.constructedType)) {
+                    throw RuntimeException(
+                        "Function argument type mismatch. " +
+                                "Expected '${expType}', Got '${processed.constructedType}'"
+                    )
+                }
+
+                processed
+            }
+    }
+
+    private val numericOperator = setOf("+", "-", "*", "/")
+
+    private fun processCompositionWithNumOp(composition: Composition, op: String) = with(composition) {
+
+        val processedArgs = processOperatorArgs(args)
+
+        val isInt = match(processedArgs.first().constructedType, Builtins.Nu)
+        val opType = when {
+            isInt -> Builtins.Nu
+            else -> Builtins.Eta
         }
 
-    private fun processComposition(composition: Composition) = with(composition) {
+        val fn = TilFunction(op, FunctionType(opType, opType, opType))
 
-        val fn = processCompositionFn(function)
+        Composition(fn, processedArgs, opType)
+    }
+
+    private fun processCompositionWithNumOp(composition: Composition, fn: Construction) =
+        processCompositionWithNumOp(composition, ((fn as Trivialization).construction as TilFunction).name)
+
+    private fun processCompositionWithFn(composition: Composition, fn: Construction) = with(composition) {
         val fnType = typeRepo.process(fn.constructedType as FunctionType)
         val fnArgs = fnType.argTypes
 
-        println(composition)
         val processedArgs = processCompositionArgs(args, fnArgs)
 
         Composition(fn, processedArgs, fnType.imageType)
     }
 
-    private fun processClosure(closure: Closure) = with(closure) {
+    private fun processComposition(composition: Composition) = with(composition) {
+
+        val fn = processCompositionFn(function)
+
+        val isNumericOp = fn is Trivialization && fn.construction is TilFunction &&
+                fn.construction.name in numericOperator
+
+        when (isNumericOp) {
+            true  -> processCompositionWithNumOp(composition, fn)
+            false -> processCompositionWithFn(composition, fn)
+        }
+    }
+
+    private fun processClosureForked(closure: Closure) = with(closure) {
 
         val vars = variables.map {
 
@@ -170,6 +219,8 @@ class TypeChecker private constructor(
         Closure(vars, abstracted, constructionType=abstracted.constructionType)
             .assignType()
     }
+
+    private fun processClosure(closure: Closure) = fork().processClosureForked(closure)
 
     private fun assignFnType(function: TilFunction) = findSymbolType(function.name).let { type ->
 

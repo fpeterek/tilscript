@@ -1,6 +1,7 @@
 package org.fpeterek.til.typechecking.tilscript
 
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
+import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
 
@@ -45,9 +46,6 @@ object Builtins {
     private val singularizer
         get() = FunctionType(GenericType(1), FunctionType(Omicron, GenericType(1)))
 
-
-    // TODO: Built-in literals (true/false)
-
     val builtinFunctions = listOf(
         // TODO: Function overloading
         //       Or integer promotion
@@ -56,10 +54,10 @@ object Builtins {
         TilFunction("*", realOperation),
         TilFunction("/", realOperation),
 
-//        TilFunction("+", intOperation),
-//        TilFunction("-", intOperation),
-//        TilFunction("*", intOperation),
-//        TilFunction("/", intOperation),
+        // TilFunction("+", intOperation),
+        // TilFunction("-", intOperation),
+        // TilFunction("*", intOperation),
+        // TilFunction("/", intOperation),
 
         TilFunction("=", equalityComparison),
 
@@ -90,5 +88,10 @@ object Builtins {
         TilFunction("FalseP", propositionTruthiness),
         TilFunction("UndefP", propositionTruthiness),
     )
+
+    val True = Literal("True", Omicron)
+    val False = Literal("False", Omicron)
+
+    val builtinValues = listOf(True, False)
 
 }
