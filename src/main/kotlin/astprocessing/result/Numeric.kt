@@ -1,3 +1,5 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class Numeric(val value: String) : IntermediateResult()
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+class Numeric(val value: String, srcPos: SrcPosition) : IntermediateResult(srcPos)

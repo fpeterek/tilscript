@@ -52,15 +52,19 @@ class ASTConverter private constructor() {
         is VarRef      -> convertVarRef(construction)
     }
 
-    private fun convertGlobalVarDef(def: GlobalVarDef) = VariableDefinition(
-        def.vars.map { it.name },
-        convertDataType(def.type)
-    )
+    private fun convertGlobalVarDef(def: GlobalVarDef) = convertDataType(def.type).let { type ->
+        VariableDefinition(
+            def.vars.map { TilVariable(it.name, it.position, type) },
+            def.position,
+        )
+    }
 
     private fun convertEntityDef(entityDef: EntityDef) = convertDataType(entityDef.type).let { type ->
         when {
-            type is FunctionType || repo.isFunction(type.name) -> FunctionDefinition(entityDef.names, type)
-            else -> LiteralDefinition(entityDef.names, type)
+            type is FunctionType || repo.isFunction(type.name) ->
+                FunctionDefinition(entityDef.names.map { TilFunction(it.name, it.position, type) }, entityDef.position)
+
+            else -> LiteralDefinition(entityDef.names.map { Literal(it.name, it.position, type) }, entityDef.position)
         }
     }.apply {
         when (this) {
@@ -76,21 +80,24 @@ class ASTConverter private constructor() {
         type=convertDataType(typeAlias.type)
     ).let { repo.process(it) }
 
-    private fun convertTypeAlias(typeAlias: TypeAlias) = TypeDefinition(processTypeAlias(typeAlias))
+    private fun convertTypeAlias(typeAlias: TypeAlias) = TypeDefinition(processTypeAlias(typeAlias), typeAlias.position)
 
     private fun convertClosure(closure: Closure): TilClosure = TilClosure(
         variables=closure.vars.map(::convertTypedVar),
-        construction=convertConstruction(closure.construction)
+        construction=convertConstruction(closure.construction),
+        srcPos=closure.position,
     )
 
     private fun convertTypedVar(typedVar: TypedVar) = TilVariable(
         typedVar.name,
-        repo[typedVar.type] ?: throw RuntimeException("Unknown type: ${typedVar.name}")
+        typedVar.position,
+        repo[typedVar.type] ?: throw RuntimeException("Unknown type: ${typedVar.name}"),
     )
 
     private fun convertComposition(composition: Composition) = TilComposition(
         function=convertConstruction(composition.fn),
-        args=composition.args.map(::convertConstruction)
+        args=composition.args.map(::convertConstruction),
+        srcPos=composition.position,
     )
 
     private fun convertExecution(execution: Execution): TilConstruction = when (execution.order) {
@@ -104,7 +111,8 @@ class ASTConverter private constructor() {
             is Construction -> convertConstruction(execution.construction)
             else -> throw RuntimeException("Invalid parser state")
         },
-        executionOrder=execution.order
+        executionOrder=execution.order,
+        srcPos=execution.position,
     )
 
     private fun convertTilTrivialization(execution: Execution) = TilTrivialization(
@@ -112,23 +120,24 @@ class ASTConverter private constructor() {
             is Construction -> convertConstruction(execution.construction)
             is Entity -> convertEntityRef(execution.construction)
             else -> throw RuntimeException("Invalid parser state")
-        }
+        },
+        srcPos=execution.position,
     )
 
     private fun convertEntityRef(entity: Entity): TilConstruction = when (entity) {
         is Entity.Number -> convertNumLiteral(entity)
         is Entity.FnOrEntity -> when (entity.value) {
-            in fns -> TilFunction(entity.value)
-            else -> Literal(entity.value)
+            in fns -> TilFunction(entity.value, entity.position)
+            else -> Literal(entity.value, entity.position)
         }
     }
 
     private fun convertNumLiteral(entity: Entity.Number) = when {
-        entity.value.all { it.isDigit() } -> Literal(entity.value, Builtins.Nu)
-        else -> Literal(entity.value, Builtins.Eta)
+        entity.value.all { it.isDigit() } -> Literal(entity.value, entity.position, Builtins.Nu)
+        else -> Literal(entity.value, entity.position, Builtins.Eta)
     }
 
-    private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name)
+    private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name, varRef.position)
 
     private fun convertDataType(type: DataType): Type = when (type) {
         is DataType.ClassType -> convertFnType(type)

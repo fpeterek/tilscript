@@ -1,7 +1,9 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class EntityName(val name: String) : IntermediateResult() {
+import org.fpeterek.til.typechecking.util.SrcPosition
 
-    constructor(symbol: Symbol) : this(symbol.symbol)
+class EntityName(val name: String, srcPos: SrcPosition) : IntermediateResult(srcPos) {
+
+    constructor(symbol: Symbol) : this(symbol.symbol, symbol.position)
 
 }

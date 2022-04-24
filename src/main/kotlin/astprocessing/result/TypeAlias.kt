@@ -1,5 +1,7 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class TypeAlias(val name: String, val type: DataType) : IntermediateResult() {
-    constructor(name: TypeName, type: DataType) : this(name.name, type)
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+class TypeAlias(val name: String, val type: DataType, srcPos: SrcPosition) : IntermediateResult(srcPos) {
+    constructor(name: TypeName, type: DataType, srcPos: SrcPosition) : this(name.name, type, srcPos)
 }

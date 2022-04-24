@@ -2,11 +2,12 @@ package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.util.SrcPosition
 
 object Util {
 
-    val w = Variable("w", Builtins.Omega)
-    val t = Variable("t", Builtins.Tau)
+    val w = Variable("w", SrcPosition(-1, -1), Builtins.Omega)
+    val t = Variable("t", SrcPosition(-1, -1), Builtins.Tau)
 
     fun FunctionType.intensionalize() =
         FunctionType(FunctionType(this, Builtins.Tau), Builtins.Omega)
@@ -15,13 +16,14 @@ object Util {
         FunctionType(FunctionType(this, Builtins.Tau), Builtins.Omega)
 
     fun Closure.intensionalize() =
-        Closure(listOf(w), Closure(listOf(t), this))
+        Closure(listOf(w), Closure(listOf(t), this, srcPos=position), srcPos=position)
 
     fun <T : Construction> T.trivialize() =
         Trivialization(
             construction=this,
-            constructedType=this.constructionType,
-            constructionType=ConstructionType
+            constructedType=constructionType,
+            constructionType=ConstructionType,
+            srcPos=position
         )
 
     fun Composition.extensionalize(w: Construction, t: Construction) =
@@ -31,7 +33,7 @@ object Util {
         this.trivialize().compose(w).compose(t)
 
     fun Construction.compose(vararg args: Construction) = when (this) {
-        is TilFunction -> Composition(this.trivialize(), args.toList())
-        else -> Composition(this, args.toList())
+        is TilFunction -> Composition(this.trivialize(), args.toList(), position)
+        else -> Composition(this, args.toList(), position)
     }
 }

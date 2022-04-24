@@ -18,6 +18,7 @@ import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.tilscript.CommonTypes
 import org.fpeterek.til.typechecking.types.TypeRepository
 import org.fpeterek.til.typechecking.types.Util.intensionalize
+import org.fpeterek.til.typechecking.util.SrcPosition
 
 
 fun main() {
@@ -40,21 +41,23 @@ fun main() {
 
     repeat(3) { println() }
 
-    val milda = Literal("Milda", Builtins.Iota)
-    val varW = Variable("w", Builtins.Omega)
-    val varT = Variable("t", Builtins.Tau)
-    val alkoholik = Variable("alkoholik", Builtins.Iota)
-    val presCr = TilFunction("President_CR", CommonTypes.office)
-    val eq = TilFunction("=")
+    val noPos = SrcPosition(-1, -1)
 
-    val and = TilFunction("And")
-    val or = TilFunction("Or")
+    val milda = Literal("Milda", noPos, Builtins.Iota)
+    val varW = Variable("w", noPos, Builtins.Omega)
+    val varT = Variable("t", noPos, Builtins.Tau)
+    val alkoholik = Variable("alkoholik", noPos, Builtins.Iota)
+    val presCr = TilFunction("President_CR", noPos, CommonTypes.office)
+    val eq = TilFunction("=", noPos)
 
-    val zena = TilFunction("Zena", CommonTypes.property)
-    val vdana = TilFunction("Vdana", CommonTypes.property)
-    val maTitul = TilFunction("MaTitul", CommonTypes.property)
+    val and = TilFunction("And", noPos)
+    val or = TilFunction("Or", noPos)
 
-    val varX = Variable("x", type=Builtins.Iota)
+    val zena = TilFunction("Zena", noPos, CommonTypes.property)
+    val vdana = TilFunction("Vdana", noPos, CommonTypes.property)
+    val maTitul = TilFunction("MaTitul", noPos, CommonTypes.property)
+
+    val varX = Variable("x", noPos, type=Builtins.Iota)
 
     val jePani = Closure(
         listOf(varX),
@@ -64,8 +67,9 @@ fun main() {
                 vdana.extensionalize(varW, varT).compose(varX),
                 maTitul.extensionalize(varW, varT).compose(varX)
             )
-        )
-    ).intensionalize()
+        ),
+        noPos
+     ).intensionalize()
 
     val emanEqPresident = eq.trivialize().compose(
         presCr.extensionalize(varW, varT),
@@ -80,9 +84,9 @@ fun main() {
         alkoholik//.trivialize(),
     )
 
-    val whale = TilFunction("Whale", CommonTypes.property)
-    val mammal = TilFunction("Mammal", CommonTypes.property)
-    val all = TilFunction("All", CommonTypes.setOfSets)
+    val whale = TilFunction("Whale", noPos, CommonTypes.property)
+    val mammal = TilFunction("Mammal", noPos, CommonTypes.property)
+    val all = TilFunction("All", noPos, CommonTypes.setOfSets)
 
     val mammalWhales = all.trivialize()
         .compose(whale.extensionalize(varW, varT))

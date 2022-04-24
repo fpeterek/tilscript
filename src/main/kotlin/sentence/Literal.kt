@@ -5,11 +5,13 @@ import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Unknown
+import org.fpeterek.til.typechecking.util.SrcPosition
 
 class Literal(
     val value: String,
+    srcPos: SrcPosition,
     type: Type = Unknown
-) : Construction(constructedType=type, constructionType=ConstructionType), NonExecutable {
+) : Construction(constructedType=type, constructionType=ConstructionType, srcPos), NonExecutable {
 
     init {
         when (type) {

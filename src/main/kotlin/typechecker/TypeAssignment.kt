@@ -12,44 +12,24 @@ object TypeAssignment {
     /* Compositions and closures retain order                   */
 
     fun Variable.assignType(type: Type) =
-        Variable(this.name, type)
+        Variable(name, position, type)
 
     fun Trivialization.assignType(type: Type) = Trivialization(
         construction=construction,
         constructedType=type,
-        constructionType=ConstructionType
+        constructionType=ConstructionType,
+        srcPos=position
     )
-
-    fun Execution.assignType() =
-        Execution(construction, executionOrder, ConstructionType)
 
     fun Closure.assignType() = Closure(
         variables,
         construction,
+        position,
         FunctionType(imageType=construction.constructedType, argTypes=variables.map { it.constructedType }),
-        constructionType
     )
 
-    private fun Closure.performAssignment(vars: List<Type>) = Closure(
-        variables.zip(vars).map { (orig, type) -> Variable(orig.name, type) },
-        construction,
-        Unknown,
-        constructionType
-    )
-
-    fun Closure.assignType(vars: List<Type>) = if (vars.size != variables.size) {
-        throw RuntimeException("Function arity mismatch")
-    } else {
-        performAssignment(vars)
-    }
-
-
-    fun Composition.assignType(type: Type) = Composition(
-        function, args, type
-    )
-
-    fun Literal.assignType(type: Type) = Literal(value, type)
+    fun Literal.assignType(type: Type) = Literal(value, position, type)
 
     fun TilFunction.assignType(type: FunctionType) =
-        TilFunction(name, type)
+        TilFunction(name, position, type)
 }

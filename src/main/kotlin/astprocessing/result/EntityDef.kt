@@ -1,3 +1,5 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class EntityDef(val names: List<String>, val type: DataType) : IntermediateResult()
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+class EntityDef(val names: List<EntityName>, val type: DataType, srcPos: SrcPosition) : IntermediateResult(srcPos)

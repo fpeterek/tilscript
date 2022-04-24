@@ -1,3 +1,5 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class Symbol(val symbol: String) : IntermediateResult()
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+class Symbol(val symbol: String, srcPos: SrcPosition) : IntermediateResult(srcPos)

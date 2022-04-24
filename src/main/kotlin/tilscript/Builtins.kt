@@ -4,6 +4,7 @@ import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
+import org.fpeterek.til.typechecking.util.SrcPosition
 
 object Builtins {
 
@@ -46,51 +47,52 @@ object Builtins {
     private val singularizer
         get() = FunctionType(GenericType(1), FunctionType(Omicron, GenericType(1)))
 
+    private val noPosition = SrcPosition(-1, -1)
+
     val builtinFunctions = listOf(
-        // TODO: Function overloading
-        //       Or integer promotion
-        TilFunction("+", realOperation),
-        TilFunction("-", realOperation),
-        TilFunction("*", realOperation),
-        TilFunction("/", realOperation),
+        // TODO: Idk whether integer promotion is supported in TILScript
+        TilFunction("+", noPosition, realOperation),
+        TilFunction("-", noPosition, realOperation),
+        TilFunction("*", noPosition, realOperation),
+        TilFunction("/", noPosition, realOperation),
 
         // TilFunction("+", intOperation),
         // TilFunction("-", intOperation),
         // TilFunction("*", intOperation),
         // TilFunction("/", intOperation),
 
-        TilFunction("=", equalityComparison),
+        TilFunction("=", noPosition, equalityComparison),
 
-        TilFunction("ToInt", FunctionType(Nu, Eta)),
-        TilFunction("ToReal", FunctionType(Eta, Nu)),
+        TilFunction("ToInt", noPosition, FunctionType(Nu, Eta)),
+        TilFunction("ToReal", noPosition, FunctionType(Eta, Nu)),
 
-        TilFunction("ForAll", nonrestrictedQuantifier),
-        TilFunction("Exist", nonrestrictedQuantifier),
-        TilFunction("Sing", singularizer),
+        TilFunction("ForAll", noPosition, nonrestrictedQuantifier),
+        TilFunction("Exist", noPosition, nonrestrictedQuantifier),
+        TilFunction("Sing", noPosition, singularizer),
 
-        TilFunction("Every", restrictedQuantifier),
-        TilFunction("Some", restrictedQuantifier),
-        TilFunction("No", restrictedQuantifier),
+        TilFunction("Every", noPosition, restrictedQuantifier),
+        TilFunction("Some", noPosition, restrictedQuantifier),
+        TilFunction("No", noPosition, restrictedQuantifier),
 
-        TilFunction("And", binaryBoolean),
-        TilFunction("Or", binaryBoolean),
-        TilFunction("Implies", binaryBoolean),
-        TilFunction("Not", unaryBoolean),
+        TilFunction("And", noPosition, binaryBoolean),
+        TilFunction("Or", noPosition, binaryBoolean),
+        TilFunction("Implies", noPosition, binaryBoolean),
+        TilFunction("Not", noPosition, unaryBoolean),
 
-        TilFunction("Sub", FunctionType(ConstructionType, ConstructionType, ConstructionType, ConstructionType)),
-        TilFunction("Tr", FunctionType(ConstructionType, ConstructionType)),
+        TilFunction("Sub", noPosition, FunctionType(ConstructionType, ConstructionType, ConstructionType, ConstructionType)),
+        TilFunction("Tr", noPosition, FunctionType(ConstructionType, ConstructionType)),
 
-        TilFunction("TrueC", constructionTruthiness),
-        TilFunction("FalseC", constructionTruthiness),
-        TilFunction("ImproperC", constructionTruthiness),
+        TilFunction("TrueC", noPosition, constructionTruthiness),
+        TilFunction("FalseC", noPosition, constructionTruthiness),
+        TilFunction("ImproperC", noPosition, constructionTruthiness),
 
-        TilFunction("TrueP", propositionTruthiness),
-        TilFunction("FalseP", propositionTruthiness),
-        TilFunction("UndefP", propositionTruthiness),
+        TilFunction("TrueP", noPosition, propositionTruthiness),
+        TilFunction("FalseP", noPosition, propositionTruthiness),
+        TilFunction("UndefP", noPosition, propositionTruthiness),
     )
 
-    val True = Literal("True", Omicron)
-    val False = Literal("False", Omicron)
+    val True = Literal("True", noPosition, Omicron)
+    val False = Literal("False", noPosition, Omicron)
 
     val builtinValues = listOf(True, False)
 

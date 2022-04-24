@@ -1,10 +1,13 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
+import org.fpeterek.til.typechecking.util.SrcPosition
+
 class TypedVar(
     val name: String,
     val type: String,
-) : IntermediateResult() {
+    srcPos: SrcPosition
+) : IntermediateResult(srcPos) {
 
-    constructor(name: VarName, type: TypeName) : this(name.name, type.name)
+    constructor(name: VarName, type: TypeName, srcPos: SrcPosition) : this(name.name, type.name, srcPos)
 
 }

@@ -1,3 +1,5 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-sealed class IntermediateResult
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+sealed class IntermediateResult(val position: SrcPosition)

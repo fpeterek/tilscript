@@ -2,12 +2,14 @@ package org.fpeterek.til.typechecking.sentence
 
 import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.typechecking.types.*
+import org.fpeterek.til.typechecking.util.SrcPosition
 
 
 class TilFunction(
     val name: String,
+    srcPosition: SrcPosition,
     type: Type = Unknown,
-) : Construction(constructedType=type, constructionType=ConstructionType),
+) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition),
     NonExecutable {
 
     override fun toString() = name

@@ -1,3 +1,5 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class TypedVars(val vars: List<TypedVar>) : IntermediateResult()
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+class TypedVars(val vars: List<TypedVar>, srcPos: SrcPosition) : IntermediateResult(srcPos)

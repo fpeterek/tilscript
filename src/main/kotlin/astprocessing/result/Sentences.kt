@@ -1,3 +1,5 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-class Sentences(val sentences: List<IntermediateResult>) : IntermediateResult()
+import org.fpeterek.til.typechecking.util.SrcPosition
+
+class Sentences(val sentences: List<IntermediateResult>, srcPos: SrcPosition) : IntermediateResult(srcPos)

@@ -84,7 +84,7 @@ class TypeChecker private constructor(
         }
 
         val processedConstruction = processConstruction(construction)
-        val firstExecution = Execution(processedConstruction, executionOrder).assignType()
+        val firstExecution = Execution(processedConstruction, executionOrder, execution.position)
 
         if (executionOrder == 1) {
             firstExecution
@@ -99,7 +99,8 @@ class TypeChecker private constructor(
             Execution(
                 processedConstruction,
                 2,
-                constructionType=ConstructionType)
+                execution.position
+            )
         }
     }
 
@@ -157,7 +158,7 @@ class TypeChecker private constructor(
 
     private val numericOperator = setOf("+", "-", "*", "/")
 
-    private fun processCompositionWithNumOp(composition: Composition, op: String) = with(composition) {
+    private fun processCompositionWithNumOp(composition: Composition, op: TilFunction) = with(composition) {
 
         val processedArgs = processOperatorArgs(args)
 
@@ -167,13 +168,13 @@ class TypeChecker private constructor(
             else -> Builtins.Eta
         }
 
-        val fn = TilFunction(op, FunctionType(opType, opType, opType))
+        val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType))
 
-        Composition(fn, processedArgs, opType)
+        Composition(fn, processedArgs, position, opType)
     }
 
     private fun processCompositionWithNumOp(composition: Composition, fn: Construction) =
-        processCompositionWithNumOp(composition, ((fn as Trivialization).construction as TilFunction).name)
+        processCompositionWithNumOp(composition, (fn as Trivialization).construction as TilFunction)
 
     private fun processCompositionWithFn(composition: Composition, fn: Construction) = with(composition) {
         val fnType = typeRepo.process(fn.constructedType as FunctionType)
@@ -181,7 +182,7 @@ class TypeChecker private constructor(
 
         val processedArgs = processCompositionArgs(args, fnArgs)
 
-        Composition(fn, processedArgs, fnType.imageType)
+        Composition(fn, processedArgs, position, fnType.imageType)
     }
 
     private fun processComposition(composition: Composition) = with(composition) {
@@ -216,8 +217,7 @@ class TypeChecker private constructor(
 
         val abstracted = process(construction, this@TypeChecker, typeRepo)
 
-        Closure(vars, abstracted, constructionType=abstracted.constructionType)
-            .assignType()
+        Closure(vars, abstracted, position).assignType()
     }
 
     private fun processClosure(closure: Closure) = fork().processClosureForked(closure)
@@ -253,6 +253,7 @@ class TypeChecker private constructor(
 
     private fun addLiteral(lit: Literal) = Literal(
         lit.value,
+        lit.position,
         typeRepo.process(lit.constructedType),
     ).apply {
         repo.add(this)

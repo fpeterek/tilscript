@@ -1,28 +1,32 @@
 package org.fpeterek.til.typechecking.astprocessing.result
 
-sealed class Construction : IntermediateResult() {
+import org.fpeterek.til.typechecking.util.SrcPosition
 
-    fun extensionalize() = Composition(
+sealed class Construction(srcPos: SrcPosition) : IntermediateResult(srcPos) {
+
+    fun extensionalize(srcPos: SrcPosition) = Composition(
         Composition(
             this,
-            listOf(VarRef("w"))
+            listOf(VarRef("w", srcPos)),
+            srcPos
         ),
-        listOf(VarRef("t"))
+        listOf(VarRef("t", srcPos)),
+        srcPos
     )
 
-    class VarRef(val name: String) : Construction() {
-        constructor(varName: VarName) : this(varName.name)
+    class VarRef(val name: String, srcPos: SrcPosition) : Construction(srcPos) {
+        constructor(varName: VarName, srcPos: SrcPosition) : this(varName.name, srcPos)
     }
 
-    class Closure(val vars: List<TypedVar>, val construction: Construction) :
-        Construction() {
-        constructor(vars: TypedVars, construction: Construction) :
-                this(vars.vars, construction)
+    class Closure(val vars: List<TypedVar>, val construction: Construction, srcPos: SrcPosition) :
+        Construction(srcPos) {
+        constructor(vars: TypedVars, construction: Construction, srcPos: SrcPosition) :
+                this(vars.vars, construction, srcPos)
     }
 
-    class Execution(val order: Int, val construction: IntermediateResult) :
-        Construction()
+    class Execution(val order: Int, val construction: IntermediateResult, srcPos: SrcPosition) :
+        Construction(srcPos)
 
-    class Composition(val fn: Construction, val args: List<Construction>) :
-        Construction()
+    class Composition(val fn: Construction, val args: List<Construction>, srcPos: SrcPosition) :
+        Construction(srcPos)
 }
