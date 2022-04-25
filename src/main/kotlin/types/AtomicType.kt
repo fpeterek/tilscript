@@ -7,11 +7,6 @@ class AtomicType(
     val description: String = "",
 ) : Type() {
 
-    override fun equals(other: Any?) = other != null && other is AtomicType &&
-            shortName == other.shortName
-
-    override fun hashCode() = shortName.hashCode()
-
     override fun toString() = shortName
 
 }

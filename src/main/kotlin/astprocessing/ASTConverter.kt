@@ -2,6 +2,7 @@ package org.fpeterek.til.typechecking.astprocessing
 
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
+import org.fpeterek.til.typechecking.exceptions.UndefinedType
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.tilscript.ScriptContext
@@ -91,7 +92,7 @@ class ASTConverter private constructor() {
     private fun convertTypedVar(typedVar: TypedVar) = TilVariable(
         typedVar.name,
         typedVar.position,
-        repo[typedVar.type] ?: throw RuntimeException("Unknown type: ${typedVar.name}"),
+        repo[typedVar.type] ?: throw UndefinedType(typedVar.name)
     )
 
     private fun convertComposition(composition: Composition) = TilComposition(

@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.sentence
 
+import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Type
@@ -10,7 +11,13 @@ class Variable(
     val name: String,
     srcPos: SrcPosition,
     type: Type = Unknown,
-) : Construction(type, ConstructionType, srcPos), Executable {
+    reports: List<Report> //= listOf(),
+) : Construction(type, ConstructionType, srcPos, reports), Executable {
+
+    override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Variable(name, position, constructedType, reports + iterable)
 
     override fun toString() = name
 

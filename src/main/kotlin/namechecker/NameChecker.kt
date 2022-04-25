@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.namechecker
 
+import org.fpeterek.til.typechecking.exceptions.UndefinedSymbol
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.types.SymbolRepository
 
@@ -53,7 +54,7 @@ class NameChecker private constructor(
 
     private fun processSymbol(symbol: String) {
         if (!findSymbol(symbol)) {
-            throw RuntimeException("Undefined symbol '${symbol}'")
+            throw UndefinedSymbol(symbol)
         }
     }
 

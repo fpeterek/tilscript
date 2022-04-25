@@ -1,5 +1,7 @@
 package org.fpeterek.til.typechecking.sentence
 
+import org.fpeterek.til.typechecking.exceptions.InvalidExecutionOrder
+import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Type
@@ -11,13 +13,19 @@ class Execution(
     val executionOrder: Int,
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
-) : Construction(constructedType, ConstructionType, srcPos), Executable {
+    reports: List<Report> //= listOf(),
+) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
 
     init {
         if (executionOrder < 1 || executionOrder > 2) {
-            throw RuntimeException("Execution order must be either 1 or 2")
+            throw InvalidExecutionOrder(executionOrder)
         }
     }
+
+    override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Execution(construction, executionOrder, position, constructedType, reports + iterable)
 
     override fun toString() = "$executionOrder^$construction"
 

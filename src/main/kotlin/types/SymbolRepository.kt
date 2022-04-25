@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.types
 
+import org.fpeterek.til.typechecking.exceptions.RedefinitionOfSymbol
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
@@ -28,7 +29,7 @@ class SymbolRepository(vararg symbols: Construction, loadBuiltins: Boolean = fal
 
         when {
             current == null || current is Unknown -> types[name] = type
-            type !is Unknown -> throw RuntimeException("Redefinition of symbol '$name'")
+            type !is Unknown -> throw RedefinitionOfSymbol(name)
             else -> Unit
         }
     }

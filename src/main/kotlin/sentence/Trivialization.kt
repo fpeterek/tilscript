@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.sentence
 
+import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
@@ -10,12 +11,19 @@ class Trivialization(
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
     constructionType: Type = Unknown,
+    reports: List<Report> //= listOf(),
 ) : Construction(
     constructedType=constructedType,
     constructionType=constructionType,
-    srcPos
+    srcPos,
+    reports,
 ), Executable {
 
     override fun toString() = "'$construction"
+
+    override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Trivialization(construction, position, constructedType, constructionType, reports + iterable)
 
 }

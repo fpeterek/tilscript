@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.sentence
 
+import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Type
@@ -11,7 +12,13 @@ class Composition(
     val args: List<Construction>,
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
-) : Construction(constructedType, ConstructionType, srcPos), Executable {
+    reports: List<Report> //= listOf(),
+) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
+
+    override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Composition(function, args, position, constructedType, reports + iterable)
 
     override fun toString() = "[$function ${args.joinToString(" ")}]"
 

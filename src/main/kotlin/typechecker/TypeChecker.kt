@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.typechecker
 
+import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
@@ -79,48 +80,51 @@ class TypeChecker private constructor(
 
     private fun processExecution(execution: Execution) = with(execution) {
 
-        if (construction !is Composition) {
-            throw RuntimeException("Only compositions can be executed")
-        }
+        val processedConstruction = processConstruction(
+            when (construction) {
+                is Composition -> construction
+                else -> construction.withReport(Report("Only compositions can be executed", construction.position))
+            }
+        )
 
-        val processedConstruction = processConstruction(construction)
-        val firstExecution = Execution(processedConstruction, executionOrder, execution.position)
+        val firstExecution = Execution(processedConstruction, executionOrder, execution.position, reports=reports)
 
         if (executionOrder == 1) {
             firstExecution
         } else {
             firstExecution.construction as Composition
-            if (firstExecution.construction.constructedType !is ConstructionType) {
-                throw RuntimeException("Objects from object base cannot be executed")
-            }
+
             // Unknown type as we may not be able to determine the type constructed
             // by the constructed construction
             // Yes, things start to get somewhat convoluted at this point
             Execution(
                 processedConstruction,
                 2,
-                execution.position
+                execution.position,
+                reports=firstExecution.reports + when(firstExecution.construction.constructedType) {
+                    is ConstructionType -> listOf()
+                    else -> listOf(Report("Objects from object base cannot be executed", firstExecution.construction.position))
+                }
             )
         }
     }
 
     private fun execute(construction: Construction) = when (construction) {
-        is Literal -> throw RuntimeException("Literals cannot be executed.")
-        is TilFunction -> throw RuntimeException("Functions cannot be executed.")
+        is Literal -> construction.withReport(Report("Literals cannot be executed.", construction.position))
+        is TilFunction -> construction.withReport(Report("Functions cannot be executed.", construction.position))
         else -> processConstruction(construction)
     }
 
     private fun processCompositionFn(fn: Construction) = processConstruction(fn).let { processed ->
         when {
-            processed is TilFunction ->
-                throw RuntimeException(
-                    "Functions cannot be executed, did you forget a trivialization ('${processed.name})?")
-            processed.constructedType !is FunctionType -> {
-                throw RuntimeException("Only functions can be applied on arguments using a composition")
-            }
+            processed is TilFunction -> processed.withReport(
+                Report("Functions cannot be executed, did you forget a trivialization?", processed.position)
+            )
+            processed.constructedType !is FunctionType -> processed.withReport(
+                Report("Only functions can be applied on arguments using a composition", processed.position)
+            )
+            else -> processed
         }
-
-        processed
     }
 
     private fun processOperatorArgs(args: List<Construction>) = when {
@@ -138,6 +142,7 @@ class TypeChecker private constructor(
     }
 
 
+    // TODO: Replace all exceptions with Reports
     private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) = when {
         args.size > expected.size -> throw RuntimeException("Too many arguments (expected ${expected.size}, received ${args.size})")
         args.size < expected.size -> throw RuntimeException("Too few arguments (expected ${expected.size}, received ${args.size})")
@@ -168,9 +173,9 @@ class TypeChecker private constructor(
             else -> Builtins.Eta
         }
 
-        val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType))
+        val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType), listOf())
 
-        Composition(fn, processedArgs, position, opType)
+        Composition(fn, processedArgs, position, opType, reports)
     }
 
     private fun processCompositionWithNumOp(composition: Composition, fn: Construction) =
@@ -182,7 +187,7 @@ class TypeChecker private constructor(
 
         val processedArgs = processCompositionArgs(args, fnArgs)
 
-        Composition(fn, processedArgs, position, fnType.imageType)
+        Composition(fn, processedArgs, position, fnType.imageType, reports)
     }
 
     private fun processComposition(composition: Composition) = with(composition) {
@@ -217,7 +222,7 @@ class TypeChecker private constructor(
 
         val abstracted = process(construction, this@TypeChecker, typeRepo)
 
-        Closure(vars, abstracted, position).assignType()
+        Closure(vars, abstracted, position, reports=reports).assignType()
     }
 
     private fun processClosure(closure: Closure) = fork().processClosureForked(closure)
@@ -255,6 +260,7 @@ class TypeChecker private constructor(
         lit.value,
         lit.position,
         typeRepo.process(lit.constructedType),
+        reports=lit.reports
     ).apply {
         repo.add(this)
     }

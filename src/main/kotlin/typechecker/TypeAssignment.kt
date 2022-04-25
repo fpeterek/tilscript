@@ -7,18 +7,14 @@ import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 
 object TypeAssignment {
-
-    /* Variables, trivializations and executions increase order */
-    /* Compositions and closures retain order                   */
-
-    fun Variable.assignType(type: Type) =
-        Variable(name, position, type)
+    fun Variable.assignType(type: Type) = Variable(name, position, type, reports)
 
     fun Trivialization.assignType(type: Type) = Trivialization(
         construction=construction,
         constructedType=type,
         constructionType=ConstructionType,
-        srcPos=position
+        srcPos=position,
+        reports=reports,
     )
 
     fun Closure.assignType() = Closure(
@@ -26,10 +22,10 @@ object TypeAssignment {
         construction,
         position,
         FunctionType(imageType=construction.constructedType, argTypes=variables.map { it.constructedType }),
+        reports
     )
 
-    fun Literal.assignType(type: Type) = Literal(value, position, type)
+    fun Literal.assignType(type: Type) = Literal(value, position, type, reports)
 
-    fun TilFunction.assignType(type: FunctionType) =
-        TilFunction(name, position, type)
+    fun TilFunction.assignType(type: FunctionType) = TilFunction(name, position, type, reports)
 }
