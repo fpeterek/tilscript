@@ -48,7 +48,10 @@ class TypeChecker private constructor(
     private val outermostRepo: SymbolRepository
         get() = parent?.outermostRepo ?: repo
 
-    private fun match(l: Type, r: Type) = TypeMatcher.match(l, r, typeRepo)
+    private val Construction.isDoubleExecution
+        get() = this is Execution && executionOrder == 2
+
+    private fun match(l: Type, r: Type) = l is Unknown || r is Unknown || TypeMatcher.match(l, r, typeRepo)
 
     private fun processTrivialization(trivialization: Trivialization): Trivialization {
 
@@ -87,7 +90,10 @@ class TypeChecker private constructor(
             }
         )
 
-        val firstExecution = Execution(processedConstruction, executionOrder, execution.position, reports=reports)
+        val firstExecution = Execution(
+            processedConstruction, executionOrder, execution.position,
+            constructedType=processedConstruction.constructedType, reports=reports
+        )
 
         if (executionOrder == 1) {
             firstExecution
@@ -98,9 +104,10 @@ class TypeChecker private constructor(
             // by the constructed construction
             // Yes, things start to get somewhat convoluted at this point
             Execution(
-                processedConstruction,
-                2,
-                execution.position,
+                construction=processedConstruction,
+                executionOrder=2,
+                srcPos=execution.position,
+                constructedType=Unknown,
                 reports=firstExecution.reports + when(firstExecution.construction.constructedType) {
                     is ConstructionType -> listOf()
                     else -> listOf(Report("Objects from object base cannot be executed", firstExecution.construction.position))
@@ -127,47 +134,49 @@ class TypeChecker private constructor(
         }
     }
 
-    private fun processOperatorArgs(args: List<Construction>) = when {
-        args.isEmpty() -> throw RuntimeException("No arguments supplied")
-
-        else -> {
-            val isInt = match(execute(args.first()).constructedType, Builtins.Nu)
-            val expType = when {
-                isInt -> Builtins.Nu
-                else -> Builtins.Eta
-            }
-
-            processCompositionArgs(args, listOf(expType, expType))
+    private fun processOperatorArgs(args: List<Construction>): List<Construction> {
+        val isInt = match(execute(args.first()).constructedType, Builtins.Nu)
+        val expType = when {
+            isInt -> Builtins.Nu
+            else -> Builtins.Eta
         }
+
+        return processCompositionArgs(args, listOf(expType, expType))
     }
 
+    private fun checkArity(composition: Composition, expArity: Int) = when {
+        composition.args.size == expArity -> listOf()
+        composition.args.size < expArity  -> listOf(
+            Report("Too few arguments (expected ${expArity}, received ${composition.args.size})", composition.position)
+        )
+        else -> listOf(
+            Report("Too few arguments (expected ${expArity}, received ${composition.args.size})", composition.position)
+        )
+    }
 
-    // TODO: Replace all exceptions with Reports
-    private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) = when {
-        args.size > expected.size -> throw RuntimeException("Too many arguments (expected ${expected.size}, received ${args.size})")
-        args.size < expected.size -> throw RuntimeException("Too few arguments (expected ${expected.size}, received ${args.size})")
+    private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) = args
+        .zip(expected)
+        .map { (cons, expType) ->
+            val processed = execute(cons)
 
-       else -> args.zip(expected).map { (cons, expType) ->
-                val processed = execute(cons)
-
-                if (expType !is Unknown && !match(expType, processed.constructedType)) {
-                    throw RuntimeException(
-                        "Function argument type mismatch. " +
-                                "Expected '${expType}', Got '${processed.constructedType}'"
+            when {
+                expType !is Unknown && !match(expType, processed.constructedType) -> processed.withReport(
+                    Report("Function argument type mismatch. " +
+                            "Expected '${expType}', Got '${processed.constructedType}'", processed.position
                     )
-                }
-
-                processed
+                )
+                else -> processed
             }
-    }
+        }
 
     private val numericOperator = setOf("+", "-", "*", "/")
 
     private fun processCompositionWithNumOp(composition: Composition, op: TilFunction) = with(composition) {
 
         val processedArgs = processOperatorArgs(args)
+        val arityErrors = checkArity(composition, 2)
 
-        val isInt = match(processedArgs.first().constructedType, Builtins.Nu)
+        val isInt = processedArgs.isNotEmpty() && match(processedArgs.first().constructedType, Builtins.Nu)
         val opType = when {
             isInt -> Builtins.Nu
             else -> Builtins.Eta
@@ -175,7 +184,7 @@ class TypeChecker private constructor(
 
         val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType), listOf())
 
-        Composition(fn, processedArgs, position, opType, reports)
+        Composition(fn, processedArgs, position, opType, reports + arityErrors)
     }
 
     private fun processCompositionWithNumOp(composition: Composition, fn: Construction) =
@@ -185,10 +194,21 @@ class TypeChecker private constructor(
         val fnType = typeRepo.process(fn.constructedType as FunctionType)
         val fnArgs = fnType.argTypes
 
+        val arityErrors = checkArity(composition, fnArgs.size)
+
         val processedArgs = processCompositionArgs(args, fnArgs)
 
-        Composition(fn, processedArgs, position, fnType.imageType, reports)
+        Composition(fn, processedArgs, position, fnType.imageType, reports + arityErrors)
     }
+
+    // Double execution cannot be meaningfully type-checked
+    // Thus, the typechecking is delegated to the user
+    // It's on them for using double executions
+    // To properly check double executions, we would need to be able to execute the procedures,
+    // yet, TILScript in its current state lacks the ability to describe how such executions should be performed
+    // TILisp may yet find more success in this regard
+    private fun processCompositionWithDE(comp: Composition, fn: Construction) =
+        Composition(fn, comp.args.map(::processConstruction), comp.position, Unknown, comp.reports)
 
     private fun processComposition(composition: Composition) = with(composition) {
 
@@ -197,9 +217,10 @@ class TypeChecker private constructor(
         val isNumericOp = fn is Trivialization && fn.construction is TilFunction &&
                 fn.construction.name in numericOperator
 
-        when (isNumericOp) {
-            true  -> processCompositionWithNumOp(composition, fn)
-            false -> processCompositionWithFn(composition, fn)
+        when {
+            isNumericOp          -> processCompositionWithNumOp(composition, fn)
+            fn.isDoubleExecution -> processCompositionWithDE(composition, fn)
+            else                 -> processCompositionWithFn(composition, fn)
         }
     }
 
@@ -212,12 +233,14 @@ class TypeChecker private constructor(
                 else -> it.assignType(typeRepo.process(lambdaBoundType(it.name)))
             }
 
-            if (typed.constructedType is Unknown) {
-                throw RuntimeException("Undefined lambda bound variable '${typed.name}'")
+            val checked = when (typed.constructedType) {
+                is Unknown -> typed.withReport(Report("Type of lambda bound variable is undefined", typed.position))
+                else -> typed
             }
-            repo.add(typed)
 
-            typed
+            repo.add(checked)
+
+            checked
         }
 
         val abstracted = process(construction, this@TypeChecker, typeRepo)
@@ -228,12 +251,10 @@ class TypeChecker private constructor(
     private fun processClosure(closure: Closure) = fork().processClosureForked(closure)
 
     private fun assignFnType(function: TilFunction) = findSymbolType(function.name).let { type ->
-
-        if (type !is FunctionType) {
-            throw RuntimeException("${function.name} is not a function")
+        when (type) {
+            is FunctionType -> function.assignType(type)
+            else -> function.withReport(Report("${function.name} is not a function", function.position))
         }
-
-        function.assignType(type)
     }
 
     private fun processFunction(fn: TilFunction) = when (fn.constructedType) {
@@ -266,7 +287,7 @@ class TypeChecker private constructor(
     }
 
     private fun processSingleDef(lit: Literal) = when (lit.value) {
-        in repo -> throw RuntimeException("Redefinition of symbol '${lit.value}'")
+        in repo -> lit.withReport(Report("Redefinition of symbol '${lit.value}'", lit.position))
         else -> addLiteral(lit)
     }
 
@@ -276,27 +297,28 @@ class TypeChecker private constructor(
 
     private fun processTypeDefinition(def: TypeDefinition) = def.apply {
         when (alias.name) {
-            in typeRepo -> throw RuntimeException("Redefinition of type '${def.alias.name}'")
+            in typeRepo -> def.withReport(Report("Redefinition of type '${def.alias.name}'", def.position))
             else -> typeRepo.process(def.alias)
         }
     }
 
     private fun processSingleDef(variable: Variable) = when (variable.name) {
-        in repo -> throw RuntimeException("Redefinition of symbol '${variable.name}'")
-        else -> repo.add(variable)
+        in repo -> variable.withReport(Report("Redefinition of symbol '${variable.name}'", variable.position))
+        else -> variable.apply { repo.add(this) }
+
     }
 
-    private fun processVariableDefinition(def: VariableDefinition) = def.apply {
-        def.variables.forEach(::processSingleDef)
+    private fun processVariableDefinition(def: VariableDefinition) = with(def) {
+        VariableDefinition(variables.map(::processSingleDef), position, reports)
     }
 
     private fun processSingleDef(fn: TilFunction) = when (fn.name) {
-        in repo -> throw RuntimeException("Redefinition of symbol '${fn.name}'")
-        else -> repo.add(fn)
+        in repo -> fn.withReport(Report("Redefinition of symbol '${fn.name}'", fn.position))
+        else -> fn.apply { repo.add(this) }
     }
 
-    private fun processFunctionDefinition(def: FunctionDefinition) = def.apply {
-        def.functions.forEach(::processSingleDef)
+    private fun processFunctionDefinition(def: FunctionDefinition) = with(def) {
+        FunctionDefinition(functions.map(::processSingleDef), position, reports)
     }
 
     private fun processDefinition(definition: Definition): Definition = when (definition) {
