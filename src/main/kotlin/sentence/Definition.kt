@@ -23,7 +23,7 @@ class LiteralDefinition(val literals: List<Literal>, srcPos: SrcPosition, report
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
 }
 
-class TypeDefinition(val alias: TypeAlias, srcPos: SrcPosition, reports: List<Report> /*= listOf()*/) :
+class TypeDefinition(val alias: TypeAlias, srcPos: SrcPosition, reports: List<Report> = listOf()) :
     Definition(srcPos, reports) {
 
     override fun withReport(report: Report) = withReports(listOf(report))
@@ -34,7 +34,7 @@ class TypeDefinition(val alias: TypeAlias, srcPos: SrcPosition, reports: List<Re
     override fun toString() = "${alias.shortName} := ${alias.type}"
 }
 
-class VariableDefinition(val variables: List<Variable>, srcPos: SrcPosition, reports: List<Report> /*= listOf()*/) :
+class VariableDefinition(val variables: List<Variable>, srcPos: SrcPosition, reports: List<Report> = listOf()) :
     Definition(srcPos, reports) {
 
     val type
@@ -50,7 +50,7 @@ class VariableDefinition(val variables: List<Variable>, srcPos: SrcPosition, rep
     override fun toString() = "${names.joinToString(separator=", ")} -> $type"
 }
 
-class FunctionDefinition(val functions: List<TilFunction>, srcPos: SrcPosition, reports: List<Report> /*= listOf()*/) :
+class FunctionDefinition(val functions: List<TilFunction>, srcPos: SrcPosition, reports: List<Report> = listOf()) :
     Definition(srcPos, reports) {
 
     val type

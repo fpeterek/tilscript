@@ -10,6 +10,7 @@ import org.fpeterek.til.typechecking.types.Util.compose
 import org.fpeterek.til.typechecking.types.Util.extensionalize
 import org.fpeterek.til.typechecking.types.Util.trivialize
 import org.fpeterek.til.typechecking.namechecker.NameChecker
+import org.fpeterek.til.typechecking.reporting.Reporter
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
@@ -33,11 +34,30 @@ fun main() {
 
     script.sentences.forEach(::println)
 
-    TypeChecker.process(
-        script.sentences,
+    val nameChecked = NameChecker.checkSymbols(script.sentences, SymbolRepository.withBuiltins())
+
+    if (Reporter.containsReports(nameChecked)) {
+        println("Namechecker errors")
+        Reporter.reportsAsList(nameChecked, "skript.tils").forEach {
+            println()
+            println(it)
+        }
+        return
+    }
+
+    val typeChecked = TypeChecker.process(
+        nameChecked,
         symbolRepository = SymbolRepository.withBuiltins(),
         typeRepo = TypeRepository.withBuiltins()
     )
+
+    if (Reporter.containsReports(typeChecked)) {
+        Reporter.reportsAsList(typeChecked, "skript.tils").forEach {
+            println()
+            println(it)
+        }
+        return
+    }
 
     repeat(3) { println() }
 

@@ -11,7 +11,7 @@ class Variable(
     val name: String,
     srcPos: SrcPosition,
     type: Type = Unknown,
-    reports: List<Report> //= listOf(),
+    reports: List<Report> = listOf(),
 ) : Construction(type, ConstructionType, srcPos, reports), Executable {
 
     override fun withReport(report: Report) = withReports(listOf(report))

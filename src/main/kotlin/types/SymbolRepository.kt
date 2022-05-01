@@ -24,6 +24,8 @@ class SymbolRepository(vararg symbols: Construction, loadBuiltins: Boolean = fal
         }
     }
 
+    val symbols get() = types.asSequence().map { it.key }
+
     fun add(name: String, type: Type) {
         val current = types[name]
 

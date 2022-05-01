@@ -11,7 +11,7 @@ class Trivialization(
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
     constructionType: Type = Unknown,
-    reports: List<Report> //= listOf(),
+    reports: List<Report> = listOf(),
 ) : Construction(
     constructedType=constructedType,
     constructionType=constructionType,

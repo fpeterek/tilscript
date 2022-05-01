@@ -13,7 +13,7 @@ class Execution(
     val executionOrder: Int,
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
-    reports: List<Report> //= listOf(),
+    reports: List<Report> = listOf(),
 ) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
 
     init {

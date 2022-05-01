@@ -13,7 +13,7 @@ class Literal(
     val value: String,
     srcPos: SrcPosition,
     type: Type = Unknown,
-    reports: List<Report> // = listOf(),
+    reports: List<Report> = listOf(),
 ) : Construction(constructedType=type, constructionType=ConstructionType, srcPos, reports), NonExecutable {
 
     init {

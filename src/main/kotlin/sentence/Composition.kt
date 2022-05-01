@@ -12,7 +12,7 @@ class Composition(
     val args: List<Construction>,
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
-    reports: List<Report> //= listOf(),
+    reports: List<Report> = listOf(),
 ) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
 
     override fun withReport(report: Report) = withReports(listOf(report))

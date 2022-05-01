@@ -11,7 +11,7 @@ class TilFunction(
     val name: String,
     srcPosition: SrcPosition,
     type: Type = Unknown,
-    reports: List<Report> //= listOf(),
+    reports: List<Report> = listOf(),
 ) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition, reports),
     NonExecutable {
 
