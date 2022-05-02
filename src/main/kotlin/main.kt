@@ -15,15 +15,28 @@ import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
 import org.fpeterek.til.typechecking.types.SymbolRepository
-import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.tilscript.CommonTypes
 import org.fpeterek.til.typechecking.types.TypeRepository
 import org.fpeterek.til.typechecking.types.Util.intensionalize
 import org.fpeterek.til.typechecking.util.SrcPosition
 
+fun printErrors(sentences: Iterable<Sentence>, file: String, errorType: String) {
 
-fun main() {
-    val stream = CharStreams.fromFileName("skript.tils")
+    println("-".repeat(80))
+    println("File: $file")
+    println("$errorType errors")
+
+    Reporter.reportsAsList(sentences, file).forEach {
+        println()
+        println(it)
+    }
+
+    println("-".repeat(80))
+    println("\n")
+}
+
+fun checkScript(filename: String) {
+    val stream = CharStreams.fromFileName(filename)
 
     val lexer = TILScriptLexer(stream)
     val parser = TILScriptParser(CommonTokenStream(lexer))
@@ -32,16 +45,12 @@ fun main() {
 
     val script = ASTConverter.convert(sentences)
 
-    script.sentences.forEach(::println)
+    // script.sentences.forEach(::println)
 
     val nameChecked = NameChecker.checkSymbols(script.sentences, SymbolRepository.withBuiltins())
 
     if (Reporter.containsReports(nameChecked)) {
-        println("Namechecker errors")
-        Reporter.reportsAsList(nameChecked, "skript.tils").forEach {
-            println()
-            println(it)
-        }
+        printErrors(nameChecked, filename, "Name")
         return
     }
 
@@ -52,14 +61,20 @@ fun main() {
     )
 
     if (Reporter.containsReports(typeChecked)) {
-        Reporter.reportsAsList(typeChecked, "skript.tils").forEach {
-            println()
-            println(it)
-        }
-        return
+        printErrors(typeChecked, filename, "Type")
     }
+}
 
-    repeat(3) { println() }
+fun main(args: Array<String>) {
+
+    args.forEach(::checkScript)
+
+    // repeat(3) { println() }
+    // test()
+
+}
+
+fun test() {
 
     val noPos = SrcPosition(-1, -1)
 
@@ -89,7 +104,7 @@ fun main() {
             )
         ),
         noPos
-     ).intensionalize()
+    ).intensionalize()
 
     val emanEqPresident = eq.trivialize().compose(
         presCr.extensionalize(varW, varT),
@@ -151,7 +166,6 @@ fun main() {
     printRes(alkoholikEqPresident, symbolRepository, lambdaBound)
     printRes(mammalWhales, symbolRepository, lambdaBound)
     printRes(jePani, symbolRepository, lambdaBound)
-
 }
 
 fun printRes(cons: Construction, repo: SymbolRepository, lambdaBound: SymbolRepository) {

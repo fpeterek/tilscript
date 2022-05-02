@@ -18,6 +18,9 @@ class NameChecker private constructor(
 
         private fun checkSymbols(construction: Construction, parent: NameChecker) =
             NameChecker(SymbolRepository(), parent).process(construction)
+
+        private fun checkSymbols(closure: Closure, parent: NameChecker) =
+            NameChecker(SymbolRepository(), parent=parent).processClosureScoped(closure)
     }
 
     constructor(symbolRepository: SymbolRepository) : this(
@@ -41,7 +44,7 @@ class NameChecker private constructor(
     private fun findSymbol(name: String): Boolean =
         (name in symbolRepository) || (parent?.findSymbol(name) ?: false)
 
-    private fun processClosure(cl: Closure): Closure {
+    private fun processClosureScoped(cl: Closure): Closure {
         cl.variables.forEach {
             symbolRepository.add(it)
         }
@@ -54,6 +57,8 @@ class NameChecker private constructor(
             cl.reports,
         )
     }
+
+    private fun processClosure(cl: Closure) = checkSymbols(cl, this)
 
     private fun processComposition(composition: Composition) = Composition(
         process(composition.function),
