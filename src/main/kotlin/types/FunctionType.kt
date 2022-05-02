@@ -22,7 +22,7 @@ class FunctionType(
     }
 
     override val name
-        get() = "(${imageType.name}${argTypes.joinToString(separator="") { it.name }})"
+        get() = "(${imageType.name} ${argTypes.joinToString(separator=" ") { it.name }})"
                 
     override val shortName
         get() = "(${imageType.shortName}${argTypes.joinToString(separator="") { it.shortName }})"

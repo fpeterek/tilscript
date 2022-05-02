@@ -6,10 +6,16 @@ import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.ASTConverter
 import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
+import org.fpeterek.til.typechecking.astprocessing.ErrorListener
+import org.fpeterek.til.typechecking.astprocessing.result.Sentences
+import org.fpeterek.til.typechecking.contextrecognition.ContextRecognizer
+import org.fpeterek.til.typechecking.formatters.JsonFormatter
 import org.fpeterek.til.typechecking.types.Util.compose
 import org.fpeterek.til.typechecking.types.Util.extensionalize
 import org.fpeterek.til.typechecking.types.Util.trivialize
 import org.fpeterek.til.typechecking.namechecker.NameChecker
+import org.fpeterek.til.typechecking.reporting.Report
+import org.fpeterek.til.typechecking.reporting.ReportFormatter
 import org.fpeterek.til.typechecking.reporting.Reporter
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
@@ -19,38 +25,53 @@ import org.fpeterek.til.typechecking.tilscript.CommonTypes
 import org.fpeterek.til.typechecking.types.TypeRepository
 import org.fpeterek.til.typechecking.types.Util.intensionalize
 import org.fpeterek.til.typechecking.util.SrcPosition
+import java.io.File
 
-fun printErrors(sentences: Iterable<Sentence>, file: String, errorType: String) {
-
+fun printErrors(errors: Iterable<Report>, file: String, errorType: String) {
     println("-".repeat(80))
     println("File: $file")
     println("$errorType errors")
 
-    Reporter.reportsAsList(sentences, file).forEach {
-        println()
-        println(it)
-    }
+    ReportFormatter(file).terminalOutput(errors)
 
     println("-".repeat(80))
     println("\n")
 }
 
+private fun printErrorsForSentences(sentences: Iterable<Sentence>, file: String, errorType: String) =
+    printErrors(Reporter.reportsAsList(sentences), file, errorType)
+
 fun checkScript(filename: String) {
     val stream = CharStreams.fromFileName(filename)
 
-    val lexer = TILScriptLexer(stream)
-    val parser = TILScriptParser(CommonTokenStream(lexer))
+    val errorListener = ErrorListener()
 
-    val sentences = AntlrVisitor.visit(parser.start())
+    val lexer = TILScriptLexer(stream)
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(errorListener)
+    val parser = TILScriptParser(CommonTokenStream(lexer))
+    parser.removeErrorListeners()
+    parser.addErrorListener(errorListener)
+
+    val start = parser.start()
+
+    val sentences = try {
+        AntlrVisitor.visit(start)
+    } catch (ignored: Exception) {
+        Sentences(listOf(), SrcPosition(0, 0))
+    }
+
+    if (errorListener.hasErrors) {
+        printErrors(errorListener.errors, filename, "Syntax")
+        return
+    }
 
     val script = ASTConverter.convert(sentences)
-
-    // script.sentences.forEach(::println)
 
     val nameChecked = NameChecker.checkSymbols(script.sentences, SymbolRepository.withBuiltins())
 
     if (Reporter.containsReports(nameChecked)) {
-        printErrors(nameChecked, filename, "Name")
+        printErrorsForSentences(nameChecked, filename, "Name")
         return
     }
 
@@ -61,8 +82,15 @@ fun checkScript(filename: String) {
     )
 
     if (Reporter.containsReports(typeChecked)) {
-        printErrors(typeChecked, filename, "Type")
+        printErrorsForSentences(typeChecked, filename, "Type")
     }
+
+    val withContext = ContextRecognizer.assignContext(typeChecked)
+
+    val json = JsonFormatter.asString(withContext)
+
+    File("${File(filename).name}.json").writeText(json)
+
 }
 
 fun main(args: Array<String>) {

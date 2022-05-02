@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.sentence
 
+import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.reporting.Report
@@ -15,7 +16,8 @@ class Closure(
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
     reports: List<Report> = listOf(),
-) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
+    context: Context = Context.Unknown,
+) : Construction(constructedType, ConstructionType, srcPos, reports, context), Executable {
 
     val functionType = when {
         construction !is Composition                    -> Unknown
@@ -27,7 +29,10 @@ class Closure(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        Closure(variables, construction, position, constructedType, reports + iterable)
+        Closure(variables, construction, position, constructedType, reports + iterable, context)
+
+    override fun withContext(context: Context) =
+        Closure(variables, construction, position, constructedType, reports, context)
 
     override fun toString() = "${variables.joinToString(", ", prefix=GreekAlphabet.lambda) } $construction"
 

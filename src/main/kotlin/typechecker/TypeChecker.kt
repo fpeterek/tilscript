@@ -182,7 +182,7 @@ class TypeChecker private constructor(
             else -> Builtins.Eta
         }
 
-        val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType), listOf())
+        val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType), listOf()).trivialize()
 
         Composition(fn, processedArgs, position, opType, reports + arityErrors)
     }

@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.sentence
 
+import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.exceptions.InvalidExecutionOrder
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
@@ -14,7 +15,8 @@ class Execution(
     srcPos: SrcPosition,
     constructedType: Type = Unknown,
     reports: List<Report> = listOf(),
-) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
+    context: Context = Context.Unknown,
+) : Construction(constructedType, ConstructionType, srcPos, reports, context), Executable {
 
     init {
         if (executionOrder < 1 || executionOrder > 2) {
@@ -25,7 +27,10 @@ class Execution(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        Execution(construction, executionOrder, position, constructedType, reports + iterable)
+        Execution(construction, executionOrder, position, constructedType, reports + iterable, context)
+
+    override fun withContext(context: Context) =
+        Execution(construction, executionOrder, position, constructedType, reports, context)
 
     override fun toString() = "$executionOrder^$construction"
 
