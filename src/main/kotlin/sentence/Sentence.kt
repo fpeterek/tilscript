@@ -12,4 +12,6 @@ sealed class Sentence(val position: SrcPosition, val reports: List<Report>, val 
     abstract fun withReports(iterable: Iterable<Report>): Sentence
 
     abstract fun withContext(context: Context): Sentence
+
+    abstract fun tsString(): String
 }

@@ -8,31 +8,32 @@ import org.json.JSONObject
 
 object JsonFormatter {
 
-    private fun sentenceBase(type: String) = JSONObject()
-        .put("sentence", type)
+    private fun sentenceBase(type: String, sentence: Sentence) = JSONObject()
+        .put("sentenceType", type)
+        .put("sentence", sentence.tsString())
 
-    private fun constructionBase(sentenceType: String, constructedType: Type, context: Context) =
-        sentenceBase(sentenceType)
+    private fun constructionBase(sentenceType: String, constructedType: Type, context: Context, sentence: Sentence) =
+        sentenceBase(sentenceType, sentence)
             .put("constructsType", constructedType.name)
             .put("context", context)
 
-    fun format(fnDef: FunctionDefinition): JSONObject = sentenceBase("Function definition")
+    fun format(fnDef: FunctionDefinition): JSONObject = sentenceBase("Function definition", fnDef)
         .put("functions", JSONArray().apply { fnDef.functions.forEach { put(it.name) } })
         .put("type", fnDef.type.name)
 
-    fun format(litDef: LiteralDefinition): JSONObject = sentenceBase("Literal definition")
+    fun format(litDef: LiteralDefinition): JSONObject = sentenceBase("Literal definition", litDef)
         .put("literals", JSONArray().apply { litDef.literals.forEach { put(it.value) } })
         .put("type", litDef.type.name)
 
-    fun format(typeDef: TypeDefinition): JSONObject = sentenceBase("Type definition")
+    fun format(typeDef: TypeDefinition): JSONObject = sentenceBase("Type definition", typeDef)
         .put("alias", typeDef.alias.name)
         .put("originalType", typeDef.alias.type.name)
 
-    fun format(varDef: VariableDefinition): JSONObject = sentenceBase("Variable definition")
+    fun format(varDef: VariableDefinition): JSONObject = sentenceBase("Variable definition", varDef)
         .put("variables", JSONArray().apply { varDef.variables.forEach { put(it.name) } })
         .put("type", varDef.type.name)
 
-    fun format(cl: Closure): JSONObject = constructionBase("Closure", cl.constructedType, cl.context)
+    fun format(cl: Closure): JSONObject = constructionBase("Closure", cl.constructedType, cl.context, cl)
         .put(
             "variables",
             JSONArray().apply {
@@ -43,38 +44,42 @@ object JsonFormatter {
         )
         .put("construction", format(cl.construction))
 
-    fun format(comp: Composition): JSONObject = constructionBase("Composition", comp.constructedType, comp.context)
+    fun format(comp: Composition): JSONObject =
+        constructionBase("Composition", comp.constructedType, comp.context, comp)
             .put("function", format(comp.function))
             .put("arguments", JSONArray().apply { comp.args.forEach { put(format(it)) } })
 
-    fun format(exec: Execution): JSONObject = constructionBase("Execution", exec.constructedType, exec.context)
-        .put("executionOrder", exec.executionOrder)
-        .put("construction", exec.construction)
+    fun format(exec: Execution): JSONObject =
+        constructionBase("Execution", exec.constructedType, exec.context, exec)
+            .put("executionOrder", exec.executionOrder)
+            .put("construction", exec.construction)
 
-    fun format(lit: Literal): JSONObject = constructionBase("Literal", lit.constructedType, lit.context)
-        .put("value", lit.value)
+    fun format(lit: Literal): JSONObject =
+        constructionBase("Literal", lit.constructedType, lit.context, lit)
+            .put("value", lit.value)
 
-    fun format(fn: TilFunction): JSONObject = constructionBase("Function", fn.constructedType, fn.context)
-        .put("function", fn.name)
+    fun format(fn: TilFunction): JSONObject =
+        constructionBase("Function", fn.constructedType, fn.context, fn)
+            .put("function", fn.name)
 
     fun format(variable: Variable): JSONObject =
-        constructionBase("Variable", variable.constructedType, variable.context)
+        constructionBase("Variable", variable.constructedType, variable.context, variable)
             .put("name", variable.name)
 
     private fun formatTrivializedLiteral(tr: Trivialization) =
-        constructionBase("Trivialization", tr.constructedType, tr.context)
+        constructionBase("Trivialization", tr.constructedType, tr.context, tr)
             .put("literal", (tr.construction as Literal).value)
 
     private fun formatTrivializedVariable(tr: Trivialization) =
-        constructionBase("Trivialization", tr.constructedType, tr.context)
+        constructionBase("Trivialization", tr.constructedType, tr.context, tr)
             .put("variable", (tr.construction as Variable).name)
 
     private fun formatTrivializedFn(tr: Trivialization) =
-        constructionBase("Trivialization", tr.constructedType, tr.context)
+        constructionBase("Trivialization", tr.constructedType, tr.context, tr)
             .put("function", (tr.construction as TilFunction).name)
 
     private fun formatTrivialization(tr: Trivialization) =
-        constructionBase("Trivialization", tr.constructedType, tr.context)
+        constructionBase("Trivialization", tr.constructedType, tr.context, tr)
             .put("construction", format(tr.construction))
 
     fun format(tr: Trivialization): JSONObject = when (tr.construction) {
@@ -92,6 +97,7 @@ object JsonFormatter {
         is TilFunction    -> format(construction)
         is Trivialization -> format(construction)
         is Variable       -> format(construction)
+        else              -> throw RuntimeException("Invalid state")
     }
 
     fun format(definition: Definition): JSONObject = when (definition) {

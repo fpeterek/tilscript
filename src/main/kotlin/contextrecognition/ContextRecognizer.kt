@@ -129,6 +129,7 @@ class ContextRecognizer private constructor(private val highestContext: Context)
         is TilFunction    -> assign(cons)
         is Trivialization -> assign(cons)
         is Variable       -> assign(cons)
+        else              -> throw RuntimeException("Invalid state")
     }
 
     private fun assign(sentence: Sentence): Sentence = when (sentence) {

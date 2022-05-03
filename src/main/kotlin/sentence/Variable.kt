@@ -25,5 +25,6 @@ class Variable(
         Variable(name, position, constructedType, reports, context)
 
     override fun toString() = name
+    override fun tsString() = name
 
 }

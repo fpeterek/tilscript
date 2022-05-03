@@ -37,6 +37,7 @@ class LiteralDefinition(
         LiteralDefinition(literals.map { it.withContext(context) }, position, reports, context)
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
+    override fun tsString() = "${names.joinToString(separator=", ")}/${type.name}"
 }
 
 class TypeDefinition(
@@ -53,6 +54,8 @@ class TypeDefinition(
         TypeDefinition(alias, position, reports, context)
 
     override fun toString() = "${alias.shortName} := ${alias.type}"
+
+    override fun tsString() = "${alias.name} := ${alias.type.name}"
 }
 
 class VariableDefinition(
@@ -74,6 +77,7 @@ class VariableDefinition(
         VariableDefinition(variables.map { it.withContext(context) }, position, reports, context)
 
     override fun toString() = "${names.joinToString(separator=", ")} -> $type"
+    override fun tsString() = "${names.joinToString(separator=", ")} -> ${type.name}"
 }
 
 class FunctionDefinition(
@@ -96,5 +100,6 @@ class FunctionDefinition(
         FunctionDefinition(functions.map { it.withContext(context) }, position, reports, context)
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
+    override fun tsString() = "${names.joinToString(separator=", ")}/${type.name}"
 
 }

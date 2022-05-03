@@ -36,4 +36,6 @@ class Closure(
 
     override fun toString() = "${variables.joinToString(", ", prefix=GreekAlphabet.lambda) } $construction"
 
+    override fun tsString() =
+        "${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} ${construction.tsString()}"
 }

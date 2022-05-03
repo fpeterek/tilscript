@@ -33,5 +33,6 @@ class Execution(
         Execution(construction, executionOrder, position, constructedType, reports, context)
 
     override fun toString() = "$executionOrder^$construction"
+    override fun tsString() = "$executionOrder^${construction.tsString()}"
 
 }

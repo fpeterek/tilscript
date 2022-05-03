@@ -18,6 +18,7 @@ class TilFunction(
     NonExecutable {
 
     override fun toString() = name
+    override fun tsString() = name
 
     val fullyTyped: Boolean
         get() = constructedType is FunctionType && constructedType.fullyTyped

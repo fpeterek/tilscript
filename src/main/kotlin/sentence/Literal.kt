@@ -37,5 +37,6 @@ class Literal(
         Literal(value, position, constructedType, reports, context)
 
     override fun toString() = value
+    override fun tsString() = value
 
 }

@@ -1,31 +1,42 @@
 [
     {
-        "sentence": "Variable definition",
+        "sentence": "x -> Int",
         "variables": ["x"],
-        "type": "Int"
+        "type": "Int",
+        "sentenceType": "Variable definition"
     },
     {
-        "sentence": "Literal definition",
+        "sentence": "Tilman/Indiv",
         "literals": ["Tilman"],
-        "type": "Indiv"
+        "type": "Indiv",
+        "sentenceType": "Literal definition"
     },
     {
-        "sentence": "Function definition",
+        "sentence": "Seek/(((Bool Indiv *) Time) World)",
         "functions": ["Seek"],
-        "type": "(((Bool Indiv *) Time) World)"
+        "type": "(((Bool Indiv *) Time) World)",
+        "sentenceType": "Function definition"
     },
     {
-        "sentence": "Function definition",
+        "sentence": "Lastdec/(Int Real)",
         "functions": ["Lastdec"],
-        "type": "(Int Real)"
+        "type": "(Int Real)",
+        "sentenceType": "Function definition"
     },
     {
-        "sentence": "Literal definition",
+        "sentence": "Pi/Real",
         "literals": ["Pi"],
-        "type": "Real"
+        "type": "Real",
+        "sentenceType": "Literal definition"
     },
     {
-        "sentence": "Closure",
+        "sentence": "DruhaMocnina/(Int Int)",
+        "functions": ["DruhaMocnina"],
+        "type": "(Int Int)",
+        "sentenceType": "Function definition"
+    },
+    {
+        "sentence": "\\w: World \\t: Time [[['Seek w] t] '['Lastdec 'Pi] 'Tilman]",
         "constructsType": "((Bool Time) World)",
         "variables": [{
             "name": "w",
@@ -33,7 +44,7 @@
         }],
         "context": "Intensional",
         "construction": {
-            "sentence": "Closure",
+            "sentence": "\\t: Time [[['Seek w] t] '['Lastdec 'Pi] 'Tilman]",
             "constructsType": "(Bool Time)",
             "variables": [{
                 "name": "t",
@@ -41,77 +52,179 @@
             }],
             "context": "Intensional",
             "construction": {
-                "sentence": "Composition",
+                "sentence": "[[['Seek w] t] '['Lastdec 'Pi] 'Tilman]",
                 "constructsType": "Bool",
                 "function": {
-                    "sentence": "Composition",
+                    "sentence": "[['Seek w] t]",
                     "constructsType": "(Bool Indiv *)",
                     "function": {
-                        "sentence": "Composition",
+                        "sentence": "['Seek w]",
                         "constructsType": "((Bool Indiv *) Time)",
                         "function": {
-                            "sentence": "Trivialization",
+                            "sentence": "'Seek",
                             "constructsType": "(((Bool Indiv *) Time) World)",
                             "function": "Seek",
-                            "context": "Extensional"
+                            "context": "Extensional",
+                            "sentenceType": "Trivialization"
                         },
                         "context": "Extensional",
                         "arguments": [{
-                            "sentence": "Variable",
+                            "sentence": "w",
                             "constructsType": "World",
                             "context": "Intensional",
-                            "name": "w"
-                        }]
+                            "name": "w",
+                            "sentenceType": "Variable"
+                        }],
+                        "sentenceType": "Composition"
                     },
                     "context": "Extensional",
                     "arguments": [{
-                        "sentence": "Variable",
+                        "sentence": "t",
                         "constructsType": "Time",
                         "context": "Intensional",
-                        "name": "t"
-                    }]
+                        "name": "t",
+                        "sentenceType": "Variable"
+                    }],
+                    "sentenceType": "Composition"
                 },
                 "context": "Extensional",
                 "arguments": [
                     {
-                        "sentence": "Trivialization",
+                        "sentence": "'['Lastdec 'Pi]",
                         "constructsType": "*",
                         "context": "Intensional",
                         "construction": {
-                            "sentence": "Composition",
+                            "sentence": "['Lastdec 'Pi]",
                             "constructsType": "Int",
                             "function": {
-                                "sentence": "Trivialization",
+                                "sentence": "'Lastdec",
                                 "constructsType": "(Int Real)",
                                 "function": "Lastdec",
-                                "context": "Hyperintensional"
+                                "context": "Hyperintensional",
+                                "sentenceType": "Trivialization"
                             },
                             "context": "Hyperintensional",
                             "arguments": [{
-                                "sentence": "Trivialization",
+                                "sentence": "'Pi",
                                 "constructsType": "Real",
                                 "context": "Hyperintensional",
+                                "sentenceType": "Trivialization",
                                 "literal": "Pi"
-                            }]
-                        }
+                            }],
+                            "sentenceType": "Composition"
+                        },
+                        "sentenceType": "Trivialization"
                     },
                     {
-                        "sentence": "Trivialization",
+                        "sentence": "'Tilman",
                         "constructsType": "Indiv",
                         "context": "Intensional",
+                        "sentenceType": "Trivialization",
                         "literal": "Tilman"
                     }
-                ]
-            }
-        }
+                ],
+                "sentenceType": "Composition"
+            },
+            "sentenceType": "Closure"
+        },
+        "sentenceType": "Closure"
     },
     {
-        "sentence": "Function definition",
-        "functions": ["DruhaMocnina"],
-        "type": "(Int Int)"
+        "sentence": "\\w: World \\t: Time [[['Seek w] t] '['Lastdec 'Pi] 'Tilman]",
+        "constructsType": "((Bool Time) World)",
+        "variables": [{
+            "name": "w",
+            "type": "World"
+        }],
+        "context": "Intensional",
+        "construction": {
+            "sentence": "\\t: Time [[['Seek w] t] '['Lastdec 'Pi] 'Tilman]",
+            "constructsType": "(Bool Time)",
+            "variables": [{
+                "name": "t",
+                "type": "Time"
+            }],
+            "context": "Intensional",
+            "construction": {
+                "sentence": "[[['Seek w] t] '['Lastdec 'Pi] 'Tilman]",
+                "constructsType": "Bool",
+                "function": {
+                    "sentence": "[['Seek w] t]",
+                    "constructsType": "(Bool Indiv *)",
+                    "function": {
+                        "sentence": "['Seek w]",
+                        "constructsType": "((Bool Indiv *) Time)",
+                        "function": {
+                            "sentence": "'Seek",
+                            "constructsType": "(((Bool Indiv *) Time) World)",
+                            "function": "Seek",
+                            "context": "Extensional",
+                            "sentenceType": "Trivialization"
+                        },
+                        "context": "Extensional",
+                        "arguments": [{
+                            "sentence": "w",
+                            "constructsType": "World",
+                            "context": "Intensional",
+                            "name": "w",
+                            "sentenceType": "Variable"
+                        }],
+                        "sentenceType": "Composition"
+                    },
+                    "context": "Extensional",
+                    "arguments": [{
+                        "sentence": "t",
+                        "constructsType": "Time",
+                        "context": "Intensional",
+                        "name": "t",
+                        "sentenceType": "Variable"
+                    }],
+                    "sentenceType": "Composition"
+                },
+                "context": "Extensional",
+                "arguments": [
+                    {
+                        "sentence": "'['Lastdec 'Pi]",
+                        "constructsType": "*",
+                        "context": "Intensional",
+                        "construction": {
+                            "sentence": "['Lastdec 'Pi]",
+                            "constructsType": "Int",
+                            "function": {
+                                "sentence": "'Lastdec",
+                                "constructsType": "(Int Real)",
+                                "function": "Lastdec",
+                                "context": "Hyperintensional",
+                                "sentenceType": "Trivialization"
+                            },
+                            "context": "Hyperintensional",
+                            "arguments": [{
+                                "sentence": "'Pi",
+                                "constructsType": "Real",
+                                "context": "Hyperintensional",
+                                "sentenceType": "Trivialization",
+                                "literal": "Pi"
+                            }],
+                            "sentenceType": "Composition"
+                        },
+                        "sentenceType": "Trivialization"
+                    },
+                    {
+                        "sentence": "'Tilman",
+                        "constructsType": "Indiv",
+                        "context": "Intensional",
+                        "sentenceType": "Trivialization",
+                        "literal": "Tilman"
+                    }
+                ],
+                "sentenceType": "Composition"
+            },
+            "sentenceType": "Closure"
+        },
+        "sentenceType": "Closure"
     },
     {
-        "sentence": "Closure",
+        "sentence": "\\y: Int \\x: Int ['+ y x]",
         "constructsType": "((Int Int) Int)",
         "variables": [{
             "name": "y",
@@ -119,7 +232,7 @@
         }],
         "context": "Intensional",
         "construction": {
-            "sentence": "Closure",
+            "sentence": "\\x: Int ['+ y x]",
             "constructsType": "(Int Int)",
             "variables": [{
                 "name": "x",
@@ -127,47 +240,56 @@
             }],
             "context": "Intensional",
             "construction": {
-                "sentence": "Composition",
+                "sentence": "['+ y x]",
                 "constructsType": "Int",
                 "function": {
-                    "sentence": "Trivialization",
+                    "sentence": "'+",
                     "constructsType": "*",
                     "function": "+",
-                    "context": "Extensional"
+                    "context": "Extensional",
+                    "sentenceType": "Trivialization"
                 },
                 "context": "Extensional",
                 "arguments": [
                     {
-                        "sentence": "Variable",
+                        "sentence": "y",
                         "constructsType": "Int",
                         "context": "Intensional",
-                        "name": "y"
+                        "name": "y",
+                        "sentenceType": "Variable"
                     },
                     {
-                        "sentence": "Variable",
+                        "sentence": "x",
                         "constructsType": "Int",
                         "context": "Intensional",
-                        "name": "x"
+                        "name": "x",
+                        "sentenceType": "Variable"
                     }
-                ]
-            }
-        }
+                ],
+                "sentenceType": "Composition"
+            },
+            "sentenceType": "Closure"
+        },
+        "sentenceType": "Closure"
     },
     {
-        "sentence": "Composition",
+        "sentence": "['DruhaMocnina 'Tilman]",
         "constructsType": "Int",
         "function": {
-            "sentence": "Trivialization",
+            "sentence": "'DruhaMocnina",
             "constructsType": "(Int Int)",
             "function": "DruhaMocnina",
-            "context": "Extensional"
+            "context": "Extensional",
+            "sentenceType": "Trivialization"
         },
         "context": "Extensional",
         "arguments": [{
-            "sentence": "Trivialization",
-            "constructsType": "Int",
+            "sentence": "'Tilman",
+            "constructsType": "Indiv",
             "context": "Intensional",
-            "literal": "2"
-        }]
+            "sentenceType": "Trivialization",
+            "literal": "Tilman"
+        }],
+        "sentenceType": "Composition"
     }
 ]

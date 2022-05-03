@@ -116,13 +116,14 @@ class NameChecker private constructor(
     }
 
     private fun process(construction: Construction): Construction = when (construction) {
-        is Closure -> processClosure(construction)
-        is Composition -> processComposition(construction)
+        is Closure        -> processClosure(construction)
+        is Composition    -> processComposition(construction)
         is Trivialization -> processTrivialization(construction)
-        is Execution -> processExecution(construction)
-        is Variable -> processVariable(construction)
-        is TilFunction -> processFunction(construction)
-        is Literal -> construction
+        is Execution      -> processExecution(construction)
+        is Variable       -> processVariable(construction)
+        is TilFunction    -> processFunction(construction)
+        is Literal        -> construction
+        else              -> throw RuntimeException("Invalid state")
     }
 
     private fun process(definition: Definition): Definition = when (definition) {

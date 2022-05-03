@@ -268,13 +268,14 @@ class TypeChecker private constructor(
     }
 
     private fun processConstruction(construction: Construction): Construction = when (construction) {
-        is Closure -> processClosure(construction)
-        is Composition -> processComposition(construction)
+        is Closure        -> processClosure(construction)
+        is Composition    -> processComposition(construction)
         is Trivialization -> processTrivialization(construction)
-        is Execution -> processExecution(construction)
-        is Variable -> processVariable(construction)
-        is TilFunction -> processFunction(construction)
-        is Literal -> processLiteral(construction)
+        is Execution      -> processExecution(construction)
+        is Variable       -> processVariable(construction)
+        is TilFunction    -> processFunction(construction)
+        is Literal        -> processLiteral(construction)
+        else              -> throw RuntimeException("Invalid state")
     }
 
     private fun addLiteral(lit: Literal) = Literal(
