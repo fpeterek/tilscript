@@ -94,6 +94,14 @@ class NameChecker private constructor(
         )
     }
 
+    private fun processLiteral(literal: Literal) = when {
+        literal.value.all { it.isDigit() || it == '.' } -> literal
+        findSymbol(literal.value) -> literal
+        else -> literal.withReport(
+            Report("Undefined symbol '${literal.value}'", literal.position)
+        )
+    }
+
     private fun processFunction(fn: TilFunction) = when {
         findSymbol(fn.name) -> fn
         else -> fn.withReport(
@@ -122,7 +130,7 @@ class NameChecker private constructor(
         is Execution      -> processExecution(construction)
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
-        is Literal        -> construction
+        is Literal        -> processLiteral(construction)
         else              -> throw RuntimeException("Invalid state")
     }
 
