@@ -16,6 +16,7 @@ repositories {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation 'org.json:json:20220320'
+    implementation 'org.apache.commons:commons-text:1.9'
 
     antlr 'org.antlr:antlr4:4.9.3'
 
@@ -52,4 +53,5 @@ jar {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
