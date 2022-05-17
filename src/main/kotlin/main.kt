@@ -11,6 +11,7 @@ import org.fpeterek.til.typechecking.astprocessing.ErrorListener
 import org.fpeterek.til.typechecking.astprocessing.result.Sentences
 import org.fpeterek.til.typechecking.contextrecognition.ContextRecognizer
 import org.fpeterek.til.typechecking.formatters.JsonFormatter
+import org.fpeterek.til.typechecking.formatters.SvgFormatter
 import org.fpeterek.til.typechecking.types.Util.compose
 import org.fpeterek.til.typechecking.types.Util.extensionalize
 import org.fpeterek.til.typechecking.types.Util.trivialize
@@ -112,10 +113,10 @@ fun checkScript(filename: String) {
     val json = JsonFormatter.asString(withContext)
     val baseName = File(filename).name
     val jsonFile = "$baseName.json"
-    val htmlFile = "$baseName.html"
+    val svgFile = "$baseName.svg"
 
     File(jsonFile).writeText(json)
-    File(htmlFile).writeText(createHTML(baseName, json))
+    File(svgFile).writeText(SvgFormatter.format(withContext.filterIsInstance<Construction>()))
 
 }
 
