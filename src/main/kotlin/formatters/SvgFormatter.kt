@@ -10,91 +10,46 @@ class SvgFormatter private constructor(private val construction: Construction) {
         fun format(constructions: List<Construction>): String = SvgFormatter(constructions.first()).formSvg()
     }
 
-    private val constructionString = construction.toString()
-    private val tree = SvgTreeCreator.createTree(construction)
+    private val tree get() = SvgTreeCreator.createTree(construction)
+    private val blobs = SvgTreeProcessor.process(construction, tree)
+    private val alignments = TreeAlignment.getAlignments(blobs)
 
-    private val charWidth = 5
-    private val levelSize = 50
+    private val levelSize = 60
 
     private val builder = StringBuilder()
         .append("""<?xml version="1.0" standalone="no"?>""")
         .append("""<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
                      |"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">""".trimMargin())
         .append("""<svg version="1.1" xmlns="http://www.w3.org/2000/svg">""")
-        .append("""<text x="20" y="30" font-size="18" font-family="Inconsolata, monospace">
-                |${constructionString}</text>""".trimMargin())
 
-    private var leftOffset = 0
-    private val typeInfo = mutableListOf<TypeInfo>()
+    private fun buildLevel(blobs: List<TextBlob>, level: Int) {
 
-    private fun traverseValue(value: Value) {
-        typeInfo.add(
-            TypeInfo(
-                typename = value.typename,
-                level = value.depth,
-                leftOffset = leftOffset
-            )
-        )
-    }
+        val y = 30 + level * levelSize
+        val x = 20
+        var prevLen = 0
 
-    private fun traverseComposite(composite: Composite) {
-        val oldOffset = leftOffset
+        builder.append("""<text xml:space="preserve" x="$x" y="$y" font-size="18" font-family="Inconsolata, monospace">""")
 
-        typeInfo.add(
-            TypeInfo(
-                typename = composite.typename,
-                level = composite.depth,
-                leftOffset = leftOffset
-            )
-        )
+        // TODO: Fix
+        blobs.forEach {
+            val paddingLen = alignments[it.offset] - prevLen
+            val padding = when {
+                paddingLen > 0 -> " ".repeat(paddingLen)
+                else -> ""
+            }
+            prevLen += padding.length + it.length
 
-        leftOffset += composite.prefix.length
-
-        traverse(composite.treeData)
-
-        leftOffset = oldOffset + composite.toString().length
-    }
-
-    private fun traverseComposition(composition: TilComposition) {
-        val oldOffset = leftOffset
-
-        typeInfo.add(
-            TypeInfo(
-                typename = composition.typename,
-                level = composition.depth,
-                leftOffset = leftOffset
-            )
-        )
-
-        leftOffset += composition.prefix.length
-
-        composition.args.forEach {
-            traverse(it)
-            leftOffset += 1 // Space after each composition element
+            builder.append(padding)
+            builder.append(it.text)
         }
 
-        leftOffset = oldOffset + composition.toString().length
+        builder.append("</text>")
     }
 
-    private fun traverse(tree: SentencePart) = when (tree) {
-        is Composite -> traverseComposite(tree)
-        is TilComposition -> traverseComposition(tree)
-        is Value -> traverseValue(tree)
-    }
-
-    private fun add(ti: TypeInfo) {
-        val y = 30 + ti.level * levelSize
-        val x = 20 + ti.leftOffset * charWidth
-        builder.append(
-            """<text x="$x" y="$y" font-size="18" font-family="Inconsolata, monospace">${ti.typename}</text>"""
-        )
-    }
-
-    private fun build() = typeInfo.forEach(::add)
+    private fun build() = blobs.forEachIndexed { index, textBlobs -> buildLevel(textBlobs, index) }
 
     private fun formSvg(): String {
 
-        traverse(tree)
         build()
 
         return builder.append("</svg>").toString()

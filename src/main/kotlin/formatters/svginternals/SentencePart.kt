@@ -3,6 +3,7 @@ package org.fpeterek.til.typechecking.formatters.svginternals
 
 sealed class SentencePart(
     val typename: String,
+    val leftOffset: Int,
 ) {
     abstract val prefix: String
     abstract val data: String
@@ -18,7 +19,8 @@ sealed class SentencePart(
 class Value(
     override val data: String,
     typename: String,
-) : SentencePart(typename) {
+    leftOffset: Int,
+) : SentencePart(typename, leftOffset) {
     override val prefix get() = ""
     override val suffix get() = ""
 
@@ -31,9 +33,10 @@ class Composite(
     override val suffix: String,
     val treeData: SentencePart,
     typename: String,
-) : SentencePart(typename) {
+    leftOffset: Int,
+) : SentencePart(typename, leftOffset) {
 
-    override val depth: Int get() = treeData.depth
+    override val depth: Int get() = treeData.depth + 1
 
 }
 
@@ -41,7 +44,8 @@ class TilComposition(
     override val data: String,
     val args: List<SentencePart>,
     typename: String,
-) : SentencePart(typename) {
+    leftOffset: Int,
+) : SentencePart(typename, leftOffset) {
     override val prefix = "["
     override val suffix = "]"
 
