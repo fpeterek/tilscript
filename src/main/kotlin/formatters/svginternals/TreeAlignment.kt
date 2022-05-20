@@ -6,7 +6,13 @@ class TreeAlignment private constructor(private val textBlobs: List<List<TextBlo
         fun getAlignments(textBlobs: List<List<TextBlob>>) = TreeAlignment(textBlobs).align()
     }
 
-    private fun maxOffset(blobs: List<TextBlob>) = blobs.maxOf { it.offset }
+    private fun maxOffset(blobs: List<TextBlob>): Int {
+
+        blobs.forEach { print("${it.offset}: $it, ") }
+        println()
+
+        return blobs.last().offset
+    }
 
     private fun maxOffset() = textBlobs.maxOf { maxOffset(it) }
 
@@ -25,17 +31,23 @@ class TreeAlignment private constructor(private val textBlobs: List<List<TextBlo
         }
     }
 
-    private fun align(row: List<TextBlob>) {
-        var lengthOfPrevious = row.first().offset
+    // TODO: Fix padding
+    private fun align(row: List<TextBlob>, index: Int) {
+        var endOfPrevious = row.first().offset
+
+        val padding = when (index) {
+            0 -> 0
+            else -> 3
+        }
 
         row.forEach {
-            storeAlignment(it.offset, lengthOfPrevious)
-            lengthOfPrevious += it.length
+            storeAlignment(it.offset, endOfPrevious)
+            endOfPrevious += it.length + padding
         }
     }
 
     private fun align(): List<Int> {
-        textBlobs.forEach(::align)
+        textBlobs.forEachIndexed { idx, line -> align(line, idx) }
 
         return alignments
     }

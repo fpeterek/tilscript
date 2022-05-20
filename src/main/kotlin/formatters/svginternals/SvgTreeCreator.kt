@@ -75,7 +75,7 @@ class SvgTreeCreator {
 
     private fun convertComposite(closure: Closure): SentencePart {
 
-        val prefix = GreekAlphabet.lambda +
+        val prefix = "\\" +
                 closure.variables.joinToString(separator=" ", postfix=" ") { formatClosureVar(it) }
 
         val origOffset = charOffset

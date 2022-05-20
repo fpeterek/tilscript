@@ -14,7 +14,7 @@ class SvgFormatter private constructor(private val construction: Construction) {
     private val blobs = SvgTreeProcessor.process(construction, tree)
     private val alignments = TreeAlignment.getAlignments(blobs)
 
-    private val levelSize = 60
+    private val levelSize = 20
 
     private val builder = StringBuilder()
         .append("""<?xml version="1.0" standalone="no"?>""")
@@ -28,9 +28,8 @@ class SvgFormatter private constructor(private val construction: Construction) {
         val x = 20
         var prevLen = 0
 
-        builder.append("""<text xml:space="preserve" x="$x" y="$y" font-size="18" font-family="Inconsolata, monospace">""")
+        builder.append("""<text xml:space="preserve" x="$x" y="$y" font-size="18px" font-family="Inconsolata, monospace">""")
 
-        // TODO: Fix
         blobs.forEach {
             val paddingLen = alignments[it.offset] - prevLen
             val padding = when {

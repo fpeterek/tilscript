@@ -11,7 +11,6 @@ class SvgTreeProcessor private constructor(
             SvgTreeProcessor(construction, tree).process()
     }
 
-    private var leftOffset = 0
     private val levels = mutableListOf<MutableList<TypeInfo>>()
 
     private fun add(typeInfo: TypeInfo) {
@@ -26,48 +25,35 @@ class SvgTreeProcessor private constructor(
             TypeInfo(
                 typename = value.typename,
                 level = value.depth,
-                leftOffset = leftOffset
+                leftOffset = value.leftOffset
             )
         )
     }
 
     private fun traverseComposite(composite: Composite) {
-        val oldOffset = leftOffset
-
         add(
             TypeInfo(
                 typename = composite.typename,
                 level = composite.depth,
-                leftOffset = leftOffset
+                leftOffset = composite.leftOffset
             )
         )
 
-        leftOffset += composite.prefix.length
-
         traverse(composite.treeData)
-
-        leftOffset = oldOffset + composite.toString().length
     }
 
     private fun traverseComposition(composition: TilComposition) {
-        val oldOffset = leftOffset
-
         add(
             TypeInfo(
                 typename = composition.typename,
                 level = composition.depth,
-                leftOffset = leftOffset
+                leftOffset = composition.leftOffset
             )
         )
 
-        leftOffset += composition.prefix.length
-
         composition.args.forEach {
             traverse(it)
-            leftOffset += 1 // Space after each composition element
         }
-
-        leftOffset = oldOffset + composition.toString().length
     }
 
     private fun traverse(tree: SentencePart) = when (tree) {
@@ -76,12 +62,7 @@ class SvgTreeProcessor private constructor(
         is Value -> traverseValue(tree)
     }
 
-    private fun asBlobs(level: List<TypeInfo>) = level.flatMapIndexed { idx, ti ->
-        when (idx) {
-            0 -> listOf(TextBlob(ti.typename, ti.leftOffset))
-            else -> listOf(TextBlob("   ", ti.leftOffset), TextBlob(ti.typename, ti.leftOffset + 3))
-        }
-    }
+    private fun asBlobs(level: List<TypeInfo>) = level.map { TextBlob(it.typename, it.leftOffset) }
 
     private fun levelsAsBlobs() = levels.map(::asBlobs).filter { it.isNotEmpty() }
 

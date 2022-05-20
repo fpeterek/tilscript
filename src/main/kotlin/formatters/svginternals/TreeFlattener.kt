@@ -12,7 +12,7 @@ object TreeFlattener {
 
         val prefix = flattenString(comp.prefix, comp.leftOffset)
         val data = prefix + flatten(comp.treeData)
-        val suffixOffset = data.sumOf { it.length }
+        val suffixOffset = data.last().offset + data.last().length
 
         return data + flattenString(comp.suffix, suffixOffset)
     }
@@ -31,7 +31,7 @@ object TreeFlattener {
         }
 
         val data = prefix + args
-        val suffixOffset = data.sumOf { it.length }
+        val suffixOffset = data.last().offset + data.last().length
 
         return data + flattenString(comp.suffix, suffixOffset)
     }
