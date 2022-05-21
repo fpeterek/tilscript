@@ -14,7 +14,7 @@ class SvgFormatter private constructor(private val construction: Construction) {
     private val blobs = SvgTreeProcessor.process(construction, tree)
     private val alignments = TreeAlignment.getAlignments(blobs)
 
-    private val levelSize = 20
+    private val levelSize = 60
 
     private val builder = StringBuilder()
         .append("""<?xml version="1.0" standalone="no"?>""")

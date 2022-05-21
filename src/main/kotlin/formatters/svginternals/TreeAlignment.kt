@@ -1,20 +1,14 @@
 package org.fpeterek.til.typechecking.formatters.svginternals
 
+import kotlin.math.max
+
 class TreeAlignment private constructor(private val textBlobs: List<List<TextBlob>>) {
 
     companion object {
         fun getAlignments(textBlobs: List<List<TextBlob>>) = TreeAlignment(textBlobs).align()
     }
 
-    private fun maxOffset(blobs: List<TextBlob>): Int {
-
-        blobs.forEach { print("${it.offset}: $it, ") }
-        println()
-
-        return blobs.last().offset
-    }
-
-    private fun maxOffset() = textBlobs.maxOf { maxOffset(it) }
+    private fun maxOffset() = textBlobs.first().last().offset
 
     // Offset level -> Actual position
     private val alignments = (0 .. maxOffset()).toMutableList()
@@ -31,7 +25,6 @@ class TreeAlignment private constructor(private val textBlobs: List<List<TextBlo
         }
     }
 
-    // TODO: Fix padding
     private fun align(row: List<TextBlob>, index: Int) {
         var endOfPrevious = row.first().offset
 
@@ -41,6 +34,7 @@ class TreeAlignment private constructor(private val textBlobs: List<List<TextBlo
         }
 
         row.forEach {
+            endOfPrevious = max(endOfPrevious, alignments[it.offset])
             storeAlignment(it.offset, endOfPrevious)
             endOfPrevious += it.length + padding
         }
