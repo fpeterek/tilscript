@@ -21,10 +21,10 @@ object TreeFlattener {
 
         val prefix = flattenString(comp.prefix, comp.leftOffset)
 
-        val args = comp.args.flatMapIndexed { level: Int, sentencePart: SentencePart ->
-            val space = when (level) {
+        val args = comp.args.flatMapIndexed { index: Int, sentencePart: SentencePart ->
+            val space = when (index) {
                 0 -> listOf()
-                else -> listOf(TextBlob(" ", sentencePart.leftOffset - 1, level, listOf()))
+                else -> listOf(TextBlob(" ", sentencePart.leftOffset - 1, 0, listOf()))
             }
 
             space + flatten(sentencePart)

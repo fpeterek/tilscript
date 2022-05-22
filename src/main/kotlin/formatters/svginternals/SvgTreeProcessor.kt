@@ -21,23 +21,23 @@ class SvgTreeProcessor private constructor(
 
     private fun traverseValue(value: Value) = TextBlob(
         text = value.typename,
-        level = value.depth,
+        level = value.depth+1, // The resulting type must be one level below whatever constructed it
         offset = value.leftOffset,
-        children = listOf(),
+        children = listOf(TextBlob("", value.leftOffset, 0, listOf())),
     ).apply { add(this) }
 
     private fun traverseComposite(composite: Composite) = TextBlob(
         text = composite.typename,
-        level = composite.depth,
+        level = composite.depth+1,
         offset = composite.leftOffset,
-        children = listOf(traverse(composite.treeData))
+        children = listOf(TextBlob("", composite.leftOffset, 0, listOf()), traverse(composite.treeData))
     ).apply { add(this) }
 
     private fun traverseComposition(composition: TilComposition) = TextBlob(
         text = composition.typename,
-        level = composition.depth,
+        level = composition.depth+1,
         offset = composition.leftOffset,
-        children = composition.args.map(::traverse)
+        children = listOf(TextBlob("", composition.leftOffset, 0, listOf())) + composition.args.map(::traverse)
     ).apply { add(this) }
 
     private fun traverse(tree: SentencePart): TextBlob = when (tree) {
