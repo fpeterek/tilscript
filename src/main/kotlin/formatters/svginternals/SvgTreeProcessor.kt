@@ -26,18 +26,28 @@ class SvgTreeProcessor private constructor(
         children = listOf(TextBlob("", value.leftOffset, 0, listOf())),
     ).apply { add(this) }
 
+    private fun compositeChildren(composite: Composite) = when (composite) {
+        is TilClosure, is TilExecution ->
+            listOf(TextBlob("", composite.leftOffset, 0, listOf()), traverse(composite.treeData))
+
+        is TilTrivialization -> {
+            traverse(composite.treeData)
+            listOf(TextBlob("", composite.leftOffset, 0, listOf()))
+        }
+    }
+
     private fun traverseComposite(composite: Composite) = TextBlob(
         text = composite.typename,
         level = composite.depth+1,
         offset = composite.leftOffset,
-        children = listOf(TextBlob("", composite.leftOffset, 0, listOf()), traverse(composite.treeData))
+        children = compositeChildren(composite),
     ).apply { add(this) }
 
     private fun traverseComposition(composition: TilComposition) = TextBlob(
         text = composition.typename,
         level = composition.depth+1,
         offset = composition.leftOffset,
-        children = listOf(TextBlob("", composition.leftOffset, 0, listOf())) + composition.args.map(::traverse)
+        children = composition.args.map(::traverse)
     ).apply { add(this) }
 
     private fun traverse(tree: SentencePart): TextBlob = when (tree) {

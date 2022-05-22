@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.formatters.svginternals
 
-import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.types.Unknown
 
@@ -42,7 +41,7 @@ class SvgTreeCreator {
         val origOffset = charOffset
         charOffset += 1
 
-        val comp = Composite(
+        return TilTrivialization(
             data = triv.construction.toString(),
             prefix = "'",
             suffix = "",
@@ -50,8 +49,6 @@ class SvgTreeCreator {
             typename = triv.constructedType.name,
             leftOffset = origOffset,
         )
-
-        return comp
     }
 
     private fun convertComposite(exec: Execution): SentencePart {
@@ -61,7 +58,7 @@ class SvgTreeCreator {
         val origOffset = charOffset
         charOffset += prefix.length
 
-        val comp = Composite(
+        return TilExecution(
             data = exec.construction.toString(),
             prefix = exec.executionOrder.toString(),
             suffix = "",
@@ -69,19 +66,17 @@ class SvgTreeCreator {
             typename = exec.constructedType.name,
             leftOffset = origOffset,
         )
-
-        return comp
     }
 
     private fun convertComposite(closure: Closure): SentencePart {
 
         val prefix = "\\" +
-                closure.variables.joinToString(separator=" ", postfix=" ") { formatClosureVar(it) }
+                closure.variables.joinToString(separator = " ", postfix = " ") { formatClosureVar(it) }
 
         val origOffset = charOffset
         charOffset += prefix.length
 
-        val comp = Composite(
+        return TilClosure(
             data = closure.construction.toString(),
             prefix = prefix,
             suffix = "",
@@ -89,8 +84,6 @@ class SvgTreeCreator {
             typename = closure.constructedType.name,
             leftOffset = origOffset,
         )
-
-        return comp
     }
 
     private fun convertCompArgs(comp: Composition): List<SentencePart> {

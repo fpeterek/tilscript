@@ -27,7 +27,7 @@ class Value(
     override val depth: Int get() = 0
 }
 
-class Composite(
+sealed class Composite(
     override val data: String,
     override val prefix: String,
     override val suffix: String,
@@ -39,6 +39,33 @@ class Composite(
     override val depth: Int get() = treeData.depth + 1
 
 }
+
+class TilTrivialization(
+    data: String,
+    prefix: String,
+    suffix: String,
+    treeData: SentencePart,
+    typename: String,
+    leftOffset: Int,
+) : Composite(data, prefix, suffix, treeData, typename, leftOffset)
+
+class TilClosure(
+    data: String,
+    prefix: String,
+    suffix: String,
+    treeData: SentencePart,
+    typename: String,
+    leftOffset: Int,
+) : Composite(data, prefix, suffix, treeData, typename, leftOffset)
+
+class TilExecution(
+    data: String,
+    prefix: String,
+    suffix: String,
+    treeData: SentencePart,
+    typename: String,
+    leftOffset: Int,
+) : Composite(data, prefix, suffix, treeData, typename, leftOffset)
 
 class TilComposition(
     override val data: String,
