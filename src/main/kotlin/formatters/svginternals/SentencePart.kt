@@ -24,7 +24,7 @@ class Value(
     override val prefix get() = ""
     override val suffix get() = ""
 
-    override val depth: Int get() = 1
+    override val depth: Int get() = 0
 }
 
 class Composite(

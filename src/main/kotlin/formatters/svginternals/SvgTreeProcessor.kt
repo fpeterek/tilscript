@@ -11,65 +11,43 @@ class SvgTreeProcessor private constructor(
             SvgTreeProcessor(construction, tree).process()
     }
 
-    private val levels = mutableListOf<MutableList<TypeInfo>>()
+    private val levels = mutableListOf<MutableList<TextBlob>>()
 
-    private fun add(typeInfo: TypeInfo) {
-        val adjustedLevel = typeInfo.level - 1
-        (levels.lastIndex .. adjustedLevel).forEach { _ -> levels.add(mutableListOf()) }
+    private fun add(typeInfo: TextBlob) {
+        (levels.lastIndex .. typeInfo.level).forEach { _ -> levels.add(mutableListOf()) }
 
-        levels[adjustedLevel].add(typeInfo)
+        levels[typeInfo.level].add(typeInfo)
     }
 
-    private fun traverseValue(value: Value) {
-        add(
-            TypeInfo(
-                typename = value.typename,
-                level = value.depth,
-                leftOffset = value.leftOffset
-            )
-        )
-    }
+    private fun traverseValue(value: Value) = TextBlob(
+        text = value.typename,
+        level = value.depth,
+        offset = value.leftOffset,
+        children = listOf(),
+    ).apply { add(this) }
 
-    private fun traverseComposite(composite: Composite) {
-        add(
-            TypeInfo(
-                typename = composite.typename,
-                level = composite.depth,
-                leftOffset = composite.leftOffset
-            )
-        )
+    private fun traverseComposite(composite: Composite) = TextBlob(
+        text = composite.typename,
+        level = composite.depth,
+        offset = composite.leftOffset,
+        children = listOf(traverse(composite.treeData))
+    ).apply { add(this) }
 
-        traverse(composite.treeData)
-    }
+    private fun traverseComposition(composition: TilComposition) = TextBlob(
+        text = composition.typename,
+        level = composition.depth,
+        offset = composition.leftOffset,
+        children = composition.args.map(::traverse)
+    ).apply { add(this) }
 
-    private fun traverseComposition(composition: TilComposition) {
-        add(
-            TypeInfo(
-                typename = composition.typename,
-                level = composition.depth,
-                leftOffset = composition.leftOffset
-            )
-        )
-
-        composition.args.forEach {
-            traverse(it)
-        }
-    }
-
-    private fun traverse(tree: SentencePart) = when (tree) {
+    private fun traverse(tree: SentencePart): TextBlob = when (tree) {
         is Composite -> traverseComposite(tree)
         is TilComposition -> traverseComposition(tree)
         is Value -> traverseValue(tree)
     }
 
-    private fun asBlobs(level: List<TypeInfo>) = level.map { TextBlob(it.typename, it.leftOffset) }
-
-    private fun levelsAsBlobs() = levels.map(::asBlobs).filter { it.isNotEmpty() }
-
-    private fun toBlobs(): List<List<TextBlob>> = listOf(TreeFlattener.flatten(tree)) + levelsAsBlobs()
-
     private fun process(): List<List<TextBlob>> {
         traverse(tree)
-        return toBlobs()
+        return listOf(TreeFlattener.flatten(tree)) + levels.filter { it.isNotEmpty() }
     }
 }

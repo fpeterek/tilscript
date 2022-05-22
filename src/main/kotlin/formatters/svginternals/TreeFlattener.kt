@@ -4,7 +4,7 @@ package org.fpeterek.til.typechecking.formatters.svginternals
 object TreeFlattener {
 
     private fun flattenString(str: String, offset: Int) = when {
-        str.isNotBlank() -> listOf(TextBlob(str, offset))
+        str.isNotBlank() -> listOf(TextBlob(str, offset, 0, listOf()))
         else             -> listOf()
     }
 
@@ -21,10 +21,10 @@ object TreeFlattener {
 
         val prefix = flattenString(comp.prefix, comp.leftOffset)
 
-        val args = comp.args.flatMapIndexed { index: Int, sentencePart: SentencePart ->
-            val space = when (index) {
+        val args = comp.args.flatMapIndexed { level: Int, sentencePart: SentencePart ->
+            val space = when (level) {
                 0 -> listOf()
-                else -> listOf(TextBlob(" ", sentencePart.leftOffset - 1))
+                else -> listOf(TextBlob(" ", sentencePart.leftOffset - 1, level, listOf()))
             }
 
             space + flatten(sentencePart)
@@ -36,7 +36,7 @@ object TreeFlattener {
         return data + flattenString(comp.suffix, suffixOffset)
     }
 
-    private fun flatten(value: Value) = listOf(TextBlob(value.toString(), value.leftOffset))
+    private fun flatten(value: Value) = listOf(TextBlob(value.toString(), value.leftOffset, value.depth, listOf()))
 
     fun flatten(tree: SentencePart): List<TextBlob> = when (tree) {
         is Composite      -> flatten(tree)
