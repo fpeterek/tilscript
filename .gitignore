@@ -3,4 +3,6 @@ build/
 .gradle
 *.swp
 .DS_Store/
-
+.auctex-auto/
+*.aux
+*.log

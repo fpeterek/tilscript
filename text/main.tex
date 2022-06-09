@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xurl}
+\usepackage[czech]{babel}
+\usepackage{csquotes}
+
+\MakeOuterQuote{"}
+
+\setlength{\parskip}{\baselineskip}
+\setlength{\parindent}{0pt}
+
+\title{Kontrola typové koherence v jazyce TIL-Script}
+\author{Filip Peterek}
+\date{1. prosinec 2021}
+
+\begin{document}
+
+\maketitle
+
+\section{Transparentní intenzionální logika}
+
+Transparentní intenzionální logika~\cite{til-duzi} (dále také pouze TIL) je logický systém sloužící
+k analýze přirozeného jazyka. TIL vychází z typovaného lambda kalkulu, a využívá rigorózně definovaný
+typový systém za účelem zabránění velké škále chyb. Mezi chyby, které lze typovým systémem zachytit
+patří například primitivnější chyby, jako je špatné pořadí argumentů (rovnice počítá Karla), ale také
+chybná změna supozice způsobená inkorektní analýzou (funkce očekává úřad, avšak na vstupu dostane
+individuum). Kontrolu typové koherence však lze provádět strojově. Tato práce se zabývá automatizací
+typové kontroly, jež je užitečná převážně v případě, kdy analyzujeme složité TIL konstrukce a manuální
+typová kontrola by tedy byla náchylná k chybě.
+
+\section{TIL-Script}
+
+TIL-Script~\cite{til-script} je funkcionální programovací jazyk sloužící k práci s TIL konstrukcemi.
+Syntax TIL-Scriptu vychází z notace TIL, kterou však upravuje pro potřeby počítačového zápisu -- zatímco
+TIL ve své notaci hojně využívá řecké abecedy nebo horních i dolních indexů, TIL-Script byl vytvářen
+tak, aby byl jednoduše zapisovatelný i na běžné klávesnici. Z toho důvodu byl také TIL-Script zvolen
+jako notace využívaná v této práci.
+
+\section{Parser jazyka TIL-Script}
+
+Parser byl vygenerován za využití generátoru parserů Antlr~\cite{antlr-src}. Díky volby již existujícího
+jazyka jako notace programu stačilo gramatiku jazyka TIL-Script upravit do formátu zpracovatelného
+Antlrem. Jelikož program pro kontrolu typové koherence využívá build systém Gradle, je parser automaticky
+vygenerován během kompilace, je-li to potřeba. Výstup vygenerovaného parseru je poté převeden na vlastní
+reprezentaci, která je méně generická a umožňuje ergonomičtější programatickou práci s abstraktním
+syntaktickým stromem TIL-Script programu.
+
+Ke kontrole syntaktických chyb je využita kontrola zabudovaná do nástroje Antlr. Nad rámec automatického
+reportování zabudovaného v Antlru je implementován pouze vylepšený indikátor pozice chyby přímo
+ve strojovém kódu, a kromě číselné pozice chyby je vypsán také samotný chybný řádek s graficky vyznačenou
+chybou.
+
+\begin{thebibliography}{50}
+
+\bibitem{til-duzi}
+Duží, M., Materna, P.: \textit{TIL jako procedurální logika} [cit. 2022-06-09] \\
+Dostupné z: \url{http://www.cs.vsb.cz/duzi/aleph.pdf} \\
+Marie Duží, Pavel Materna, 2012
+
+\bibitem{til-script}
+Ciprich, N., Duží, M., Košinár, M.: \textit{TIL-Script: Functional Programming Based on
+Transparent Intensional Logic} [cit. 2022-06-09] \\
+In: \textit{RASLAN 2007}, Sojka, P., Horák, A., (Eds.), Masaryk University Brno, 2007, pp. 37–42.
+
+\bibitem{antlr-src}
+Parr, T.: \textit{ANTLR v4} [cit. 2022-06-09] \\
+Dostupné z: \url{https://www.antlr.org} \\
+Terence Parr
+
+\end{thebibliography}
+
+\end{document}
+
