@@ -6,16 +6,21 @@
 
 \MakeOuterQuote{"}
 
-\setlength{\parskip}{\baselineskip}
-\setlength{\parindent}{0pt}
-
 \title{Kontrola typové koherence v jazyce TIL-Script}
 \author{Filip Peterek}
-\date{1. prosinec 2021}
+\date{9. červen 2022}
 
 \begin{document}
 
 \maketitle
+
+\section{Cíl práce}
+
+Cílem práce bylo vytvoření programu umožňujícího kontrolu typové koherence konstrukcí Transparentní
+intenzionální logiky. Program měl na svém vstupu příjímat konstrukce, na svém výstupu poté měl
+vrátit seznam případných chyb, a graficky znázornit průběh typové kontroly za využití grafu.
+
+Program je psán v programovacím jazyce Kotlin, jako build systém byl zvolen Gradle.
 
 \section{Transparentní intenzionální logika}
 
@@ -49,6 +54,67 @@ Ke kontrole syntaktických chyb je využita kontrola zabudovaná do nástroje An
 reportování zabudovaného v Antlru je implementován pouze vylepšený indikátor pozice chyby přímo
 ve strojovém kódu, a kromě číselné pozice chyby je vypsán také samotný chybný řádek s graficky vyznačenou
 chybou.
+
+\section{Kontrola existence symbolů}
+
+Aby bylo možné provést typovou kontrolu, je třeba znát typy všech symbolů, které se ve vstupní konstrukci
+nacházejí. Proto tvorbu abstraktního syntaktického programu následuje právě kontrola, zda jsou všechny
+symboly definovány. Symbol může být definován jako literál (např. Karel, Vysoká škola báňská), funkce,
+proměnná libovolného typu, nebo jako typový alias (ekvivalent např. \texttt{typedef} známého z jazyků
+C a C++). Typové aliasy, literály a funkce lze definovat pouze pomocí samostatné TIL-Script definice.
+Proměnné lze definovat pomocí globální definice definující volnou proměnnou, nebo jako $\lambda$-vázanou
+proměnnou v konstrukci uzávěru. Symbol musí být definován před jeho prvním použitím.
+
+Proměnné vázané trivializací musí být definované. Ačkoliv proměnné vázané trivializací nejsou konstituenty,
+neboť trivializace konstruuje konstrukci proměnné, tedy typ $*_{n}$, program provádí typovou kontrolu všech
+podkonstrukcí.
+
+V případě, že se vstupní program odkazuje na alespoň jeden nedefinovaný symbol, je běh programu ukončen a
+na standardní výstup jsou vypsány všechny využívané, avšak nedefinované symboly. K typové kontrole nedojde,
+neboť ji nejde provést.
+
+Program automatickou dedukci typů symbolů nepodporuje.
+
+\section{Kontrola typové koherence}
+
+Kontrola typové koherence vyžaduje průchod stromem a proto je přirozeně implementována rekurzivně. Při
+kontrole každé konstrukce jsou zkontrolovány nejprve její podkonstrukce (všechny podkonstrukce, nejen
+konstituenty). Podkonstrukce jsou zkontrolovány, zda jsou typově koherentní a je jim přirazen datový
+typ, který konstruují. Teprve poté je zkontrolována původní konstrukce. Atomickým konstrukcím, tedy
+proměnným, literálům a funkcím, je jejich typ přirazen rovnou.
+
+V kompozici, tedy při aplikaci funkce, je třeba zkontrolovat, že je funkce aplikována na správný počet
+argumentů, a že všechny typy argumentů odpovídají signatuře funkce. V opačném případě samozřejmě typová
+kontrola selhává a na standardní výstup je vypsána chyba.
+
+Selže-li typová kontrola v některé z podkonstrukcí, typová kontrola konstrukce samotné selhává také,
+neboť ji nelze provést. V takovém případě však není vypisována žádná chyba, neboť program v současné
+verzi nedokáže určit, zda by k chybě došlo. Typ konstruovaný konstrukcí je označen za neznámý. Jelikož
+kontrola existence symbolů byla provedena již v předchozím kroku, lze v tomto kroku přítomnost neznámého
+typu interpretovat právě jako selhání typové kontroly.
+
+Datové typy jsou konstrukcím přiřazovány teprve při úspěšném dokončení typové kontroly pro danou konstrukci.
+Důvodem této implementace je existence typově polymorfních funkcí, u kterých nemusí být předem jednoznačně
+určen konstruovaný typ.
+
+Při typové kontrole je nutné brát v potaz vázání proměnných. Proto je pro každou trivializaci konstrukce, jež
+není literál nebo funkce, a pro každý uzávěr konstruován nový kontext. Kontext trivializace je nezávislý na
+kontextu nadkonstrukce, odkazuje se pouze na globální kontext, jež obsahuje informace o volných proměnných
+a funkcích. Kontext uzávěru se na kontext nadkonstrukce odkazuje, umožňuje však definovat $\lambda$-vázané proměnné,
+jež zastíní proměnné z rodičovských kontextů. Při nalezení symbolu jsou poté kontexty prohledávány rekurzivně,
+od nejbližšího kontextu až po kontext globální, a je hledán typ konstruovaný symbolem. Globální kontext je
+samozřejmě nezávislý na kontextech uzávěrů a trivializací. Lze jej modifikovat pouze globální definicí.
+
+\section{Rozpoznání kontextu}
+
+\section{Grafický výstup}
+
+\section{Textový výstup}
+
+\section{Závěr}
+
+% TODO: Možná vylepšení -> LSP
+
 
 \begin{thebibliography}{50}
 
