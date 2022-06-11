@@ -6,3 +6,8 @@ build/
 .auctex-auto/
 *.aux
 *.log
+*.toc
+*.nav
+*.snm
+*.out
+
