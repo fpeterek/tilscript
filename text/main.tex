@@ -48,7 +48,7 @@ typová kontrola by tedy byla náchylná k chybě.
 \subsection{TIL-Script}
 
 TIL-Script~\cite{til-script} je funkcionální programovací jazyk sloužící k práci s TIL konstrukcemi.
-Syntax TIL-Scriptu vychází z notace TIL, kterou je však upravena pro~potřeby počítačového zápisu -- zatímco
+Syntax TIL-Scriptu vychází z notace TIL, která je však upravena pro~potřeby počítačového zápisu -- zatímco
 TIL ve své notaci hojně využívá řecké abecedy nebo horních i dolních indexů, TIL-Script byl vytvářen
 tak, aby byl jednoduše zapisovatelný i na běžné klávesnici. Z toho důvodu byl také TIL-Script zvolen
 jako notace využívaná v této práci.
@@ -57,11 +57,11 @@ jako notace využívaná v této práci.
 
 \subsection{Parser jazyka TIL-Script}
 
-Parser byl vygenerován za využití generátoru parserů Antlr~\cite{antlr-src}. Díky volby již existujícího
+Parser byl vygenerován za využití generátoru parserů Antlr~\cite{antlr-src}. Díky volbě již existujícího
 jazyka jako notace programu stačilo gramatiku jazyka TIL-Script upravit do formátu zpracovatelného
 Antlrem. Jelikož program pro kontrolu typové koherence využívá build systém Gradle, je parser automaticky
 vygenerován během kompilace, je-li to potřeba. Výstup vygenerovaného parseru je poté převeden na vlastní
-reprezentaci, která je méně generická a umožňuje ergonomičtější programatickou práci s abstraktním
+reprezentaci, která je méně generická a umožňuje programátorovi ergonomičtější práci s abstraktním
 syntaktickým stromem TIL-Script programu.
 
 Ke kontrole syntaktických chyb je využita kontrola zabudovaná do nástroje Antlr. Nad rámec automatického
@@ -113,13 +113,13 @@ určen konstruovaný typ.
 
 Při typové kontrole je nutné brát v potaz vázání proměnných. Proto je pro každou trivializaci konstrukce, jež
 není literál nebo funkce, a pro každý uzávěr konstruován nový kontext. Kontext trivializace je nezávislý na
-kontextu nadkonstrukce, odkazuje se pouze na globální kontext, jež obsahuje informace o~volných proměnných
+kontextu nadkonstrukce, odkazuje se pouze na globální kontext, jenž obsahuje informace o~volných proměnných
 a funkcích. Kontext uzávěru se na kontext nadkonstrukce odkazuje, umožňuje však definovat $\lambda$-vázané proměnné,
 jež zastíní proměnné z~rodičovských kontextů. Při nalezení symbolu jsou poté kontexty prohledávány rekurzivně,
 od nejbližšího kontextu až po kontext globální, a je hledán typ konstruovaný symbolem. Globální kontext je
 samozřejmě nezávislý na kontextech uzávěrů a trivializací. Lze jej modifikovat pouze globální definicí.
 
-Dále je důležité vyřešit porovnávání uživatelem definovaných typových aliasů a typů jimi reprezentovanými.
+Dále je důležité vyřešit porovnávání uživatelem definovaných typových aliasů a typů jimi reprezentovaných.
 Při porovnávání typů jsou vždy všechny aliasy rekurzivně expandovány, dokud se datový typ neskládá pouze
 z typů zabudovaných přímo do jazyka TIL-Script. Teprve takto plně expandované typy se mezi sebou porovnávají.
 Tento způsob porovnávání uživatelem definovaných typů byl zvolen zejména proto, že TIL-Script neumožňuje
@@ -195,8 +195,8 @@ webovou službu umožňující provádět typovou kontrolu v prohlížeči.
 \begin{thebibliography}{50}
 
 \bibitem{til-duzi}
-Duží, M., Materna, P.: \textit{TIL jako procedurální logika} \\
-Marie Duží, Pavel Materna, 2012
+Duží, M., Materna, P.: \textit{TIL jako procedurální logika, (průvodce zvídavého čtenáře Transparentní intensionální logikou)} \\
+Aleph Bratislava 2012, ISBN 978-80-89491-08-7
 
 \bibitem{til-script}
 Ciprich, N., Duží, M., Košinár, M.: \textit{TIL-Script: Functional Programming Based on
