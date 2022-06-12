@@ -51,7 +51,10 @@
 \begin{frame}
     \frametitle{Parser Implementation}
     \begin{itemize}
-        \item TIL-Script grammar has been modified
+        \item Existing TIL-Script grammar has been utilized
+            \begin{itemize}
+                \item Slight tweaks were necessary to make it work with Antlr
+            \end{itemize}
         \item Parser is generated using Antlr
         \item Resulting AST is converted to a custom structure
     \end{itemize}
@@ -150,24 +153,10 @@
     \end{itemize}
 \end{frame}
 
-\lstset{
-    frame=none,
-    tabsize=4,
-    showstringspaces=false,
-    numbers=none,
-    %upquote=true,
-    commentstyle=\color{black},
-    keywordstyle=\color{black},
-    %stringstyle=\color{red},
-    otherkeywords={>,<,.,;,-,!,=,~},
-    morekeywords={>,<,.,;,-,!,=,~},
-    keywordstyle=\color{black},
-    classoffset=0,
-}
-
 \begin{frame}
-    \frametitle{The End}
-    \lstinputlisting[]{tux.txt}
+    \begin{center}
+        \Huge The End
+    \end{center}
 \end{frame}
 
 \end{document}
