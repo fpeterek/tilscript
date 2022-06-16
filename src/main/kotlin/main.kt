@@ -43,27 +43,6 @@ fun printErrors(errors: Iterable<Report>, file: String, errorType: String) {
 private fun printErrorsForSentences(sentences: Iterable<Sentence>, file: String, errorType: String) =
     printErrors(Reporter.reportsAsList(sentences), file, errorType)
 
-private fun createHTML(file: String, data: String) = """
-    <document>
-        <head>
-            <title>$file</title> 
-            <script src="src/main/resources/script.js"></script>
-        </head>
-        <body>
-            <p id='vis'>
-            </p>
-        </body>
-        <script>
-            let data = JSON.parse("${StringEscapeUtils.escapeJson(data)}");
-            
-            document.getElementById('vis').innerHtml = data;
-            console.log(data);
-            
-            console.log('aaa');
-        </script>
-    </document>
-""".trimIndent()
-
 fun checkScript(filename: String) {
     val stream = CharStreams.fromFileName(filename)
 
@@ -110,13 +89,12 @@ fun checkScript(filename: String) {
 
     val withContext = ContextRecognizer.assignContext(typeChecked)
 
-    val json = JsonFormatter.asString(withContext)
-    val baseName = File(filename).name
-    val jsonFile = "$baseName.json"
-    val svgFile = "$baseName.svg"
-
-    File(jsonFile).writeText(json)
-    File(svgFile).writeText(SvgFormatter.format(withContext.filterIsInstance<Construction>()))
+    // val json = JsonFormatter.asString(withContext)
+    // val baseName = File(filename).name
+    // val jsonFile = "$baseName.json"
+    // val svgFile = "$baseName.svg"
+    // File(jsonFile).writeText(json)
+    // File(svgFile).writeText(SvgFormatter.format(withContext.filterIsInstance<Construction>()))
 
 }
 
