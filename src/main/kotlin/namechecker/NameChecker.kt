@@ -131,7 +131,6 @@ class NameChecker private constructor(
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
         is Literal        -> processLiteral(construction)
-        else              -> throw RuntimeException("Invalid state")
     }
 
     private fun process(definition: Definition): Definition = when (definition) {

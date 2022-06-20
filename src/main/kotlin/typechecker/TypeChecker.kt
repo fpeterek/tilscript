@@ -275,7 +275,6 @@ class TypeChecker private constructor(
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
         is Literal        -> processLiteral(construction)
-        else              -> throw RuntimeException("Invalid state")
     }
 
     private fun addLiteral(lit: Literal) = Literal(

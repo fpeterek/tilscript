@@ -50,7 +50,6 @@ object Reporter {
         is TilFunction    -> containsReports(construction)
         is Trivialization -> containsReports(construction)
         is Variable       -> containsReports(construction)
-        else              -> throw RuntimeException("Invalid state")
     }
 
     fun containsReports(sentence: Sentence): Boolean = when (sentence) {
@@ -103,7 +102,6 @@ object Reporter {
         is TilFunction    -> reportsAsList(construction)
         is Trivialization -> reportsAsList(construction)
         is Variable       -> reportsAsList(construction)
-        else              -> throw RuntimeException("Invalid state")
     }
 
     fun reportsAsList(sentence: Sentence): List<Report> = when (sentence) {

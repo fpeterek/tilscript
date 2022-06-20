@@ -27,7 +27,6 @@ sealed class Construction(
         is TilFunction    -> withReports(iterable)
         is Trivialization -> withReports(iterable)
         is Variable       -> withReports(iterable)
-        else              -> throw RuntimeException("Invalid state")
     }
 
     // Same as above
@@ -39,6 +38,5 @@ sealed class Construction(
         is TilFunction    -> withContext(context)
         is Trivialization -> withContext(context)
         is Variable       -> withContext(context)
-        else              -> throw RuntimeException("Invalid state")
     }
 }

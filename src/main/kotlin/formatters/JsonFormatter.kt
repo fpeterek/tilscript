@@ -97,7 +97,6 @@ object JsonFormatter {
         is TilFunction    -> format(construction)
         is Trivialization -> format(construction)
         is Variable       -> format(construction)
-        else              -> throw RuntimeException("Invalid state")
     }
 
     fun format(definition: Definition): JSONObject = when (definition) {

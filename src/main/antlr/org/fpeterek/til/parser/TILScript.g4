@@ -11,25 +11,31 @@ sentence : sentenceContent terminator;
 sentenceContent : typeDefinition
                 | entityDefinition
                 | construction
-                | globalVarDef;
+                | globalVarDecl
+                | globalVarDef
+                | funDefinition;
 
 terminator : TERMINATOR;
 
-typeDefinition : 'TypeDef' WS typeName ASSIGNTYPE dataType;
+typeDefinition : TYPEDEF WS typeName ASSIGN dataType;
+
+funDefinition : 'defn' WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW typeName ASSIGN construction;
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 
 construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
-globalVarDef : variableName (COMMA variableName)* ARROW dataType;
+globalVarDecl : variableName (COMMA variableName)* ARROW dataType;
+
+globalVarDef : variableName ARROW dataType ASSIGN construction;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
 builtinType : BUILTIN_TYPE | ASTERISK;
 
-listType : 'List' OPEN_PAR dataType CLOSE_PAR;
+listType : LIST LESS dataType GREATER;
 
-tupleType : 'Tuple' OPEN_PAR dataType CLOSE_PAR;
+tupleType : TUPLE LESS dataType GREATER;
 
 userType : typeName;
 
@@ -43,13 +49,17 @@ composition : OPEN_BRA construction (construction | (WS construction))+ CLOSE_BR
 
 closure : OPEN_BRA lambdaVariables (construction | (WS construction)) CLOSE_BRA;
 
-lambdaVariables : LAMBDA typedVariables;
+lambdaVariables : LAMBDA optTypedVariables;
 
 nExecution : EXEC (construction | entity);
 
+optTypedVariables : optTypedVariable (COMMA optTypedVariable)*;
+
 typedVariables : typedVariable (COMMA typedVariable)*;
 
-typedVariable : variableName (COLON typeName)?;
+optTypedVariable : variableName (COLON typeName)?;
+
+typedVariable : variableName COLON typeName;
 
 entity : keyword | entityName | number | symbol;
 
@@ -59,27 +69,13 @@ entityName : ucname;
 
 variableName : lcname;
 
-keyword : 'ForAll'
-        | 'Exist'
-        | 'Every'
-        | 'Some'
-        | 'No'
-        | 'True'
+keyword : 'True'
         | 'False'
-        | 'And'
-        | 'Or'
-        | 'Not'
-        | 'Implies'
-        | 'Sing'
-        | 'Sub'
+        | 'If'
         | 'Tr'
-        | 'TrueC'
-        | 'FalseC'
-        | 'ImproperC'
-        | 'TrueP'
-        | 'FalseP'
-        | 'UndefP'
-        | 'ToInt';
+        | 'Improper'
+        | 'ToInt'
+        | 'ToReal';
 
 
 symbol : SYMBOLS | ASTERISK | FS;
@@ -120,13 +116,18 @@ OPEN_BRA   : '[' OPT_WS;
 CLOSE_BRA  : OPT_WS ']';
 OPEN_PAR   : OPT_WS '(' OPT_WS;
 CLOSE_PAR  : OPT_WS ')' OPT_WS;
+LESS       : OPT_WS '<' OPT_WS;
+GREATER    : OPT_WS '>' OPT_WS;
 ARROW      : OPT_WS '->' OPT_WS;
 TERMINATOR : OPT_WS '.' OPT_WS;
-ASSIGNTYPE : OPT_WS ':=' OPT_WS;
+ASSIGN     : OPT_WS ':=' OPT_WS;
 COMMA      : OPT_WS ',' OPT_WS;
 COLON      : OPT_WS ':' OPT_WS;
 FS         : OPT_WS '/' OPT_WS;
 ASTERISK   : '*';
+TYPEDEF    : 'typedef';
+LIST       : 'List';
+TUPLE      : 'Tuple';
 
 WT : OPT_WS '@wt';
 TW : OPT_WS '@tw';

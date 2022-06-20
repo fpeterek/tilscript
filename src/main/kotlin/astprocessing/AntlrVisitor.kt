@@ -33,7 +33,9 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
     override fun visitSentenceContent(ctx: TILScriptParser.SentenceContentContext) = when {
         ctx.construction()     != null -> visitConstruction(ctx.construction())
+        ctx.funDefinition()    != null -> visitFunDefinition(ctx.funDefinition())
         ctx.globalVarDef()     != null -> visitGlobalVarDef(ctx.globalVarDef())
+        ctx.globalVarDecl()    != null -> visitGlobalVarDecl(ctx.globalVarDecl())
         ctx.typeDefinition()   != null -> visitTypeDefinition(ctx.typeDefinition())
         ctx.entityDefinition() != null -> visitEntityDefinition(ctx.entityDefinition())
 
@@ -67,10 +69,25 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         }
     }
 
-    override fun visitGlobalVarDef(ctx: TILScriptParser.GlobalVarDefContext) = GlobalVarDef(
+    override fun visitGlobalVarDecl(ctx: TILScriptParser.GlobalVarDeclContext) = GlobalVarDecl(
         ctx.variableName().map { visitVariableName(it) },
         visitDataType(ctx.dataType()),
         ctx.position()
+    )
+
+    override fun visitFunDefinition(ctx: TILScriptParser.FunDefinitionContext) = FunDefinition(
+        visitEntityName(ctx.entityName()),
+        visitTypedVariables(ctx.typedVariables()),
+        visitTypeName(ctx.typeName()),
+        visitConstruction(ctx.construction()),
+        ctx.position(),
+    )
+
+    override fun visitGlobalVarDef(ctx: TILScriptParser.GlobalVarDefContext) = GlobalVarDef(
+        visitVariableName(ctx.variableName()),
+        visitDataType(ctx.dataType()),
+        visitConstruction(ctx.construction()),
+        ctx.position(),
     )
 
     override fun visitDataType(ctx: TILScriptParser.DataTypeContext): DataType = when {
@@ -129,7 +146,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     )
 
     override fun visitLambdaVariables(ctx: TILScriptParser.LambdaVariablesContext) =
-        visitTypedVariables(ctx.typedVariables())
+        visitOptTypedVariables(ctx.optTypedVariables())
 
     override fun visitNExecution(ctx: TILScriptParser.NExecutionContext) = Construction.Execution(
         order=ctx.EXEC().text.drop(1).takeWhile { it.isDigit() }.toInt(),
@@ -141,10 +158,10 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         srcPos=ctx.position(),
     )
 
-    override fun visitTypedVariables(ctx: TILScriptParser.TypedVariablesContext) =
-        TypedVars(ctx.typedVariable().map(::visitTypedVariable), ctx.position())
+    override fun visitOptTypedVariables(ctx: TILScriptParser.OptTypedVariablesContext) =
+        TypedVars(ctx.optTypedVariable().map(::visitOptTypedVariable), ctx.position())
 
-    override fun visitTypedVariable(ctx: TILScriptParser.TypedVariableContext): TypedVar {
+    override fun visitOptTypedVariable(ctx: TILScriptParser.OptTypedVariableContext): TypedVar {
 
         val variable = visitVariableName(ctx.variableName())
 
@@ -155,6 +172,15 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
         return TypedVar(variable, type, ctx.position())
     }
+
+    override fun visitTypedVariables(ctx: TILScriptParser.TypedVariablesContext) =
+        TypedVars(ctx.typedVariable().map(::visitTypedVariable), ctx.position())
+
+    override fun visitTypedVariable(ctx: TILScriptParser.TypedVariableContext) = TypedVar(
+        visitVariableName(ctx.variableName()),
+        visitTypeName(ctx.typeName()),
+        ctx.position()
+    )
 
     override fun visitEntity(ctx: TILScriptParser.EntityContext) = Entity.from(
         when {

@@ -38,10 +38,12 @@ class ASTConverter private constructor() {
     )
 
     private fun convertSentence(sentence: IntermediateResult) = when (sentence) {
-        is Construction -> convertConstruction(sentence)
-        is GlobalVarDef -> convertGlobalVarDef(sentence)
-        is EntityDef    -> convertEntityDef(sentence)
-        is TypeAlias    -> convertTypeAlias(sentence)
+        is Construction  -> convertConstruction(sentence)
+        is GlobalVarDecl -> convertGlobalVarDef(sentence)
+        is EntityDef     -> convertEntityDef(sentence)
+        is TypeAlias     -> convertTypeAlias(sentence)
+        is FunDefinition -> // TODO: convertDefun(sentence)
+        is GlobalVarDef  -> // TODO: convertGlobalVarDef(sentence)
 
         else -> throw RuntimeException("Invalid parser state")
     }
@@ -53,7 +55,7 @@ class ASTConverter private constructor() {
         is VarRef      -> convertVarRef(construction)
     }
 
-    private fun convertGlobalVarDef(def: GlobalVarDef) = convertDataType(def.type).let { type ->
+    private fun convertGlobalVarDef(def: GlobalVarDecl) = convertDataType(def.type).let { type ->
         VariableDefinition(
             def.vars.map { TilVariable(it.name, it.position, type) },
             def.position,
