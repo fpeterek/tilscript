@@ -109,17 +109,17 @@ class NameChecker private constructor(
         )
     }
 
-    private fun processFnDef(def: FunctionDefinition) = def.apply {
+    private fun processFnDecl(decl: FunctionDeclaration) = decl.apply {
         functions.forEach(symbolRepository::add)
     }
 
-    private fun processLitDef(def: LiteralDefinition) = def.apply {
+    private fun processLitDecl(decl: LiteralDeclaration) = decl.apply {
         literals.forEach(symbolRepository::add)
     }
 
     private fun processTypeDef(def: TypeDefinition) = def
 
-    private fun processVarDef(def: VariableDefinition) = def.apply {
+    private fun processVarDecl(decl: VariableDeclaration) = decl.apply {
         variables.forEach(symbolRepository::add)
     }
 
@@ -133,16 +133,16 @@ class NameChecker private constructor(
         is Literal        -> processLiteral(construction)
     }
 
-    private fun process(definition: Definition): Definition = when (definition) {
-        is FunctionDefinition -> processFnDef(definition)
-        is LiteralDefinition -> processLitDef(definition)
-        is TypeDefinition -> processTypeDef(definition)
-        is VariableDefinition -> processVarDef(definition)
+    private fun process(declaration: Declaration): Declaration = when (declaration) {
+        is FunctionDeclaration -> processFnDecl(declaration)
+        is LiteralDeclaration -> processLitDecl(declaration)
+        is TypeDefinition -> processTypeDef(declaration)
+        is VariableDeclaration -> processVarDecl(declaration)
     }
 
     private fun process(sentence: Sentence): Sentence = when (sentence) {
         is Construction -> process(sentence)
-        is Definition -> process(sentence)
+        is Declaration -> process(sentence)
     }
 
     private fun process(sentences: Iterable<Sentence>): List<Sentence> = sentences.map(::process)

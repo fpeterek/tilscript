@@ -17,11 +17,11 @@ object JsonFormatter {
             .put("constructsType", constructedType.name)
             .put("context", context)
 
-    fun format(fnDef: FunctionDefinition): JSONObject = sentenceBase("Function definition", fnDef)
+    fun format(fnDef: FunctionDeclaration): JSONObject = sentenceBase("Function definition", fnDef)
         .put("functions", JSONArray().apply { fnDef.functions.forEach { put(it.name) } })
         .put("type", fnDef.type.name)
 
-    fun format(litDef: LiteralDefinition): JSONObject = sentenceBase("Literal definition", litDef)
+    fun format(litDef: LiteralDeclaration): JSONObject = sentenceBase("Literal definition", litDef)
         .put("literals", JSONArray().apply { litDef.literals.forEach { put(it.value) } })
         .put("type", litDef.type.name)
 
@@ -29,7 +29,7 @@ object JsonFormatter {
         .put("alias", typeDef.alias.name)
         .put("originalType", typeDef.alias.type.name)
 
-    fun format(varDef: VariableDefinition): JSONObject = sentenceBase("Variable definition", varDef)
+    fun format(varDef: VariableDeclaration): JSONObject = sentenceBase("Variable definition", varDef)
         .put("variables", JSONArray().apply { varDef.variables.forEach { put(it.name) } })
         .put("type", varDef.type.name)
 
@@ -99,15 +99,15 @@ object JsonFormatter {
         is Variable       -> format(construction)
     }
 
-    fun format(definition: Definition): JSONObject = when (definition) {
-        is FunctionDefinition -> format(definition)
-        is LiteralDefinition  -> format(definition)
-        is TypeDefinition     -> format(definition)
-        is VariableDefinition -> format(definition)
+    fun format(declaration: Declaration): JSONObject = when (declaration) {
+        is FunctionDeclaration -> format(declaration)
+        is LiteralDeclaration  -> format(declaration)
+        is TypeDefinition     -> format(declaration)
+        is VariableDeclaration -> format(declaration)
     }
 
     fun format(sentence: Sentence): JSONObject = when (sentence) {
-        is Definition   -> format(sentence)
+        is Declaration   -> format(sentence)
         is Construction -> format(sentence)
     }
 

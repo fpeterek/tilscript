@@ -56,7 +56,7 @@ class ASTConverter private constructor() {
     }
 
     private fun convertGlobalVarDef(def: GlobalVarDecl) = convertDataType(def.type).let { type ->
-        VariableDefinition(
+        VariableDeclaration(
             def.vars.map { TilVariable(it.name, it.position, type) },
             def.position,
         )
@@ -65,14 +65,14 @@ class ASTConverter private constructor() {
     private fun convertEntityDef(entityDef: EntityDef) = convertDataType(entityDef.type).let { type ->
         when {
             type is FunctionType || repo.isFunction(type.name) ->
-                FunctionDefinition(entityDef.names.map { TilFunction(it.name, it.position, type) }, entityDef.position)
+                FunctionDeclaration(entityDef.names.map { TilFunction(it.name, it.position, type) }, entityDef.position)
 
-            else -> LiteralDefinition(entityDef.names.map { Literal(it.name, it.position, type) }, entityDef.position)
+            else -> LiteralDeclaration(entityDef.names.map { Literal(it.name, it.position, type) }, entityDef.position)
         }
     }.apply {
         when (this) {
-            is FunctionDefinition -> fns.addAll(names)
-            is LiteralDefinition -> lits.addAll(names)
+            is FunctionDeclaration -> fns.addAll(names)
+            is LiteralDeclaration -> lits.addAll(names)
             else -> throw RuntimeException("Invalid state")
         }
     }

@@ -7,15 +7,15 @@ object Reporter {
 
     private val Sentence.hasReports get() = reports.isNotEmpty()
 
-    private fun containsReports(fnDef: FunctionDefinition): Boolean =
+    private fun containsReports(fnDef: FunctionDeclaration): Boolean =
         fnDef.hasReports || fnDef.functions.any(::containsReports)
 
-    private fun containsReports(litDef: LiteralDefinition): Boolean =
+    private fun containsReports(litDef: LiteralDeclaration): Boolean =
         litDef.hasReports || litDef.literals.any(::containsReports)
 
     private fun containsReports(typeDef: TypeDefinition): Boolean = typeDef.hasReports
 
-    private fun containsReports(varDef: VariableDefinition): Boolean =
+    private fun containsReports(varDef: VariableDeclaration): Boolean =
         varDef.hasReports || varDef.variables.any(::containsReports)
 
     private fun containsReports(closure: Closure): Boolean =
@@ -35,11 +35,11 @@ object Reporter {
 
     private fun containsReports(variable: Variable): Boolean = variable.hasReports
 
-    private fun containsReports(def: Definition): Boolean = when (def) {
-        is FunctionDefinition -> containsReports(def)
-        is LiteralDefinition  -> containsReports(def)
+    private fun containsReports(def: Declaration): Boolean = when (def) {
+        is FunctionDeclaration -> containsReports(def)
+        is LiteralDeclaration  -> containsReports(def)
         is TypeDefinition     -> containsReports(def)
-        is VariableDefinition -> containsReports(def)
+        is VariableDeclaration -> containsReports(def)
     }
 
     private fun containsReports(construction: Construction): Boolean = when (construction) {
@@ -53,21 +53,21 @@ object Reporter {
     }
 
     fun containsReports(sentence: Sentence): Boolean = when (sentence) {
-        is Definition   -> containsReports(sentence)
+        is Declaration   -> containsReports(sentence)
         is Construction -> containsReports(sentence)
     }
 
     fun containsReports(sentences: Iterable<Sentence>): Boolean = sentences.any(::containsReports)
 
-    private fun reportsAsList(def: FunctionDefinition): List<Report> =
+    private fun reportsAsList(def: FunctionDeclaration): List<Report> =
         def.reports + def.functions.flatMap(::reportsAsList)
 
-    private fun reportsAsList(def: LiteralDefinition): List<Report> =
+    private fun reportsAsList(def: LiteralDeclaration): List<Report> =
         def.reports + def.literals.flatMap(::reportsAsList)
 
     private fun reportsAsList(def: TypeDefinition): List<Report> = def.reports
 
-    private fun reportsAsList(def: VariableDefinition): List<Report> =
+    private fun reportsAsList(def: VariableDeclaration): List<Report> =
         def.reports + def.variables.flatMap(::reportsAsList)
 
     private fun reportsAsList(closure: Closure): List<Report> =
@@ -87,11 +87,11 @@ object Reporter {
 
     private fun reportsAsList(variable: Variable): List<Report> = variable.reports
 
-    private fun reportsAsList(def: Definition): List<Report> = when (def) {
-        is FunctionDefinition -> reportsAsList(def)
-        is LiteralDefinition  -> reportsAsList(def)
+    private fun reportsAsList(def: Declaration): List<Report> = when (def) {
+        is FunctionDeclaration -> reportsAsList(def)
+        is LiteralDeclaration  -> reportsAsList(def)
         is TypeDefinition     -> reportsAsList(def)
-        is VariableDefinition -> reportsAsList(def)
+        is VariableDeclaration -> reportsAsList(def)
     }
 
     private fun reportsAsList(construction: Construction): List<Report> = when (construction) {
@@ -105,7 +105,7 @@ object Reporter {
     }
 
     fun reportsAsList(sentence: Sentence): List<Report> = when (sentence) {
-        is Definition   -> reportsAsList(sentence)
+        is Declaration   -> reportsAsList(sentence)
         is Construction -> reportsAsList(sentence)
     }
 

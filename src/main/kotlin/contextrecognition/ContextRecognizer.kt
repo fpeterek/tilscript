@@ -119,7 +119,7 @@ class ContextRecognizer private constructor(private val highestContext: Context)
         maxOf(highestContext, Context.Intensional),
     )
 
-    private fun assign(def: Definition): Definition = def.withContext(Context.Definition)
+    private fun assign(def: Declaration): Declaration = def.withContext(Context.Definition)
 
     private fun assign(cons: Construction): Construction = when (cons) {
         is Closure        -> assign(cons)
@@ -132,7 +132,7 @@ class ContextRecognizer private constructor(private val highestContext: Context)
     }
 
     private fun assign(sentence: Sentence): Sentence = when (sentence) {
-        is Definition   -> assign(sentence)
+        is Declaration   -> assign(sentence)
         is Construction -> assign(sentence)
     }
 }

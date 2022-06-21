@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.typechecker
 
+
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
@@ -286,13 +287,13 @@ class TypeChecker private constructor(
         repo.add(this)
     }
 
-    private fun processSingleDef(lit: Literal) = when (lit.value) {
+    private fun processSingleDecl(lit: Literal) = when (lit.value) {
         in repo -> lit.withReport(Report("Redefinition of symbol '${lit.value}'", lit.position))
         else -> addLiteral(lit)
     }
 
-    private fun processLiteralDefinition(def: LiteralDefinition) = def.apply {
-        def.literals.forEach(::processSingleDef)
+    private fun processLiteralDeclaration(decl: LiteralDeclaration) = decl.apply {
+        literals.forEach(::processSingleDecl)
     }
 
     private fun processTypeDefinition(def: TypeDefinition) = def.apply {
@@ -302,34 +303,61 @@ class TypeChecker private constructor(
         }
     }
 
-    private fun processSingleDef(variable: Variable) = when (variable.name) {
+    private fun processSingleDecl(variable: Variable) = when (variable.name) {
         in repo -> variable.withReport(Report("Redefinition of symbol '${variable.name}'", variable.position))
         else -> variable.apply { repo.add(this) }
 
     }
 
-    private fun processVariableDefinition(def: VariableDefinition) = with(def) {
-        VariableDefinition(variables.map(::processSingleDef), position, reports)
+    private fun processVariableDeclaration(decl: VariableDeclaration) = with(decl) {
+        VariableDeclaration(variables.map(::processSingleDecl), position, reports)
     }
 
-    private fun processSingleDef(fn: TilFunction) = when (fn.name) {
+    private fun processSingleDecl(fn: TilFunction) = when (fn.name) {
         in repo -> fn.withReport(Report("Redefinition of symbol '${fn.name}'", fn.position))
         else -> fn.apply { repo.add(this) }
     }
 
-    private fun processFunctionDefinition(def: FunctionDefinition) = with(def) {
-        FunctionDefinition(functions.map(::processSingleDef), position, reports)
+    private fun processFunctionDeclaration(decl: FunctionDeclaration) = with(decl) {
+        FunctionDeclaration(functions.map(::processSingleDecl), position, reports)
     }
 
-    private fun processDefinition(definition: Definition): Definition = when (definition) {
-        is LiteralDefinition -> processLiteralDefinition(definition)
-        is TypeDefinition -> processTypeDefinition(definition)
-        is VariableDefinition -> processVariableDefinition(definition)
-        is FunctionDefinition -> processFunctionDefinition(definition)
+    private fun processFunctionDefinition(def: FunctionDefinition): FunctionDefinition {
+        val withReport = when (def.name) {
+            in repo -> def.withReport(Report("Redefinition of symbol '${def.name}'", def.position))
+            else -> def.apply { repo.add(tilFunction) }
+        }
+
+        // TODO: Process fn args
+
+        val withConstruction = FunctionDefinition(
+            withReport.name,
+            withReport.args,
+            withReport.constructsType,
+            processConstruction(withReport.construction),
+            withReport.position,
+            withReport.reports,
+            withReport.context
+        )
+
+        return when (match(withConstruction.construction.constructedType, withConstruction.constructsType)) {
+            true -> withConstruction
+            else -> withConstruction.withReport(
+                Report("Type constructed by function body does not match function signature", withConstruction.construction.position)
+            )
+        }
+    }
+
+    private fun processDeclaration(declaration: Declaration): Declaration = when (declaration) {
+        is LiteralDeclaration  -> processLiteralDeclaration(declaration)
+        is TypeDefinition      -> processTypeDefinition(declaration)
+        is VariableDeclaration -> processVariableDeclaration(declaration)
+        is FunctionDeclaration -> processFunctionDeclaration(declaration)
+        is FunctionDefinition  -> processFunctionDefinition(declaration)
     }
 
     private fun process(sentence: Sentence): Sentence = when (sentence) {
-        is Definition -> processDefinition(sentence)
+        is Declaration -> processDeclaration(sentence)
         is Construction -> processConstruction(sentence)
     }
 
