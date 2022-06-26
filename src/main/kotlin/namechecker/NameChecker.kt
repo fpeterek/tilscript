@@ -138,6 +138,7 @@ class NameChecker private constructor(
         is LiteralDeclaration -> processLitDecl(declaration)
         is TypeDefinition -> processTypeDef(declaration)
         is VariableDeclaration -> processVarDecl(declaration)
+        is FunctionDefinition -> TODO()
     }
 
     private fun process(sentence: Sentence): Sentence = when (sentence) {

@@ -19,15 +19,15 @@ terminator : TERMINATOR;
 
 typeDefinition : TYPEDEF WS typeName ASSIGN dataType;
 
-funDefinition : 'defn' WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW typeName ASSIGN construction;
+funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW typeName ASSIGN construction;
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 
 construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
-globalVarDecl : variableName (COMMA variableName)* ARROW dataType;
+globalVarDecl : LET variableName (COMMA variableName)* ARROW dataType;
 
-globalVarDef : variableName ARROW dataType ASSIGN construction;
+globalVarDef : LET variableName ARROW dataType ASSIGN construction;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
@@ -74,8 +74,7 @@ keyword : 'True'
         | 'If'
         | 'Tr'
         | 'Improper'
-        | 'ToInt'
-        | 'ToReal';
+        | 'Nil';
 
 
 symbol : SYMBOLS | ASTERISK | FS;
@@ -120,7 +119,7 @@ LESS       : OPT_WS '<' OPT_WS;
 GREATER    : OPT_WS '>' OPT_WS;
 ARROW      : OPT_WS '->' OPT_WS;
 TERMINATOR : OPT_WS '.' OPT_WS;
-ASSIGN     : OPT_WS ':=' OPT_WS;
+ASSIGN     : OPT_WS '=' OPT_WS;
 COMMA      : OPT_WS ',' OPT_WS;
 COLON      : OPT_WS ':' OPT_WS;
 FS         : OPT_WS '/' OPT_WS;
@@ -128,6 +127,8 @@ ASTERISK   : '*';
 TYPEDEF    : 'typedef';
 LIST       : 'List';
 TUPLE      : 'Tuple';
+DEFN       : 'defn';
+LET        : 'let';
 
 WT : OPT_WS '@wt';
 TW : OPT_WS '@tw';

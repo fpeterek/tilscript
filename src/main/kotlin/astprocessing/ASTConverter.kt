@@ -1,12 +1,15 @@
 package org.fpeterek.til.typechecking.astprocessing
 
+import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor.position
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
 import org.fpeterek.til.typechecking.exceptions.UndefinedType
+import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.tilscript.ScriptContext
 import org.fpeterek.til.typechecking.types.*
+import java.util.UnknownFormatConversionException
 import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
 import org.fpeterek.til.typechecking.sentence.Construction as TilConstruction
 import org.fpeterek.til.typechecking.sentence.Execution as TilExecution
@@ -37,13 +40,38 @@ class ASTConverter private constructor() {
         types=repo,
     )
 
+    private fun convertDefn(def: FunDefinition): FunctionDefinition {
+
+        val consType = repo[def.consType.name]
+
+        val reports = when (consType) {
+            null -> listOf(Report("Unknown type '${def.consType.name}'", def.consType.position))
+            else -> listOf()
+        }
+
+        return FunctionDefinition(
+            name = def.name.name,
+            args = def.args.map(::convertTypedVar),
+            constructsType = consType ?: Unknown,
+            construction = convertConstruction(def.cons),
+            srcPos = def.position
+        ).withReports(reports)
+    }
+
+    private fun convertGlobalVarDef(def: GlobalVarDef) = VariableDefinition(
+        def.varName.name,
+        convertDataType(def.type),
+        convertConstruction(def.init),
+        def.position,
+    )
+
     private fun convertSentence(sentence: IntermediateResult) = when (sentence) {
         is Construction  -> convertConstruction(sentence)
-        is GlobalVarDecl -> convertGlobalVarDef(sentence)
+        is GlobalVarDecl -> convertGlobalVarDecl(sentence)
         is EntityDef     -> convertEntityDef(sentence)
         is TypeAlias     -> convertTypeAlias(sentence)
-        is FunDefinition -> // TODO: convertDefun(sentence)
-        is GlobalVarDef  -> // TODO: convertGlobalVarDef(sentence)
+        is FunDefinition -> convertDefn(sentence)
+        is GlobalVarDef  -> convertGlobalVarDef(sentence)
 
         else -> throw RuntimeException("Invalid parser state")
     }
@@ -55,7 +83,7 @@ class ASTConverter private constructor() {
         is VarRef      -> convertVarRef(construction)
     }
 
-    private fun convertGlobalVarDef(def: GlobalVarDecl) = convertDataType(def.type).let { type ->
+    private fun convertGlobalVarDecl(def: GlobalVarDecl) = convertDataType(def.type).let { type ->
         VariableDeclaration(
             def.vars.map { TilVariable(it.name, it.position, type) },
             def.position,
@@ -91,11 +119,21 @@ class ASTConverter private constructor() {
         srcPos=closure.position,
     )
 
-    private fun convertTypedVar(typedVar: TypedVar) = TilVariable(
-        typedVar.name,
-        typedVar.position,
-        repo[typedVar.type] ?: throw UndefinedType(typedVar.name)
-    )
+    private fun convertTypedVar(typedVar: TypedVar): TilVariable {
+
+        val type = repo[typedVar.type]
+
+        val reports = when (type) {
+            null -> listOf(Report("Unknown type ${typedVar.type}", typedVar.position))
+            else -> listOf()
+        }
+
+        return TilVariable(
+            typedVar.name,
+            typedVar.position,
+            type ?: Unknown
+        ).withReports(reports)
+    }
 
     private fun convertComposition(composition: Composition) = TilComposition(
         function=convertConstruction(composition.fn),
@@ -167,6 +205,7 @@ class ASTConverter private constructor() {
         else -> convertAtomicType(type)
     }
 
+    // TODO: Report an error if type has not been defined yet
     private fun convertAtomicType(type: DataType.PrimitiveType) = AtomicType(shortName="", name=type.name)
         .apply { repo.process(this) }
 

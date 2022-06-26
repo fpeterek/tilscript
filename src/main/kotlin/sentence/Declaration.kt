@@ -8,6 +8,7 @@ import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.TypeAlias
 import org.fpeterek.til.typechecking.util.SrcPosition
+import javax.swing.text.DefaultCaret
 
 
 sealed class Declaration(srcPos: SrcPosition, reports: List<Report>, context: Context) :
@@ -18,6 +19,7 @@ sealed class Declaration(srcPos: SrcPosition, reports: List<Report>, context: Co
         is TypeDefinition      -> withContext(context)
         is VariableDeclaration -> withContext(context)
         is FunctionDeclaration -> withContext(context)
+        is FunctionDefinition  -> withContext(context)
     }
 
 }
@@ -84,6 +86,25 @@ class VariableDeclaration(
     override fun tsString() = "${names.joinToString(separator=", ")} -> ${type.name}"
 }
 
+class VariableDefinition(
+    val name: String,
+    val constructsType: Type,
+    val construction: Construction,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+    context: Context = Context.Unknown
+) : Declaration(srcPos, reports, context) {
+
+    override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withReports(iterable: Iterable<Report>) = VariableDefinition(
+        name, constructsType, construction, position, reports + iterable, context
+    )
+
+    override fun toString() = "let $name -> $constructsType = $construction"
+    override fun tsString() = "let $name -> ${constructsType.name} = ${construction.tsString()}"
+}
+
 class FunctionDeclaration(
     val functions: List<TilFunction>, srcPos: SrcPosition, reports: List<Report> = listOf(),
     context: Context = Context.Unknown
@@ -128,5 +149,5 @@ class FunctionDefinition(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun tsString() =
-        "defn $name(${args.joinToString(", ") { it.tsString() }}) -> ${constructsType.name} := ${construction.tsString()}"
+        "defn $name(${args.joinToString(", ") { it.tsString() }}) -> ${constructsType.name} = ${construction.tsString()}"
 }

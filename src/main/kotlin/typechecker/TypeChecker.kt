@@ -322,13 +322,13 @@ class TypeChecker private constructor(
         FunctionDeclaration(functions.map(::processSingleDecl), position, reports)
     }
 
-    private fun processFunctionDefinition(def: FunctionDefinition): FunctionDefinition {
+    private fun processFunctionDefinitionForked(def: FunctionDefinition): FunctionDefinition {
         val withReport = when (def.name) {
             in repo -> def.withReport(Report("Redefinition of symbol '${def.name}'", def.position))
             else -> def.apply { repo.add(tilFunction) }
         }
 
-        // TODO: Process fn args
+        withReport.args.forEach(repo::add)
 
         val withConstruction = FunctionDefinition(
             withReport.name,
@@ -347,6 +347,9 @@ class TypeChecker private constructor(
             )
         }
     }
+
+    private fun processFunctionDefinition(def: FunctionDefinition) =
+        fork().processFunctionDefinitionForked(def)
 
     private fun processDeclaration(declaration: Declaration): Declaration = when (declaration) {
         is LiteralDeclaration  -> processLiteralDeclaration(declaration)
