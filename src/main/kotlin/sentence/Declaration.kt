@@ -1,14 +1,11 @@
 package org.fpeterek.til.typechecking.sentence
 
-import org.antlr.v4.codegen.model.decl.Decl
-import org.fpeterek.til.typechecking.astprocessing.result.TypeName
 import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.TypeAlias
 import org.fpeterek.til.typechecking.util.SrcPosition
-import javax.swing.text.DefaultCaret
 
 
 sealed class Declaration(srcPos: SrcPosition, reports: List<Report>, context: Context) :
@@ -20,6 +17,7 @@ sealed class Declaration(srcPos: SrcPosition, reports: List<Report>, context: Co
         is VariableDeclaration -> withContext(context)
         is FunctionDeclaration -> withContext(context)
         is FunctionDefinition  -> withContext(context)
+        is VariableDefinition  -> withContext(context)
     }
 
 }
@@ -95,10 +93,17 @@ class VariableDefinition(
     context: Context = Context.Unknown
 ) : Declaration(srcPos, reports, context) {
 
+    val variable
+        get() = Variable(name, position, constructsType)
+
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) = VariableDefinition(
         name, constructsType, construction, position, reports + iterable, context
+    )
+
+    override fun withContext(context: Context) = VariableDefinition(
+        name, constructsType, construction, position, reports, context
     )
 
     override fun toString() = "let $name -> $constructsType = $construction"
@@ -147,6 +152,10 @@ class FunctionDefinition(
     )
 
     override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withContext(context: Context) = FunctionDefinition(
+        name, args, constructsType, construction, position, reports, context
+    )
 
     override fun tsString() =
         "defn $name(${args.joinToString(", ") { it.tsString() }}) -> ${constructsType.name} = ${construction.tsString()}"

@@ -4,10 +4,6 @@ import org.fpeterek.til.typechecking.util.SrcPosition
 
 class TypedVar(
     val name: String,
-    val type: String,
+    val type: DataType?,
     srcPos: SrcPosition
-) : IntermediateResult(srcPos) {
-
-    constructor(name: VarName, type: TypeName, srcPos: SrcPosition) : this(name.name, type.name, srcPos)
-
-}
+) : IntermediateResult(srcPos)

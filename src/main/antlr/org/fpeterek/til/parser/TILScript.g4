@@ -19,7 +19,7 @@ terminator : TERMINATOR;
 
 typeDefinition : TYPEDEF WS typeName ASSIGN dataType;
 
-funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW typeName ASSIGN construction;
+funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType ASSIGN construction;
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 
@@ -57,9 +57,9 @@ optTypedVariables : optTypedVariable (COMMA optTypedVariable)*;
 
 typedVariables : typedVariable (COMMA typedVariable)*;
 
-optTypedVariable : variableName (COLON typeName)?;
+optTypedVariable : variableName (COLON dataType)?;
 
-typedVariable : variableName COLON typeName;
+typedVariable : variableName COLON dataType;
 
 entity : keyword | entityName | number | symbol;
 

@@ -1,15 +1,11 @@
 package org.fpeterek.til.typechecking.astprocessing
 
-import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor.position
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
-import org.fpeterek.til.typechecking.exceptions.UndefinedType
-import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.tilscript.ScriptContext
 import org.fpeterek.til.typechecking.types.*
-import java.util.UnknownFormatConversionException
 import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
 import org.fpeterek.til.typechecking.sentence.Construction as TilConstruction
 import org.fpeterek.til.typechecking.sentence.Execution as TilExecution
@@ -40,23 +36,13 @@ class ASTConverter private constructor() {
         types=repo,
     )
 
-    private fun convertDefn(def: FunDefinition): FunctionDefinition {
-
-        val consType = repo[def.consType.name]
-
-        val reports = when (consType) {
-            null -> listOf(Report("Unknown type '${def.consType.name}'", def.consType.position))
-            else -> listOf()
-        }
-
-        return FunctionDefinition(
-            name = def.name.name,
-            args = def.args.map(::convertTypedVar),
-            constructsType = consType ?: Unknown,
-            construction = convertConstruction(def.cons),
-            srcPos = def.position
-        ).withReports(reports)
-    }
+    private fun convertDefn(def: FunDefinition) = FunctionDefinition(
+        name = def.name.name,
+        args = def.args.map(::convertTypedVar),
+        constructsType = convertDataType(def.consType),
+        construction = convertConstruction(def.cons),
+        srcPos = def.position
+    )
 
     private fun convertGlobalVarDef(def: GlobalVarDef) = VariableDefinition(
         def.varName.name,
@@ -121,18 +107,16 @@ class ASTConverter private constructor() {
 
     private fun convertTypedVar(typedVar: TypedVar): TilVariable {
 
-        val type = repo[typedVar.type]
-
-        val reports = when (type) {
-            null -> listOf(Report("Unknown type ${typedVar.type}", typedVar.position))
-            else -> listOf()
+        val type = when (typedVar.type) {
+            null -> Unknown
+            else -> convertDataType(typedVar.type)
         }
 
         return TilVariable(
             typedVar.name,
             typedVar.position,
-            type ?: Unknown
-        ).withReports(reports)
+            type
+        )
     }
 
     private fun convertComposition(composition: Composition) = TilComposition(
@@ -205,7 +189,6 @@ class ASTConverter private constructor() {
         else -> convertAtomicType(type)
     }
 
-    // TODO: Report an error if type has not been defined yet
     private fun convertAtomicType(type: DataType.PrimitiveType) = AtomicType(shortName="", name=type.name)
         .apply { repo.process(this) }
 

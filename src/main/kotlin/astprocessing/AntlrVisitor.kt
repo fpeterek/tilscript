@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.result.*
+import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
@@ -78,7 +79,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     override fun visitFunDefinition(ctx: TILScriptParser.FunDefinitionContext) = FunDefinition(
         visitEntityName(ctx.entityName()),
         visitTypedVariables(ctx.typedVariables()),
-        visitTypeName(ctx.typeName()),
+        visitDataType(ctx.dataType()),
         visitConstruction(ctx.construction()),
         ctx.position(),
     )
@@ -163,11 +164,11 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
     override fun visitOptTypedVariable(ctx: TILScriptParser.OptTypedVariableContext): TypedVar {
 
-        val variable = visitVariableName(ctx.variableName())
+        val variable = visitVariableName(ctx.variableName()).name
 
         val type = when {
-            ctx.typeName() == null -> TypeName("", ctx.position())
-            else -> visitTypeName(ctx.typeName())
+            ctx.dataType() == null -> null
+            else -> visitDataType(ctx.dataType())
         }
 
         return TypedVar(variable, type, ctx.position())
@@ -177,8 +178,8 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         TypedVars(ctx.typedVariable().map(::visitTypedVariable), ctx.position())
 
     override fun visitTypedVariable(ctx: TILScriptParser.TypedVariableContext) = TypedVar(
-        visitVariableName(ctx.variableName()),
-        visitTypeName(ctx.typeName()),
+        visitVariableName(ctx.variableName()).name,
+        visitDataType(ctx.dataType()),
         ctx.position()
     )
 

@@ -21,6 +21,9 @@ class NameChecker private constructor(
 
         private fun checkSymbols(closure: Closure, parent: NameChecker) =
             NameChecker(SymbolRepository(), parent=parent).processClosureScoped(closure)
+
+        private fun checkSymbols(defn: FunctionDefinition, parent: NameChecker) =
+            NameChecker(SymbolRepository(), parent=parent).processDefnScoped(defn)
     }
 
     constructor(symbolRepository: SymbolRepository) : this(
@@ -123,6 +126,37 @@ class NameChecker private constructor(
         variables.forEach(symbolRepository::add)
     }
 
+    private fun processDefnScoped(def: FunctionDefinition): FunctionDefinition {
+
+        val withRedef = when (def.name) {
+            in symbolRepository -> def.withReport(Report("Redefinition of symbol ${def.name}", def.position))
+            else -> def
+        }
+
+        symbolRepository.add(withRedef.tilFunction)
+
+        withRedef.args.forEach(symbolRepository::add)
+
+        return FunctionDefinition(
+            withRedef.name,
+            withRedef.args,
+            withRedef.constructsType,
+            process(withRedef.construction),
+            withRedef.position,
+            withRedef.reports,
+            withRedef.context,
+        )
+    }
+
+    private fun processFunctionDef(def: FunctionDefinition) = checkSymbols(def, this)
+
+    private fun processVariableDef(def: VariableDefinition) = when (def.name) {
+        in symbolRepository -> def.withReport(Report("Redefinition of symbol '${def.name}'", def.position))
+        else -> def
+    }.apply {
+        symbolRepository.add(variable)
+    }
+
     private fun process(construction: Construction): Construction = when (construction) {
         is Closure        -> processClosure(construction)
         is Composition    -> processComposition(construction)
@@ -135,15 +169,16 @@ class NameChecker private constructor(
 
     private fun process(declaration: Declaration): Declaration = when (declaration) {
         is FunctionDeclaration -> processFnDecl(declaration)
-        is LiteralDeclaration -> processLitDecl(declaration)
-        is TypeDefinition -> processTypeDef(declaration)
+        is LiteralDeclaration  -> processLitDecl(declaration)
+        is TypeDefinition      -> processTypeDef(declaration)
         is VariableDeclaration -> processVarDecl(declaration)
-        is FunctionDefinition -> TODO()
+        is FunctionDefinition  -> processFunctionDef(declaration)
+        is VariableDefinition  -> processVariableDef(declaration)
     }
 
     private fun process(sentence: Sentence): Sentence = when (sentence) {
         is Construction -> process(sentence)
-        is Declaration -> process(sentence)
+        is Declaration  -> process(sentence)
     }
 
     private fun process(sentences: Iterable<Sentence>): List<Sentence> = sentences.map(::process)
