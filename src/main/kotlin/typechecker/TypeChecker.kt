@@ -351,16 +351,41 @@ class TypeChecker private constructor(
     private fun processFunctionDefinition(def: FunctionDefinition) =
         fork().processFunctionDefinitionForked(def)
 
+    private fun processVariableDefinition(def: VariableDefinition): VariableDefinition {
+
+        val withRedef = when (def.name) {
+            in repo -> def.withReport(Report("Redefinition of symbol ${def.name}", def.position))
+            else    -> def
+        }
+
+        val withConstruction = VariableDefinition(
+            withRedef.name,
+            withRedef.constructsType,
+            processConstruction(withRedef.construction),
+            withRedef.position,
+            withRedef.reports,
+            withRedef.context
+        )
+
+        return when (match(withConstruction.construction.constructedType, withConstruction.constructsType)) {
+            true -> withConstruction
+            else -> withConstruction.withReport(
+                Report("Type constructed by initializer does not match declared type", withConstruction.construction.position)
+            )
+        }
+    }
+
     private fun processDeclaration(declaration: Declaration): Declaration = when (declaration) {
         is LiteralDeclaration  -> processLiteralDeclaration(declaration)
         is TypeDefinition      -> processTypeDefinition(declaration)
         is VariableDeclaration -> processVariableDeclaration(declaration)
         is FunctionDeclaration -> processFunctionDeclaration(declaration)
         is FunctionDefinition  -> processFunctionDefinition(declaration)
+        is VariableDefinition  -> processVariableDefinition(declaration)
     }
 
     private fun process(sentence: Sentence): Sentence = when (sentence) {
-        is Declaration -> processDeclaration(sentence)
+        is Declaration  -> processDeclaration(sentence)
         is Construction -> processConstruction(sentence)
     }
 

@@ -17,7 +17,7 @@ object JsonFormatter {
             .put("constructsType", constructedType.name)
             .put("context", context)
 
-    fun format(fnDef: FunctionDeclaration): JSONObject = sentenceBase("Function definition", fnDef)
+    fun format(fnDef: FunctionDeclaration): JSONObject = sentenceBase("Function declaration", fnDef)
         .put("functions", JSONArray().apply { fnDef.functions.forEach { put(it.name) } })
         .put("type", fnDef.type.name)
 
@@ -29,7 +29,7 @@ object JsonFormatter {
         .put("alias", typeDef.alias.name)
         .put("originalType", typeDef.alias.type.name)
 
-    fun format(varDef: VariableDeclaration): JSONObject = sentenceBase("Variable definition", varDef)
+    fun format(varDef: VariableDeclaration): JSONObject = sentenceBase("Variable declaration", varDef)
         .put("variables", JSONArray().apply { varDef.variables.forEach { put(it.name) } })
         .put("type", varDef.type.name)
 
@@ -82,6 +82,16 @@ object JsonFormatter {
         constructionBase("Trivialization", tr.constructedType, tr.context, tr)
             .put("construction", format(tr.construction))
 
+    fun format(def: FunctionDefinition): JSONObject = sentenceBase("Function definition", def)
+        .put("name", def.name)
+        .put("signature", def.tilFunction.constructedType.name)
+        .put("construction", format(def.construction))
+
+    fun format(def: VariableDefinition): JSONObject = sentenceBase("Variable definition", def)
+        .put("name", def.name)
+        .put("type", def.constructsType.name)
+        .put("initialization", format(def.construction))
+
     fun format(tr: Trivialization): JSONObject = when (tr.construction) {
         is Literal     -> formatTrivializedLiteral(tr)
         is TilFunction -> formatTrivializedFn(tr)
@@ -102,13 +112,15 @@ object JsonFormatter {
     fun format(declaration: Declaration): JSONObject = when (declaration) {
         is FunctionDeclaration -> format(declaration)
         is LiteralDeclaration  -> format(declaration)
-        is TypeDefinition     -> format(declaration)
+        is TypeDefinition      -> format(declaration)
         is VariableDeclaration -> format(declaration)
+        is FunctionDefinition  -> format(declaration)
+        is VariableDefinition  -> format(declaration)
     }
 
     fun format(sentence: Sentence): JSONObject = when (sentence) {
         is Declaration   -> format(sentence)
-        is Construction -> format(sentence)
+        is Construction  -> format(sentence)
     }
 
     fun format(sentences: Iterable<Sentence>) = JSONArray().apply {
