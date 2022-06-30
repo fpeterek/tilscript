@@ -1,8 +1,7 @@
 package org.fpeterek.til.typechecking
 
-import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.CharStreams
-import org.apache.commons.text.StringEscapeUtils
+import org.antlr.v4.runtime.CommonTokenStream
 import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.ASTConverter
@@ -10,24 +9,15 @@ import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
 import org.fpeterek.til.typechecking.astprocessing.ErrorListener
 import org.fpeterek.til.typechecking.astprocessing.result.Sentences
 import org.fpeterek.til.typechecking.contextrecognition.ContextRecognizer
-import org.fpeterek.til.typechecking.formatters.JsonFormatter
-import org.fpeterek.til.typechecking.formatters.SvgFormatter
-import org.fpeterek.til.typechecking.types.Util.compose
-import org.fpeterek.til.typechecking.types.Util.extensionalize
-import org.fpeterek.til.typechecking.types.Util.trivialize
 import org.fpeterek.til.typechecking.namechecker.NameChecker
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.reporting.ReportFormatter
 import org.fpeterek.til.typechecking.reporting.Reporter
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.sentence.Sentence
 import org.fpeterek.til.typechecking.typechecker.TypeChecker
 import org.fpeterek.til.typechecking.types.SymbolRepository
-import org.fpeterek.til.typechecking.tilscript.CommonTypes
 import org.fpeterek.til.typechecking.types.TypeRepository
-import org.fpeterek.til.typechecking.types.Util.intensionalize
 import org.fpeterek.til.typechecking.util.SrcPosition
-import java.io.File
 
 fun printErrors(errors: Iterable<Report>, file: String, errorType: String) {
     println("-".repeat(80))

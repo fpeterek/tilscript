@@ -6,7 +6,6 @@ import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
 import org.fpeterek.til.typechecking.types.*
-import org.fpeterek.til.typechecking.types.SymbolRepository
 import org.fpeterek.til.typechecking.types.Util.trivialize
 
 class TypeChecker private constructor(

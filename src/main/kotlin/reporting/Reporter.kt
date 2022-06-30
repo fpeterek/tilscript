@@ -35,11 +35,18 @@ object Reporter {
 
     private fun containsReports(variable: Variable): Boolean = variable.hasReports
 
+    private fun containsReports(def: FunctionDefinition): Boolean = def.hasReports || containsReports(def.construction)
+
+    private fun containsReports(def: VariableDefinition): Boolean =
+        def.hasReports || containsReports(def.variable) || containsReports(def.construction)
+
     private fun containsReports(def: Declaration): Boolean = when (def) {
         is FunctionDeclaration -> containsReports(def)
         is LiteralDeclaration  -> containsReports(def)
-        is TypeDefinition     -> containsReports(def)
+        is TypeDefinition      -> containsReports(def)
         is VariableDeclaration -> containsReports(def)
+        is FunctionDefinition  -> containsReports(def)
+        is VariableDefinition  -> containsReports(def)
     }
 
     private fun containsReports(construction: Construction): Boolean = when (construction) {
@@ -87,11 +94,18 @@ object Reporter {
 
     private fun reportsAsList(variable: Variable): List<Report> = variable.reports
 
+    private fun reportsAsList(def: FunctionDefinition): List<Report> = def.reports + reportsAsList(def.construction)
+
+    private fun reportsAsList(def: VariableDefinition): List<Report> =
+        def.reports + reportsAsList(def.variable) + reportsAsList(def.construction)
+
     private fun reportsAsList(def: Declaration): List<Report> = when (def) {
         is FunctionDeclaration -> reportsAsList(def)
         is LiteralDeclaration  -> reportsAsList(def)
-        is TypeDefinition     -> reportsAsList(def)
+        is TypeDefinition      -> reportsAsList(def)
         is VariableDeclaration -> reportsAsList(def)
+        is FunctionDefinition  -> reportsAsList(def)
+        is VariableDefinition  -> reportsAsList(def)
     }
 
     private fun reportsAsList(construction: Construction): List<Report> = when (construction) {
