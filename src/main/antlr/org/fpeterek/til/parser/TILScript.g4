@@ -8,12 +8,12 @@ start : sentence*;
 
 sentence : sentenceContent terminator;
 
-sentenceContent : typeDefinition
-                | entityDefinition
-                | construction
-                | globalVarDecl
+sentenceContent : globalVarDecl
                 | globalVarDef
-                | funDefinition;
+                | funDefinition
+                | typeDefinition
+                | entityDefinition
+                | construction;
 
 terminator : TERMINATOR;
 
@@ -25,9 +25,9 @@ entityDefinition : entityName (COMMA entityName)* FS dataType;
 
 construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
-globalVarDecl : LET variableName (COMMA variableName)* ARROW dataType;
+globalVarDecl : LET WS variableName (COMMA variableName)* COLON dataType;
 
-globalVarDef : LET variableName ARROW dataType ASSIGN construction;
+globalVarDef : LET WS variableName COLON dataType ASSIGN construction;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
@@ -87,9 +87,6 @@ lcname : LCNAME;
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;
 
-UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
-LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
-
 DIGIT   : [0-9];
 ZERO    : '0';
 NONZERO : [1-9];
@@ -106,7 +103,7 @@ BUILTIN_TYPE : 'Bool'
 
 SYMBOLS : ('+' | '-' | '=');
 
-ANY : 'Any' DIGIT*;
+ANY : 'Any' LESS DIGIT* GREATER;
 
 EXEC       : '^' NONZERO OPT_WS;
 LAMBDA     : '\\' OPT_WS;
@@ -129,6 +126,9 @@ LIST       : 'List';
 TUPLE      : 'Tuple';
 DEFN       : 'defn';
 LET        : 'let';
+
+UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
+LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 
 WT : OPT_WS '@wt';
 TW : OPT_WS '@tw';

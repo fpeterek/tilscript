@@ -1,9 +1,33 @@
-x->Int .
+let variable: Int.
+
+let pi: Int = '3.14159.
+
+let fromConstruction: Int = ['/ '4 '2].
+
+defn ChainCalls(fst: Any<1>, snd: Any<2>) -> Any<2> = snd.
+
+If/(Any<1> Boolean Any<1> Any<1>).
+
+defn Divisible(num: Int, divisor: Int) -> Bool =
+    ['If ['= num 0]
+        'True
+        ['If ['< num 0]
+            'False
+            ['Divisible ['- num divisor] divisor]]].
+
+
 Tilman/Indiv.
-Seek / ( Bool Indiv *) @tw.  
+
+Seek / ( Bool Indiv *) @tw.
+
 Lastdec/(Int Real).
+
 Pi/Real.
+
 [\w: World [\t:Time['Seek@wt 'Tilman '['Lastdec 'Pi]]]].
+
 DruhaMocnina/(Int Int).
+
 [\y:Int[\x:Int['+ y  x]]].
+
 ['DruhaMocnina '2].
