@@ -339,10 +339,15 @@ class TypeChecker private constructor(
             withReport.context
         )
 
-        return when (match(withConstruction.construction.constructedType, withConstruction.constructsType)) {
+        val expType = withConstruction.construction.constructedType
+        val received = withConstruction.constructsType
+
+        return when (match(expType, received)) {
             true -> withConstruction
             else -> withConstruction.withReport(
-                Report("Type constructed by function body does not match function signature", withConstruction.construction.position)
+                Report(
+                    "Type constructed by function body does not match function signature (expected: ${expType.javaClass}, received: ${received.javaClass})",
+                    withConstruction.construction.position)
             )
         }
     }

@@ -193,11 +193,11 @@ class ASTConverter private constructor() {
         .apply { repo.process(this) }
 
     private val DataType.PrimitiveType.isGenericType
-        get() = name.startsWith("Any") &&
-                    name.asSequence().drop(3).all { it.isDigit() }
+        get() = name.startsWith("Any<") && name.endsWith(">") &&
+                    name.drop(4).dropLast(1).all { it.isDigit() }
 
     private fun convertGenericType(type: DataType.PrimitiveType) = GenericType(
-        type.name.drop(3).toInt()
+        type.name.drop(4).dropLast(1).toInt()
     )
 
     private fun convertFnType(classType: DataType.ClassType) = FunctionType(

@@ -1,7 +1,8 @@
 let variable: Int.
 
-let pi: Int = '3.14159.
+let pi: Real = '3.14159.
 
+['/ '4 '2].
 let fromConstruction: Int = ['/ '4 '2].
 
 defn ChainCalls(fst: Any<1>, snd: Any<2>) -> Any<2> = snd.

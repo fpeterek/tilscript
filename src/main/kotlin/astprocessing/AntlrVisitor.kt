@@ -205,7 +205,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
     override fun visitKeyword(ctx: TILScriptParser.KeywordContext) = Symbol(ctx.text, ctx.position())
 
-    override fun visitSymbol(ctx: TILScriptParser.SymbolContext) = Symbol(ctx.text, ctx.position())
+    override fun visitSymbol(ctx: TILScriptParser.SymbolContext) = Symbol(ctx.text.trim(), ctx.position())
 
     override fun visitNumber(ctx: TILScriptParser.NumberContext) = Numeric(ctx.text, ctx.position())
 

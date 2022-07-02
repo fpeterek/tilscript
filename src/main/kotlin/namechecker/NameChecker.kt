@@ -105,7 +105,10 @@ class NameChecker private constructor(
         )
     }
 
+    private val mathOperators = listOf("+", "-", "/", "*")
+
     private fun processFunction(fn: TilFunction) = when {
+        fn.name in mathOperators -> fn
         findSymbol(fn.name) -> fn
         else -> fn.withReport(
             Report("Undefined symbol '${fn.name}'", fn.position)

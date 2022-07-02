@@ -21,7 +21,7 @@ typeDefinition : TYPEDEF WS typeName ASSIGN dataType;
 
 funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType ASSIGN construction;
 
-entityDefinition : entityName (COMMA entityName)* FS dataType;
+entityDefinition : entityName (COMMA entityName)* FS_WITH_WS dataType;
 
 construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
@@ -77,7 +77,14 @@ keyword : 'True'
         | 'Nil';
 
 
-symbol : SYMBOLS | ASTERISK | FS;
+// For some reason, Antlr seems unable to match a single forward
+// slash '/' and always matches the following space alongside the
+// forward slash character
+// The same behaviour does not occur with asterisk or other special
+// symbols, no idea why
+// Thus, I include optional whitespace as a part of the lexer rule
+// and I'll have to trim the whitespace afterwards
+symbol : SYMBOLS | ASTERISK | FS_WITH_WS;
 
 number : NUMBER;
 
@@ -119,7 +126,8 @@ TERMINATOR : OPT_WS '.' OPT_WS;
 ASSIGN     : OPT_WS '=' OPT_WS;
 COMMA      : OPT_WS ',' OPT_WS;
 COLON      : OPT_WS ':' OPT_WS;
-FS         : OPT_WS '/' OPT_WS;
+FS_WITH_WS : OPT_WS '/' OPT_WS;
+FS         : '/';
 ASTERISK   : '*';
 TYPEDEF    : 'typedef';
 LIST       : 'List';
