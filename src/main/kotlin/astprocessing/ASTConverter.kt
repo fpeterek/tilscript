@@ -3,6 +3,7 @@ package org.fpeterek.til.typechecking.astprocessing
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.sentence.Symbol
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.tilscript.ScriptContext
 import org.fpeterek.til.typechecking.types.*
@@ -28,7 +29,9 @@ class ASTConverter private constructor() {
 
     init {
         fns.addAll(Builtins.builtinFunctions.asSequence().map { it.name })
-        lits.addAll(Builtins.builtinValues.asSequence().map { it.value })
+        // Since we know built-ins will only ever be Symbols, Nil, or Booleans,
+        // we can store their values as a String
+        lits.addAll(Builtins.builtinValues.asSequence().map { it.toString() })
     }
 
     private fun convert(sentences: Sentences) = ScriptContext(
@@ -81,7 +84,7 @@ class ASTConverter private constructor() {
             type is FunctionType || repo.isFunction(type.name) ->
                 FunctionDeclaration(entityDef.names.map { TilFunction(it.name, it.position, type) }, entityDef.position)
 
-            else -> LiteralDeclaration(entityDef.names.map { Literal(it.name, it.position, type) }, entityDef.position)
+            else -> LiteralDeclaration(entityDef.names.map { Symbol(it.name, it.position, type) }, entityDef.position)
         }
     }.apply {
         when (this) {
@@ -153,13 +156,20 @@ class ASTConverter private constructor() {
         is Entity.Number -> convertNumLiteral(entity)
         is Entity.FnOrEntity -> when (entity.value) {
             in fns -> TilFunction(entity.value, entity.position)
-            else -> Literal(entity.value, entity.position)
+            else -> convertNonNumLiteral(entity)
         }
     }
 
+    private fun convertNonNumLiteral(entity: Entity.FnOrEntity) = when (entity.value) {
+        "Nil" -> Nil(entity.position)
+        "True" -> Bool(true, entity.position, Builtins.Omicron)
+        "False" -> Bool(false, entity.position, Builtins.Omicron)
+        else -> Symbol(entity.value, entity.position)
+    }
+
     private fun convertNumLiteral(entity: Entity.Number) = when {
-        entity.value.all { it.isDigit() } -> Literal(entity.value, entity.position, Builtins.Nu)
-        else -> Literal(entity.value, entity.position, Builtins.Eta)
+        entity.value.all { it.isDigit() } -> Integral(entity.value.toLong(), entity.position, Builtins.Nu)
+        else -> Real(entity.value.toDouble(), entity.position, Builtins.Eta)
     }
 
     private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name, varRef.position)

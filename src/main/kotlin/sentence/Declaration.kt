@@ -23,7 +23,7 @@ sealed class Declaration(srcPos: SrcPosition, reports: List<Report>, context: Co
 }
 
 class LiteralDeclaration(
-    val literals: List<Literal>, srcPos: SrcPosition, reports: List<Report> = listOf(),
+    val literals: List<Symbol>, srcPos: SrcPosition, reports: List<Report> = listOf(),
     context: Context = Context.Unknown
 ) : Declaration(srcPos, reports, context) {
 

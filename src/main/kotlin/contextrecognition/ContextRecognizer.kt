@@ -33,10 +33,12 @@ class ContextRecognizer private constructor(private val highestContext: Context)
 
         val ctx = maxOf(highestContext, Context.Extensional)
 
-        val fnContext = maxOf(when {
-            comp.args.isEmpty() -> Context.Intensional
-            else -> Context.Extensional
-        }, ctx)
+        val fnContext = maxOf(
+            when {
+                comp.args.isEmpty() -> Context.Intensional
+                else -> Context.Extensional
+            }, ctx
+        )
 
         val processedFn = when (comp.function) {
             is Trivialization -> when (comp.function.construction) {
@@ -78,13 +80,53 @@ class ContextRecognizer private constructor(private val highestContext: Context)
         maxOf(highestContext, Context.Extensional),
     )
 
-    private fun assign(lit: Literal) = Literal(
-        lit.value,
-        lit.position,
-        lit.constructedType,
-        lit.reports,
+    private fun assign(nil: Nil) = Nil(
+        nil.position,
+        nil.constructedType,
+        nil.reports,
+        maxOf(highestContext, Context.Intensional)
+    )
+
+    private fun assign(bool: Bool) = Bool(
+        bool.value,
+        bool.position,
+        bool.constructedType,
+        bool.reports,
+        maxOf(highestContext, Context.Intensional)
+    )
+
+    private fun assign(symbol: Symbol) = Symbol(
+        symbol.value,
+        symbol.position,
+        symbol.constructedType,
+        symbol.reports,
         maxOf(highestContext, Context.Intensional),
     )
+
+    private fun assign(int: Integral) = Integral(
+        int.value,
+        int.position,
+        int.constructedType,
+        int.reports,
+        maxOf(highestContext, Context.Intensional),
+    )
+
+    private fun assign(real: Real) = Real(
+        real.value,
+        real.position,
+        real.constructedType,
+        real.reports,
+        maxOf(highestContext, Context.Intensional),
+    )
+
+
+    private fun assign(lit: Literal) = when (lit) {
+        is Symbol   -> assign(lit)
+        is Bool     -> assign(lit)
+        is Integral -> assign(lit)
+        is Nil      -> assign(lit)
+        is Real     -> assign(lit)
+    }
 
     // Functions in compositions are handled separately - thus, we can assume
     // that if we have gotten to this point, the function is not applied to arguments

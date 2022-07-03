@@ -56,7 +56,7 @@ object JsonFormatter {
 
     fun format(lit: Literal): JSONObject =
         constructionBase("Literal", lit.constructedType, lit.context, lit)
-            .put("value", lit.value)
+            .put("value", lit.tsString())
 
     fun format(fn: TilFunction): JSONObject =
         constructionBase("Function", fn.constructedType, fn.context, fn)
@@ -68,7 +68,7 @@ object JsonFormatter {
 
     private fun formatTrivializedLiteral(tr: Trivialization) =
         constructionBase("Trivialization", tr.constructedType, tr.context, tr)
-            .put("literal", (tr.construction as Literal).value)
+            .put("literal", (tr.construction as Literal).tsString())
 
     private fun formatTrivializedVariable(tr: Trivialization) =
         constructionBase("Trivialization", tr.constructedType, tr.context, tr)

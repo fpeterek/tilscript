@@ -26,7 +26,7 @@ class SvgTreeCreator {
 
     private fun convertValue(triv: Trivialization) = Value(
         when (triv.construction) {
-            is Literal     -> "'${triv.construction.value}"
+            is Literal     -> "'${triv.construction.tsString()}"
             is TilFunction -> "'${triv.construction.name}"
             else           -> throw RuntimeException("Invalid state")
         },

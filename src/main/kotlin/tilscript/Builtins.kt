@@ -1,6 +1,7 @@
 package org.fpeterek.til.typechecking.tilscript
 
 import org.fpeterek.til.typechecking.greek.GreekAlphabet
+import org.fpeterek.til.typechecking.sentence.Bool
 import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
@@ -91,8 +92,8 @@ object Builtins {
         TilFunction("UndefP", noPosition, propositionTruthiness),
     )
 
-    val True = Literal("True", noPosition, Omicron)
-    val False = Literal("False", noPosition, Omicron)
+    val True = Bool(true, noPosition, Omicron)
+    val False = Bool(false, noPosition, Omicron)
 
     val builtinValues = listOf(True, False)
 
