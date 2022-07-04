@@ -25,7 +25,10 @@ object TypeAssignment {
         reports
     )
 
-    fun Literal.assignType(type: Type) = Literal(value, position, type, reports)
+    fun Literal.assignType(type: Type) = when (this) {
+        is Symbol -> Symbol(value, position, type, reports)
+        else -> this
+    }
 
     fun TilFunction.assignType(type: FunctionType) = TilFunction(name, position, type, reports)
 }

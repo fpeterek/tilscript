@@ -4,6 +4,7 @@ import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.exceptions.InvalidType
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.ConstructionType
@@ -53,16 +54,15 @@ class Symbol(
 class Integral(
     val value: Long,
     srcPos: SrcPosition,
-    type: Type = Unknown,
     reports: List<Report> = listOf(),
     context: Context = Context.Unknown,
-) : Literal(srcPos, type, reports, context) {
+) : Literal(srcPos, Builtins.Nu, reports, context) {
 
     override fun withReports(iterable: Iterable<Report>) =
-        Integral(value, position, constructedType, reports + iterable, context)
+        Integral(value, position, reports + iterable, context)
 
     override fun withContext(context: Context) =
-        Integral(value, position, constructedType, reports, context)
+        Integral(value, position, reports, context)
 
     override fun toString() = value.toString()
     override fun tsString() = value.toString()
@@ -71,16 +71,15 @@ class Integral(
 class Real(
     val value: Double,
     srcPos: SrcPosition,
-    type: Type = Unknown,
     reports: List<Report> = listOf(),
     context: Context = Context.Unknown,
-) : Literal(srcPos, type, reports, context) {
+) : Literal(srcPos, Builtins.Eta, reports, context) {
 
     override fun withReports(iterable: Iterable<Report>) =
-        Real(value, position, constructedType, reports + iterable, context)
+        Real(value, position, reports + iterable, context)
 
     override fun withContext(context: Context) =
-        Real(value, position, constructedType, reports, context)
+        Real(value, position, reports, context)
 
     override fun toString() = value.toString()
     override fun tsString() = value.toString()
@@ -89,16 +88,15 @@ class Real(
 class Bool(
     val value: Boolean,
     srcPos: SrcPosition,
-    type: Type = Unknown,
     reports: List<Report> = listOf(),
     context: Context = Context.Unknown,
-) : Literal(srcPos, type, reports, context) {
+) : Literal(srcPos, Builtins.Omicron, reports, context) {
 
     override fun withReports(iterable: Iterable<Report>) =
-        Bool(value, position, constructedType, reports + iterable, context)
+        Bool(value, position, reports + iterable, context)
 
     override fun withContext(context: Context) =
-        Bool(value, position, constructedType, reports, context)
+        Bool(value, position, reports, context)
 
     override fun toString() = if (value) { "True" } else { "False" }
     override fun tsString() = toString()
@@ -106,16 +104,15 @@ class Bool(
 
 class Nil(
     srcPos: SrcPosition,
-    type: Type = Unknown,
     reports: List<Report> = listOf(),
     context: Context = Context.Unknown,
-) : Literal(srcPos, type, reports, context) {
+) : Literal(srcPos, Unknown, reports, context) {
 
     override fun withReports(iterable: Iterable<Report>) =
-        Nil(position, constructedType, reports + iterable, context)
+        Nil(position, reports + iterable, context)
 
     override fun withContext(context: Context) =
-        Nil(position, constructedType, reports, context)
+        Nil(position, reports, context)
 
     override fun toString() = "Nil"
     override fun tsString() = "Nil"

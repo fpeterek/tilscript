@@ -92,8 +92,8 @@ object Builtins {
         TilFunction("UndefP", noPosition, propositionTruthiness),
     )
 
-    val True = Bool(true, noPosition, Omicron)
-    val False = Bool(false, noPosition, Omicron)
+    val True = Bool(true, noPosition)
+    val False = Bool(false, noPosition)
 
     val builtinValues = listOf(True, False)
 

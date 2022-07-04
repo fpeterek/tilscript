@@ -162,14 +162,14 @@ class ASTConverter private constructor() {
 
     private fun convertNonNumLiteral(entity: Entity.FnOrEntity) = when (entity.value) {
         "Nil" -> Nil(entity.position)
-        "True" -> Bool(true, entity.position, Builtins.Omicron)
-        "False" -> Bool(false, entity.position, Builtins.Omicron)
+        "True" -> Bool(true, entity.position)
+        "False" -> Bool(false, entity.position)
         else -> Symbol(entity.value, entity.position)
     }
 
     private fun convertNumLiteral(entity: Entity.Number) = when {
-        entity.value.all { it.isDigit() } -> Integral(entity.value.toLong(), entity.position, Builtins.Nu)
-        else -> Real(entity.value.toDouble(), entity.position, Builtins.Eta)
+        entity.value.all { it.isDigit() } -> Integral(entity.value.toLong(), entity.position)
+        else -> Real(entity.value.toDouble(), entity.position)
     }
 
     private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name, varRef.position)

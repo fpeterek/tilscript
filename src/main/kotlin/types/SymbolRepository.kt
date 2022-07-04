@@ -38,7 +38,7 @@ class SymbolRepository(vararg symbols: Construction, loadBuiltins: Boolean = fal
 
     fun add(variable: Variable) = add(variable.name, variable.constructedType)
     fun add(function: TilFunction) = add(function.name, function.constructedType)
-    fun add(literal: Literal) = add(literal.value, literal.constructedType)
+    fun add(literal: Literal) = add(literal.tsString(), literal.constructedType)
 
     fun add(construction: Construction) = when (construction) {
         is Variable -> add(construction)

@@ -82,7 +82,6 @@ class ContextRecognizer private constructor(private val highestContext: Context)
 
     private fun assign(nil: Nil) = Nil(
         nil.position,
-        nil.constructedType,
         nil.reports,
         maxOf(highestContext, Context.Intensional)
     )
@@ -90,7 +89,6 @@ class ContextRecognizer private constructor(private val highestContext: Context)
     private fun assign(bool: Bool) = Bool(
         bool.value,
         bool.position,
-        bool.constructedType,
         bool.reports,
         maxOf(highestContext, Context.Intensional)
     )
@@ -106,7 +104,6 @@ class ContextRecognizer private constructor(private val highestContext: Context)
     private fun assign(int: Integral) = Integral(
         int.value,
         int.position,
-        int.constructedType,
         int.reports,
         maxOf(highestContext, Context.Intensional),
     )
@@ -114,7 +111,6 @@ class ContextRecognizer private constructor(private val highestContext: Context)
     private fun assign(real: Real) = Real(
         real.value,
         real.position,
-        real.constructedType,
         real.reports,
         maxOf(highestContext, Context.Intensional),
     )

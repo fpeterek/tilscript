@@ -262,9 +262,10 @@ class TypeChecker private constructor(
         else -> assignFnType(fn)
     }
 
-    private fun processLiteral(literal: Literal) = when (literal.constructedType) {
-        !is Unknown -> literal
-        else -> literal.assignType(findSymbolType(literal.value))
+    private fun processLiteral(literal: Literal) = when {
+        literal.constructedType !is Unknown -> literal
+        literal is Symbol -> literal.assignType(findSymbolType(literal.value))
+        else -> throw RuntimeException("Attempting to assign type to a non-symbol literal")
     }
 
     private fun processConstruction(construction: Construction): Construction = when (construction) {
@@ -277,18 +278,18 @@ class TypeChecker private constructor(
         is Literal        -> processLiteral(construction)
     }
 
-    private fun addLiteral(lit: Literal) = Literal(
-        lit.value,
-        lit.position,
-        typeRepo.process(lit.constructedType),
-        reports=lit.reports
+    private fun addSymbol(symbol: Symbol) = Symbol(
+        symbol.value,
+        symbol.position,
+        typeRepo.process(symbol.constructedType),
+        reports=symbol.reports
     ).apply {
         repo.add(this)
     }
 
-    private fun processSingleDecl(lit: Literal) = when (lit.value) {
-        in repo -> lit.withReport(Report("Redefinition of symbol '${lit.value}'", lit.position))
-        else -> addLiteral(lit)
+    private fun processSingleDecl(symbol: Symbol) = when (symbol.value) {
+        in repo -> symbol.withReport(Report("Redefinition of symbol '${symbol.value}'", symbol.position))
+        else -> addSymbol(symbol)
     }
 
     private fun processLiteralDeclaration(decl: LiteralDeclaration) = decl.apply {
