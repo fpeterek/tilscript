@@ -135,10 +135,10 @@ class TypeChecker private constructor(
     }
 
     private fun processOperatorArgs(args: List<Construction>): List<Construction> {
-        val isInt = match(execute(args.first()).constructedType, Builtins.Nu)
+        val isInt = match(execute(args.first()).constructedType, Builtins.Int)
         val expType = when {
-            isInt -> Builtins.Nu
-            else -> Builtins.Eta
+            isInt -> Builtins.Int
+            else -> Builtins.Real
         }
 
         return processCompositionArgs(args, listOf(expType, expType))
@@ -176,10 +176,10 @@ class TypeChecker private constructor(
         val processedArgs = processOperatorArgs(args)
         val arityErrors = checkArity(composition, 2)
 
-        val isInt = processedArgs.isNotEmpty() && match(processedArgs.first().constructedType, Builtins.Nu)
+        val isInt = processedArgs.isNotEmpty() && match(processedArgs.first().constructedType, Builtins.Int)
         val opType = when {
-            isInt -> Builtins.Nu
-            else -> Builtins.Eta
+            isInt -> Builtins.Int
+            else -> Builtins.Real
         }
 
         val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType), listOf()).trivialize()

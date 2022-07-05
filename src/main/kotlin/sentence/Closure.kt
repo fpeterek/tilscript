@@ -1,7 +1,6 @@
 package org.fpeterek.til.typechecking.sentence
 
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
-import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
@@ -29,8 +28,6 @@ class Closure(
     override fun withReports(iterable: Iterable<Report>) =
         Closure(variables, construction, position, constructedType, reports + iterable)
 
-    override fun toString() = "${variables.joinToString(", ", prefix=GreekAlphabet.lambda) } $construction"
-
-    override fun tsString() =
-        "${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} ${construction.tsString()}"
+    override fun toString() =
+        "${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} $construction"
 }

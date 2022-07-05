@@ -6,7 +6,6 @@ import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SrcPosition
 
@@ -14,7 +13,7 @@ sealed class Literal(
     srcPos: SrcPosition,
     type: Type = Unknown,
     reports: List<Report> = listOf(),
-) : Construction(constructedType=type, constructionType=ConstructionType, srcPos, reports), NonExecutable {
+) : Construction(constructedType=type, constructionType=type, srcPos, reports), NonExecutable {
 
     init {
         when (type) {
@@ -41,46 +40,42 @@ class Symbol(
         Symbol(value, position, constructedType, reports + iterable)
 
     override fun toString() = value
-    override fun tsString() = value
 }
 
 class Integral(
     val value: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Builtins.Nu, reports) {
+) : Literal(srcPos, Builtins.Int, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Integral(value, position, reports + iterable)
 
     override fun toString() = value.toString()
-    override fun tsString() = value.toString()
 }
 
 class Real(
     val value: Double,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Builtins.Eta, reports) {
+) : Literal(srcPos, Builtins.Real, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Real(value, position, reports + iterable)
 
     override fun toString() = value.toString()
-    override fun tsString() = value.toString()
 }
 
 class Bool(
     val value: Boolean,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Builtins.Omicron, reports) {
+) : Literal(srcPos, Builtins.Bool, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Bool(value, position, reports + iterable)
 
     override fun toString() = if (value) { "True" } else { "False" }
-    override fun tsString() = toString()
 }
 
 class Nil(
@@ -92,6 +87,4 @@ class Nil(
         Nil(position, reports + iterable)
 
     override fun toString() = "Nil"
-    override fun tsString() = "Nil"
-
 }

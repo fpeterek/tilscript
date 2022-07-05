@@ -24,7 +24,6 @@ class LiteralDeclaration(
         LiteralDeclaration(literals, position, reports + iterable)
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
-    override fun tsString() = "${names.joinToString(separator=", ")}/${type.name}"
 }
 
 class TypeDefinition(
@@ -36,9 +35,7 @@ class TypeDefinition(
     override fun withReports(iterable: Iterable<Report>) =
         TypeDefinition(alias, position, reports + iterable)
 
-    override fun toString() = "${alias.shortName} := ${alias.type}"
-
-    override fun tsString() = "${alias.name} := ${alias.type.name}"
+    override fun toString() = "${alias.name} := ${alias.type}"
 }
 
 class VariableDeclaration(
@@ -56,7 +53,6 @@ class VariableDeclaration(
         VariableDeclaration(variables, position, reports + iterable)
 
     override fun toString() = "${names.joinToString(separator=", ")} -> $type"
-    override fun tsString() = "${names.joinToString(separator=", ")} -> ${type.name}"
 }
 
 class VariableDefinition(
@@ -77,7 +73,6 @@ class VariableDefinition(
     )
 
     override fun toString() = "let $name -> $constructsType = $construction"
-    override fun tsString() = "let $name -> ${constructsType.name} = ${construction.tsString()}"
 }
 
 class FunctionDeclaration(
@@ -96,7 +91,6 @@ class FunctionDeclaration(
         FunctionDeclaration(functions, position, reports + iterable)
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
-    override fun tsString() = "${names.joinToString(separator=", ")}/${type.name}"
 }
 
 class FunctionDefinition(
@@ -118,6 +112,6 @@ class FunctionDefinition(
 
     override fun withReport(report: Report) = withReports(listOf(report))
 
-    override fun tsString() =
-        "defn $name(${args.joinToString(", ") { it.tsString() }}) -> ${constructsType.name} = ${construction.tsString()}"
+    override fun toString() =
+        "defn $name(${args.joinToString(", ")}) -> ${constructsType.name} = $construction"
 }

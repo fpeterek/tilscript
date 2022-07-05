@@ -20,7 +20,6 @@ class Trivialization(
 ), Executable {
 
     override fun toString() = "'$construction"
-    override fun tsString() = "'${construction.tsString()}"
 
     override fun withReport(report: Report) = withReports(listOf(report))
 

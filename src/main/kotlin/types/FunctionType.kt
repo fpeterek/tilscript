@@ -22,11 +22,8 @@ class FunctionType(
     }
 
     override val name
-        get() = "(${imageType.name} ${argTypes.joinToString(separator=" ") { it.name }})"
+        get() = "(${imageType.name} ${argTypes.joinToString(separator=" ")})"
                 
-    override val shortName
-        get() = "(${imageType.shortName}${argTypes.joinToString(separator="") { it.shortName }})"
-
     private val Type.isKnown
         get() = when (this) {
             is FunctionType -> this.fullyTyped
@@ -48,5 +45,5 @@ class FunctionType(
     val arity
         get() = argTypes.size
 
-    override fun toString() = shortName
+    override fun toString() = name
 }

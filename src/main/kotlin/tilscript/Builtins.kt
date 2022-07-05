@@ -1,52 +1,50 @@
 package org.fpeterek.til.typechecking.tilscript
 
-import org.fpeterek.til.typechecking.greek.GreekAlphabet
 import org.fpeterek.til.typechecking.sentence.Bool
-import org.fpeterek.til.typechecking.sentence.Literal
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object Builtins {
 
-    val Omicron = AtomicType(GreekAlphabet.omicron, "Bool", "Truth values")
-    val Iota = AtomicType(GreekAlphabet.iota, "Indiv", "Individuals")
-    val Tau = AtomicType(GreekAlphabet.tau, "Time", "Timestamps")
-    val Omega = AtomicType(GreekAlphabet.omega, "World", "Worlds")
-    val Eta = AtomicType(GreekAlphabet.eta, "Real", "Real numbers")
-    val Nu = AtomicType(GreekAlphabet.nu, "Int", "Whole numbers")
+    val Bool = AtomicType("Bool", "Truth values")
+    val Indiv = AtomicType("Indiv", "Individuals")
+    val Time = AtomicType("Time", "Timestamps")
+    val World = AtomicType("World", "Worlds")
+    val Real = AtomicType("Real", "Real numbers")
+    val Int = AtomicType("Int", "Whole numbers")
 
     val builtinTypes = listOf(
-        Omicron, Iota, Tau, Omega, Eta, Nu
+        Bool, Indiv, Time, World, Real, Int
     )
 
     private val realOperation
-        get() = FunctionType(Eta, Eta, Eta)
+        get() = FunctionType(Real, Real, Real)
 
     private val intOperation
-        get() = FunctionType(Nu, Nu, Nu)
+        get() = FunctionType(Int, Int, Int)
 
     private val equalityComparison
-        get() = FunctionType(Omicron, GenericType(1), GenericType(1))
+        get() = FunctionType(Bool, GenericType(1), GenericType(1))
 
     private val nonrestrictedQuantifier
-        get() = FunctionType(Omicron, FunctionType(Omicron, GenericType(1)))
+        get() = FunctionType(Bool, FunctionType(Bool, GenericType(1)))
 
     private val restrictedQuantifier
-        get() = FunctionType(FunctionType(Omicron, GenericType(1)), FunctionType(Omicron, GenericType(1)))
+        get() = FunctionType(FunctionType(Bool, GenericType(1)), FunctionType(Bool, GenericType(1)))
 
     private val binaryBoolean
-        get() = FunctionType(Omicron, Omicron, Omicron)
+        get() = FunctionType(Bool, Bool, Bool)
     private val unaryBoolean
-        get() = FunctionType(Omicron, Omicron)
+        get() = FunctionType(Bool, Bool)
 
     private val constructionTruthiness
-        get() = FunctionType(Omicron, ConstructionType)
+        get() = FunctionType(Bool, ConstructionType)
     private val propositionTruthiness
-        get() = FunctionType(Omicron, CommonTypes.proposition)
+        get() = FunctionType(Bool, CommonTypes.proposition)
 
     private val singularizer
-        get() = FunctionType(GenericType(1), FunctionType(Omicron, GenericType(1)))
+        get() = FunctionType(GenericType(1), FunctionType(Bool, GenericType(1)))
 
     private val noPosition = SrcPosition(-1, -1)
 
@@ -64,8 +62,8 @@ object Builtins {
 
         TilFunction("=", noPosition, equalityComparison),
 
-        TilFunction("ToInt", noPosition, FunctionType(Nu, Eta)),
-        TilFunction("ToReal", noPosition, FunctionType(Eta, Nu)),
+        TilFunction("ToInt", noPosition, FunctionType(Int, Real)),
+        TilFunction("ToReal", noPosition, FunctionType(Real, Int)),
 
         TilFunction("ForAll", noPosition, nonrestrictedQuantifier),
         TilFunction("Exist", noPosition, nonrestrictedQuantifier),

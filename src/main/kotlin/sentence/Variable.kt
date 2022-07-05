@@ -20,6 +20,4 @@ class Variable(
         Variable(name, position, constructedType, reports + iterable)
 
     override fun toString() = name
-    override fun tsString() = name
-
 }

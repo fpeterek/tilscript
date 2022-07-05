@@ -9,6 +9,4 @@ sealed class Sentence(val position: SrcPosition, val reports: List<Report>) {
     // withReports(listOf(report)) here
     abstract fun withReport(report: Report): Sentence
     abstract fun withReports(iterable: Iterable<Report>): Sentence
-
-    abstract fun tsString(): String
 }

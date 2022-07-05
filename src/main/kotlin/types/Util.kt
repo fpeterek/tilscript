@@ -6,14 +6,14 @@ import org.fpeterek.til.typechecking.util.SrcPosition
 
 object Util {
 
-    val w = Variable("w", SrcPosition(-1, -1), Builtins.Omega)
-    val t = Variable("t", SrcPosition(-1, -1), Builtins.Tau)
+    val w = Variable("w", SrcPosition(-1, -1), Builtins.World)
+    val t = Variable("t", SrcPosition(-1, -1), Builtins.Time)
 
     fun FunctionType.intensionalize() =
-        FunctionType(FunctionType(this, Builtins.Tau), Builtins.Omega)
+        FunctionType(FunctionType(this, Builtins.Time), Builtins.World)
 
     fun AtomicType.intensionalize() =
-        FunctionType(FunctionType(this, Builtins.Tau), Builtins.Omega)
+        FunctionType(FunctionType(this, Builtins.Time), Builtins.World)
 
     fun Closure.intensionalize() =
         Closure(listOf(w), Closure(listOf(t), this, srcPos=position), srcPos=position)

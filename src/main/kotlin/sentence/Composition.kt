@@ -21,6 +21,4 @@ class Composition(
         Composition(function, args, position, constructedType, reports + iterable)
 
     override fun toString() = "[$function ${args.joinToString(" ")}]"
-
-    override fun tsString() = "[$function ${args.joinToString(" ") { it.tsString() }}]"
 }

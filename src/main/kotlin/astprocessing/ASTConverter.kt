@@ -95,7 +95,6 @@ class ASTConverter private constructor() {
     }
 
     private fun processTypeAlias(typeAlias: TypeAlias) = TilTypeAlias(
-        shortName="",
         name=typeAlias.name,
         type=convertDataType(typeAlias.type)
     ).let { repo.process(it) }
@@ -199,7 +198,7 @@ class ASTConverter private constructor() {
         else -> convertAtomicType(type)
     }
 
-    private fun convertAtomicType(type: DataType.PrimitiveType) = AtomicType(shortName="", name=type.name)
+    private fun convertAtomicType(type: DataType.PrimitiveType) = AtomicType(name=type.name)
         .apply { repo.process(this) }
 
     private val DataType.PrimitiveType.isGenericType
