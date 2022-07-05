@@ -147,7 +147,6 @@ class NameChecker private constructor(
             process(withRedef.construction),
             withRedef.position,
             withRedef.reports,
-            withRedef.context,
         )
     }
 

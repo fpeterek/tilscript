@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.sentence
 
-import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.Executable
 import org.fpeterek.til.typechecking.types.ConstructionType
@@ -13,16 +12,12 @@ class Variable(
     srcPos: SrcPosition,
     type: Type = Unknown,
     reports: List<Report> = listOf(),
-    context: Context = Context.Unknown,
-) : Construction(type, ConstructionType, srcPos, reports, context), Executable {
+) : Construction(type, ConstructionType, srcPos, reports), Executable {
 
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        Variable(name, position, constructedType, reports + iterable, context)
-
-    override fun withContext(context: Context) =
-        Variable(name, position, constructedType, reports, context)
+        Variable(name, position, constructedType, reports + iterable)
 
     override fun toString() = name
     override fun tsString() = name

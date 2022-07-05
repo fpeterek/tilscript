@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.sentence
 
-import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.exceptions.InvalidType
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
@@ -13,8 +12,7 @@ class TilFunction(
     srcPosition: SrcPosition,
     type: Type = Unknown,
     reports: List<Report> = listOf(),
-    context: Context = Context.Unknown,
-) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition, reports, context),
+) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition, reports),
     NonExecutable {
 
     override fun toString() = name
@@ -32,8 +30,5 @@ class TilFunction(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        TilFunction(name, position, constructedType, reports + iterable, context)
-
-    override fun withContext(context: Context) =
-        TilFunction(name, position, constructedType, reports, context)
+        TilFunction(name, position, constructedType, reports + iterable)
 }

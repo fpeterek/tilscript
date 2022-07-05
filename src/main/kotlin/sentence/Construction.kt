@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.sentence
 
-import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.IsExecutable
 import org.fpeterek.til.typechecking.types.Type
@@ -12,8 +11,7 @@ sealed class Construction(
     val constructionType: Type = Unknown,
     srcPos: SrcPosition,
     reports: List<Report>,
-    context: Context,
-) : Sentence(srcPos, reports, context), IsExecutable {
+) : Sentence(srcPos, reports), IsExecutable {
 
     override fun withReport(report: Report) = withReports(listOf(report))
 
@@ -27,16 +25,5 @@ sealed class Construction(
         is TilFunction    -> withReports(iterable)
         is Trivialization -> withReports(iterable)
         is Variable       -> withReports(iterable)
-    }
-
-    // Same as above
-    override fun withContext(context: Context): Construction = when (this) {
-        is Closure        -> withContext(context)
-        is Composition    -> withContext(context)
-        is Execution      -> withContext(context)
-        is Literal        -> withContext(context)
-        is TilFunction    -> withContext(context)
-        is Trivialization -> withContext(context)
-        is Variable       -> withContext(context)
     }
 }

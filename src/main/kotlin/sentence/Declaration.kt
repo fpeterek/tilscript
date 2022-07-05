@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.sentence
 
-import org.fpeterek.til.typechecking.contextrecognition.Context
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
@@ -8,24 +7,11 @@ import org.fpeterek.til.typechecking.types.TypeAlias
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 
-sealed class Declaration(srcPos: SrcPosition, reports: List<Report>, context: Context) :
-    Sentence(srcPos, reports, context) {
-
-    override fun withContext(context: Context): Declaration = when (this) {
-        is LiteralDeclaration  -> withContext(context)
-        is TypeDefinition      -> withContext(context)
-        is VariableDeclaration -> withContext(context)
-        is FunctionDeclaration -> withContext(context)
-        is FunctionDefinition  -> withContext(context)
-        is VariableDefinition  -> withContext(context)
-    }
-
-}
+sealed class Declaration(srcPos: SrcPosition, reports: List<Report>) : Sentence(srcPos, reports)
 
 class LiteralDeclaration(
     val literals: List<Symbol>, srcPos: SrcPosition, reports: List<Report> = listOf(),
-    context: Context = Context.Unknown
-) : Declaration(srcPos, reports, context) {
+) : Declaration(srcPos, reports) {
 
     val type
         get() = literals.first().constructedType
@@ -35,10 +21,7 @@ class LiteralDeclaration(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        LiteralDeclaration(literals, position, reports + iterable, context)
-
-    override fun withContext(context: Context) =
-        LiteralDeclaration(literals.map { it.withContext(context) }, position, reports, context)
+        LiteralDeclaration(literals, position, reports + iterable)
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
     override fun tsString() = "${names.joinToString(separator=", ")}/${type.name}"
@@ -46,16 +29,12 @@ class LiteralDeclaration(
 
 class TypeDefinition(
     val alias: TypeAlias, srcPos: SrcPosition, reports: List<Report> = listOf(),
-    context: Context = Context.Unknown
-) : Declaration(srcPos, reports, context) {
+) : Declaration(srcPos, reports) {
 
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        TypeDefinition(alias, position, reports + iterable, context)
-
-    override fun withContext(context: Context) =
-        TypeDefinition(alias, position, reports, context)
+        TypeDefinition(alias, position, reports + iterable)
 
     override fun toString() = "${alias.shortName} := ${alias.type}"
 
@@ -64,8 +43,7 @@ class TypeDefinition(
 
 class VariableDeclaration(
     val variables: List<Variable>, srcPos: SrcPosition, reports: List<Report> = listOf(),
-    context: Context = Context.Unknown
-) : Declaration(srcPos, reports, context) {
+) : Declaration(srcPos, reports) {
 
     val type
         get() = variables.first().constructedType
@@ -75,10 +53,7 @@ class VariableDeclaration(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        VariableDeclaration(variables, position, reports + iterable, context)
-
-    override fun withContext(context: Context) =
-        VariableDeclaration(variables.map { it.withContext(context) }, position, reports, context)
+        VariableDeclaration(variables, position, reports + iterable)
 
     override fun toString() = "${names.joinToString(separator=", ")} -> $type"
     override fun tsString() = "${names.joinToString(separator=", ")} -> ${type.name}"
@@ -90,8 +65,7 @@ class VariableDefinition(
     val construction: Construction,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-    context: Context = Context.Unknown
-) : Declaration(srcPos, reports, context) {
+) : Declaration(srcPos, reports) {
 
     val variable
         get() = Variable(name, position, constructsType)
@@ -99,11 +73,7 @@ class VariableDefinition(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) = VariableDefinition(
-        name, constructsType, construction, position, reports + iterable, context
-    )
-
-    override fun withContext(context: Context) = VariableDefinition(
-        name, constructsType, construction, position, reports, context
+        name, constructsType, construction, position, reports + iterable
     )
 
     override fun toString() = "let $name -> $constructsType = $construction"
@@ -112,8 +82,7 @@ class VariableDefinition(
 
 class FunctionDeclaration(
     val functions: List<TilFunction>, srcPos: SrcPosition, reports: List<Report> = listOf(),
-    context: Context = Context.Unknown
-) : Declaration(srcPos, reports, context) {
+) : Declaration(srcPos, reports) {
 
     val type
         get() = functions.first().constructedType
@@ -124,10 +93,7 @@ class FunctionDeclaration(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        FunctionDeclaration(functions, position, reports + iterable, context)
-
-    override fun withContext(context: Context) =
-        FunctionDeclaration(functions.map { it.withContext(context) }, position, reports, context)
+        FunctionDeclaration(functions, position, reports + iterable)
 
     override fun toString() = "${names.joinToString(separator=", ")}/$type"
     override fun tsString() = "${names.joinToString(separator=", ")}/${type.name}"
@@ -140,22 +106,17 @@ class FunctionDefinition(
     val construction: Construction,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-    context: Context = Context.Unknown
-) : Declaration(srcPos, reports, context) {
+) : Declaration(srcPos, reports) {
 
     val signature = FunctionType(listOf(constructsType) + args.map { it.constructedType })
 
-    val tilFunction = TilFunction(name, srcPos, signature, reports, context)
+    val tilFunction = TilFunction(name, srcPos, signature, reports)
 
     override fun withReports(iterable: Iterable<Report>) = FunctionDefinition(
-        name, args, constructsType, construction, position, reports + iterable, context
+        name, args, constructsType, construction, position, reports + iterable
     )
 
     override fun withReport(report: Report) = withReports(listOf(report))
-
-    override fun withContext(context: Context) = FunctionDefinition(
-        name, args, constructsType, construction, position, reports, context
-    )
 
     override fun tsString() =
         "defn $name(${args.joinToString(", ") { it.tsString() }}) -> ${constructsType.name} = ${construction.tsString()}"

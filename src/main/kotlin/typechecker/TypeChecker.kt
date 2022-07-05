@@ -337,7 +337,6 @@ class TypeChecker private constructor(
             processConstruction(withReport.construction),
             withReport.position,
             withReport.reports,
-            withReport.context
         )
 
         val expType = withConstruction.construction.constructedType
@@ -369,7 +368,6 @@ class TypeChecker private constructor(
             processConstruction(withRedef.construction),
             withRedef.position,
             withRedef.reports,
-            withRedef.context
         )
 
         return when (match(withConstruction.construction.constructedType, withConstruction.constructsType)) {

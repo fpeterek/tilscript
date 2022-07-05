@@ -8,7 +8,6 @@ import org.fpeterek.til.typechecking.astprocessing.ASTConverter
 import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
 import org.fpeterek.til.typechecking.astprocessing.ErrorListener
 import org.fpeterek.til.typechecking.astprocessing.result.Sentences
-import org.fpeterek.til.typechecking.contextrecognition.ContextRecognizer
 import org.fpeterek.til.typechecking.namechecker.NameChecker
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.reporting.ReportFormatter
@@ -76,8 +75,6 @@ fun checkScript(filename: String) {
     if (Reporter.containsReports(typeChecked)) {
         printErrorsForSentences(typeChecked, filename, "Type")
     }
-
-    val withContext = ContextRecognizer.assignContext(typeChecked)
 
     // val json = JsonFormatter.asString(withContext)
     // val baseName = File(filename).name
