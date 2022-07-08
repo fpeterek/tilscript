@@ -76,13 +76,6 @@ fun checkScript(filename: String) {
         printErrorsForSentences(typeChecked, filename, "Type")
     }
 
-    // val json = JsonFormatter.asString(withContext)
-    // val baseName = File(filename).name
-    // val jsonFile = "$baseName.json"
-    // val svgFile = "$baseName.svg"
-    // File(jsonFile).writeText(json)
-    // File(svgFile).writeText(SvgFormatter.format(withContext.filterIsInstance<Construction>()))
-
 }
 
 fun main(args: Array<String>) = args.forEach(::checkScript)

@@ -97,7 +97,7 @@ class NameChecker private constructor(
         )
     }
 
-    private fun processLiteral(literal: Literal) = when {
+    private fun processLiteral(literal: Value) = when {
         literal !is Symbol -> literal
         findSymbol(literal.value) -> literal
         else -> literal.withReport(
@@ -166,7 +166,7 @@ class NameChecker private constructor(
         is Execution      -> processExecution(construction)
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
-        is Literal        -> processLiteral(construction)
+        is Value        -> processLiteral(construction)
     }
 
     private fun process(declaration: Declaration): Declaration = when (declaration) {

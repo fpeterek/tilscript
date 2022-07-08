@@ -31,4 +31,6 @@ DruhaMocnina/(Int Int).
 
 [\y:Int[\x:Int['+ y  x]]].
 
+defn Add(x: Int, y: Int) -> Int = ['+ x y].
+
 ['DruhaMocnina '2].

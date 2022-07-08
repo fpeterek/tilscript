@@ -56,7 +56,7 @@ class TypeChecker private constructor(
     private fun processTrivialization(trivialization: Trivialization): Trivialization {
 
         val processed = when (trivialization.construction) {
-            is TilFunction, is Literal -> process(trivialization.construction, this, typeRepo)
+            is TilFunction, is Value -> process(trivialization.construction, this, typeRepo)
 
             // Binding by trivialization -> variables from outer scopes
             // are inaccessible
@@ -69,7 +69,7 @@ class TypeChecker private constructor(
         // To clarify, functions must be applied onto (zero or more) arguments using compositions,
         // to construct anything
         val type = when (processed.construction) {
-            is Literal, is TilFunction -> processed.construction.constructedType
+            is Value, is TilFunction -> processed.construction.constructedType
 
             // Otherwise, trivialization constructs a construction
             else -> ConstructionType
@@ -117,7 +117,7 @@ class TypeChecker private constructor(
     }
 
     private fun execute(construction: Construction) = when (construction) {
-        is Literal -> construction.withReport(Report("Literals cannot be executed.", construction.position))
+        is Value -> construction.withReport(Report("Literals cannot be executed.", construction.position))
         is TilFunction -> construction.withReport(Report("Functions cannot be executed.", construction.position))
         else -> processConstruction(construction)
     }
@@ -262,7 +262,7 @@ class TypeChecker private constructor(
         else -> assignFnType(fn)
     }
 
-    private fun processLiteral(literal: Literal) = when {
+    private fun processLiteral(literal: Value) = when {
         literal.constructedType !is Unknown -> literal
         literal is Symbol -> literal.assignType(findSymbolType(literal.value))
         else -> throw RuntimeException("Attempting to assign type to a non-symbol literal")
@@ -275,7 +275,7 @@ class TypeChecker private constructor(
         is Execution      -> processExecution(construction)
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
-        is Literal        -> processLiteral(construction)
+        is Value        -> processLiteral(construction)
     }
 
     private fun addSymbol(symbol: Symbol) = Symbol(

@@ -27,7 +27,7 @@ object Reporter {
     private fun containsReports(exec: Execution): Boolean =
         exec.hasReports || containsReports(exec.construction)
 
-    private fun containsReports(lit: Literal): Boolean = lit.hasReports
+    private fun containsReports(lit: Value): Boolean = lit.hasReports
 
     private fun containsReports(fn: TilFunction): Boolean = fn.hasReports
 
@@ -53,7 +53,7 @@ object Reporter {
         is Closure        -> containsReports(construction)
         is Composition    -> containsReports(construction)
         is Execution      -> containsReports(construction)
-        is Literal        -> containsReports(construction)
+        is Value        -> containsReports(construction)
         is TilFunction    -> containsReports(construction)
         is Trivialization -> containsReports(construction)
         is Variable       -> containsReports(construction)
@@ -86,7 +86,7 @@ object Reporter {
     private fun reportsAsList(exec: Execution): List<Report> =
         exec.reports + reportsAsList(exec.construction)
 
-    private fun reportsAsList(lit: Literal): List<Report> = lit.reports
+    private fun reportsAsList(lit: Value): List<Report> = lit.reports
 
     private fun reportsAsList(fn: TilFunction): List<Report> = fn.reports
 
@@ -112,7 +112,7 @@ object Reporter {
         is Closure        -> reportsAsList(construction)
         is Composition    -> reportsAsList(construction)
         is Execution      -> reportsAsList(construction)
-        is Literal        -> reportsAsList(construction)
+        is Value        -> reportsAsList(construction)
         is TilFunction    -> reportsAsList(construction)
         is Trivialization -> reportsAsList(construction)
         is Variable       -> reportsAsList(construction)

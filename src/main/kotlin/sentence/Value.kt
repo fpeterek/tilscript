@@ -9,7 +9,7 @@ import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SrcPosition
 
-sealed class Literal(
+sealed class Value(
     srcPos: SrcPosition,
     type: Type = Unknown,
     reports: List<Report> = listOf(),
@@ -24,8 +24,8 @@ sealed class Literal(
         }
     }
 
-    override fun withReport(report: Report): Literal = withReports(listOf(report))
-    abstract override fun withReports(iterable: Iterable<Report>): Literal
+    override fun withReport(report: Report): Value = withReports(listOf(report))
+    abstract override fun withReports(iterable: Iterable<Report>): Value
 
 }
 
@@ -34,7 +34,7 @@ class Symbol(
     srcPos: SrcPosition,
     type: Type = Unknown,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, type, reports) {
+) : Value(srcPos, type, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Symbol(value, position, constructedType, reports + iterable)
@@ -46,7 +46,7 @@ class Integral(
     val value: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Builtins.Int, reports) {
+) : Value(srcPos, Builtins.Int, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Integral(value, position, reports + iterable)
@@ -58,7 +58,7 @@ class Real(
     val value: Double,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Builtins.Real, reports) {
+) : Value(srcPos, Builtins.Real, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Real(value, position, reports + iterable)
@@ -70,7 +70,7 @@ class Bool(
     val value: Boolean,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Builtins.Bool, reports) {
+) : Value(srcPos, Builtins.Bool, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Bool(value, position, reports + iterable)
@@ -81,7 +81,7 @@ class Bool(
 class Nil(
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Literal(srcPos, Unknown, reports) {
+) : Value(srcPos, Unknown, reports) {
 
     override fun withReports(iterable: Iterable<Report>) =
         Nil(position, reports + iterable)

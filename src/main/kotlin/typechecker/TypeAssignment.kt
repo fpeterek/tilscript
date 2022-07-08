@@ -4,7 +4,6 @@ import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.Unknown
 
 object TypeAssignment {
     fun Variable.assignType(type: Type) = Variable(name, position, type, reports)
@@ -25,7 +24,7 @@ object TypeAssignment {
         reports
     )
 
-    fun Literal.assignType(type: Type) = when (this) {
+    fun Value.assignType(type: Type) = when (this) {
         is Symbol -> Symbol(value, position, type, reports)
         else -> this
     }

@@ -2,7 +2,7 @@ package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.exceptions.RedefinitionOfSymbol
 import org.fpeterek.til.typechecking.sentence.Construction
-import org.fpeterek.til.typechecking.sentence.Literal
+import org.fpeterek.til.typechecking.sentence.Value
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.sentence.Variable
 import org.fpeterek.til.typechecking.tilscript.Builtins
@@ -38,12 +38,12 @@ class SymbolRepository(vararg symbols: Construction, loadBuiltins: Boolean = fal
 
     fun add(variable: Variable) = add(variable.name, variable.constructedType)
     fun add(function: TilFunction) = add(function.name, function.constructedType)
-    fun add(literal: Literal) = add(literal.toString(), literal.constructedType)
+    fun add(literal: Value) = add(literal.toString(), literal.constructedType)
 
     fun add(construction: Construction) = when (construction) {
         is Variable -> add(construction)
         is TilFunction -> add(construction)
-        is Literal -> add(construction)
+        is Value -> add(construction)
         else -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
     }
 
