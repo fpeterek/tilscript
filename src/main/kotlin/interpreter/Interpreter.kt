@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.interpreter
 
+import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.typechecker.TypeMatcher
 import org.fpeterek.til.typechecking.types.SymbolRepository
@@ -45,6 +46,14 @@ class Interpreter: InterpreterInterface {
         // Nil also only ever constructs nil, but Nil is a Value
         is Value -> nil
         is Variable -> interpret(construction)
+    }
+
+    override fun typesMatch(t1: Type, t2: Type) = t1 matches t2
+
+    override fun ensureMatch(expected: Type, received: Type) {
+        if (!(expected matches received)) {
+            throw RuntimeException("Type mismatch (expected: $expected, received: $received)")
+        }
     }
 
 
