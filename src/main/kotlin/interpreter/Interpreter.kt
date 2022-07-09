@@ -36,16 +36,28 @@ class Interpreter: InterpreterInterface {
         return value
     }
 
+    private fun interpret(triv: Trivialization) = triv.construction
+
+    private fun execute(construction: Construction, executions: Int): Construction = if (executions > 0) {
+        execute(interpret(construction), executions-1)
+    } else {
+        construction
+    }
+
+    private fun interpret(execution: Execution) = execute(execution.construction, execution.executionOrder)
+
     override fun interpret(construction: Construction): Construction = when (construction) {
-        is Closure -> TODO()
-        is Composition -> TODO()
-        is Execution -> TODO()
-        is TilFunction -> TODO()
-        is Trivialization -> TODO()
+        is Closure        -> TODO()
+        is Composition    -> TODO()
+        is Execution      -> interpret(construction)
+        is Trivialization -> interpret(construction)
         // Values cannot be executed as they by themselves do not construct anything
         // Nil also only ever constructs nil, but Nil is a Value
-        is Value -> nil
-        is Variable -> interpret(construction)
+        is Value          -> nil
+        // Functions too cannot be executed, functions can only be applied using compositions
+        // Functions must be constructed using trivializations or closures
+        is TilFunction    -> nil
+        is Variable       -> interpret(construction)
     }
 
     override fun typesMatch(t1: Type, t2: Type) = t1 matches t2

@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.interpreter.interpreterinterface
 
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.FunctionType
