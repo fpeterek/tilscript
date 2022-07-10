@@ -2,21 +2,25 @@ package org.fpeterek.til.typechecking.interpreter.interpreterinterface
 
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Nil
+import org.fpeterek.til.typechecking.sentence.Variable
 import org.fpeterek.til.typechecking.types.Type
 
-abstract class EagerFunction(name: String, returns: Type, args: List<Type>): FunctionInterface(name, returns, args) {
+abstract class EagerFunction(name: String, returns: Type, args: List<Variable>): FunctionInterface(name, returns, args) {
 
     override fun invoke(interpreter: InterpreterInterface, args: List<Construction>): Construction {
         val cons = args.map(interpreter::interpret)
 
-        val nilArg = args.firstOrNull { it is Nil }
+        val nilArg = cons.firstOrNull { it is Nil }
 
         if (nilArg != null) {
             return nilArg
         }
 
-        checkArgCount(args)
-        checkArgTypes(interpreter, args)
+        checkArgCount(cons)
+        checkArgTypes(interpreter, cons)
+        cons.zip(this.args).map { (value, variable) ->
+            interpreter.createLocal(variable, value)
+        }
 
         return apply(interpreter, cons)
     }

@@ -2,6 +2,7 @@ package org.fpeterek.til.typechecking.interpreter.interpreterinterface
 
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.TilFunction
+import org.fpeterek.til.typechecking.sentence.Variable
 import org.fpeterek.til.typechecking.types.FunctionType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.util.SrcPosition
@@ -9,10 +10,12 @@ import org.fpeterek.til.typechecking.util.SrcPosition
 sealed class FunctionInterface constructor(
     val name: String,
     val returns: Type,
-    val args: List<Type>,
+    val args: List<Variable>,
 ) {
 
-    val signature = FunctionType(returns, args)
+    val argTypes = args.map { it.constructedType }
+
+    val signature = FunctionType(returns, argTypes)
     val tilFunction = TilFunction(name, SrcPosition(-1, -1), signature)
 
     protected fun checkArgCount(fnArgs: List<Construction>) {
@@ -27,9 +30,9 @@ sealed class FunctionInterface constructor(
         }
     }
 
-    protected fun checkArgTypes(interpreter: InterpreterInterface, fnArgs: List<Construction>) =
-        args.zip(fnArgs.map { it.constructedType })
-            .forEach { (expected, received) -> checkArgTypeMatch(interpreter, expected, received) }
+    protected fun checkArgTypes(interpreter: InterpreterInterface, fnArgs: List<Construction>) = argTypes
+        .zip(fnArgs.map { it.constructedType })
+        .forEach { (expected, received) -> checkArgTypeMatch(interpreter, expected, received) }
 
     abstract fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction
 
