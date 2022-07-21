@@ -1,16 +1,17 @@
 package org.fpeterek.til.typechecking.interpreter
 
 import org.fpeterek.til.typechecking.sentence.Construction
+import org.fpeterek.til.typechecking.sentence.Variable
 
-class StackFrame {
+class StackFrame(val parent: StackFrame?) {
 
-    private val variables = mutableMapOf<String, Construction>()
+    private val variables = mutableMapOf<String, Variable>()
 
-    fun putVar(name: String, value: Construction) {
-        if (name in variables) {
-            throw RuntimeException("Redefinition of variable '$name'")
+    fun putVar(variable: Variable) {
+        if (variable.name in variables) {
+            throw RuntimeException("Redefinition of variable '${variable.name}'")
         }
-        variables[name] = value
+        variables[variable.name] = variable
     }
 
     fun getVar(name: String): Construction = variables.getOrElse(name) {
@@ -18,5 +19,9 @@ class StackFrame {
     }
 
     fun hasVar(name: String) = name in variables
+
+    operator fun contains(name: String) = hasVar(name)
+
+    operator fun get(name: String) = variables[name]
 
 }

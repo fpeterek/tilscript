@@ -13,27 +13,33 @@ class Interpreter: InterpreterInterface {
     private val symbolRepo = SymbolRepository()
     private val typeRepo = TypeRepository()
 
-    private val stack = mutableListOf(StackFrame())
+    private val topLevelFrame = StackFrame(parent = null)
 
-    private fun pushFrame() = stack.add(0, StackFrame())
-    private fun popFrame() = stack.removeFirst()
+    private var currentFrame = topLevelFrame
 
     private infix fun Type.matches(other: Type) = TypeMatcher.match(this, other, typeRepo)
 
-    private fun findVar(name: String): Construction {
-        val frame = stack.firstOrNull { it.hasVar(name) } ?: throw RuntimeException("Variable not found '$name'")
-
-        return frame.getVar(name)
+    private fun findVar(frame: StackFrame?, name: String): Variable = when {
+        frame == null -> throw RuntimeException("Variable not found '$name'")
+        name in frame -> frame[name]!!
+        else          -> findVar(frame.parent, name)
     }
 
-    private fun interpret(variable: Variable): Construction {
-        val value = findVar(variable.name)
+    private fun findVar(name: String) = findVar(currentFrame, name)
 
-        if (!(value.constructedType matches variable.constructedType)) {
-            throw RuntimeException("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${value.constructedType})")
+    private fun interpret(variable: Variable): Construction {
+
+        if (variable.value == null) {
+            throw RuntimeException("Variable '${variable.name}' is declared but undefined")
         }
 
-        return value
+        val frameVar = findVar(variable.name)
+
+        if (!(frameVar.constructedType matches variable.constructedType)) {
+            throw RuntimeException("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${frameVar.constructedType})")
+        }
+
+        return variable.value!!
     }
 
     private fun interpret(triv: Trivialization) = triv.construction
@@ -45,6 +51,9 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun interpret(execution: Execution) = execute(execution.construction, execution.executionOrder)
+
+    // TODO: Closure captures
+    // TODO: Function invocation
 
     override fun interpret(construction: Construction): Construction = when (construction) {
         is Closure        -> TODO()
@@ -66,6 +75,10 @@ class Interpreter: InterpreterInterface {
         if (!(expected matches received)) {
             throw RuntimeException("Type mismatch (expected: $expected, received: $received)")
         }
+    }
+
+    override fun createLocal(variable: Variable, value: Construction) {
+        TODO("Not yet implemented")
     }
 
 
