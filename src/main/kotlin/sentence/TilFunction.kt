@@ -1,6 +1,7 @@
 package org.fpeterek.til.typechecking.sentence
 
 import org.fpeterek.til.typechecking.exceptions.InvalidType
+import org.fpeterek.til.typechecking.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.typechecking.types.*
@@ -12,6 +13,7 @@ class TilFunction(
     srcPosition: SrcPosition,
     type: Type = Unknown,
     reports: List<Report> = listOf(),
+    val implementation: FunctionInterface? = null,
 ) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition, reports),
     NonExecutable {
 
