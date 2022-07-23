@@ -6,6 +6,7 @@ import org.fpeterek.til.typechecking.typechecker.TypeMatcher
 import org.fpeterek.til.typechecking.types.SymbolRepository
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.TypeRepository
+import java.util.StringJoiner
 
 
 class Interpreter: InterpreterInterface {
@@ -18,6 +19,8 @@ class Interpreter: InterpreterInterface {
     private val stack: MutableList<StackFrame> = mutableListOf(topLevelFrame)
 
     private val currentFrame get() = stack.last()
+
+    private val functions = mutableMapOf<String, TilFunction>()
 
     private fun pushFrame() = stack.add(StackFrame(parent = currentFrame))
     private fun popFrame() = stack.removeLast()
@@ -90,12 +93,13 @@ class Interpreter: InterpreterInterface {
             throw RuntimeException("Only functions can be applied on arguments. $fn is not a function")
         }
 
-        if (fn.implementation == null) {
-            throw RuntimeException("Function ${fn.name} is declared but undefined, application is impossible")
-        }
+        val fnImpl = when (fn.implementation) {
+            null -> functions[fn.name]?.implementation
+            else -> fn.implementation
+        } ?: throw RuntimeException("Function ${fn.name} is declared but undefined, application is impossible")
 
         return withFrame {
-            fn.implementation.apply(this, comp.args)
+            fnImpl.apply(this, comp.args)
         }
     }
 
@@ -123,6 +127,11 @@ class Interpreter: InterpreterInterface {
     }
 
     override fun createLocal(variable: Variable, value: Construction) {
+
+        if (variable.name in currentFrame) {
+            throw RuntimeException("Redefinition of variable '${variable.name}'")
+        }
+
         val varWithValue = Variable(
             variable.name,
             variable.position,
@@ -134,8 +143,105 @@ class Interpreter: InterpreterInterface {
         currentFrame.putVar(varWithValue)
     }
 
-    // TODO: Declarations
-    private fun interpret(declaration: Declaration) = Unit
+    private fun interpret(decl: FunctionDeclaration) = decl.functions.forEach {
+        if (it.name !in functions) {
+            functions[it.name] = it
+        } else {
+            val fn = functions[it.name]!!
+
+            if (fn.constructedType matches it.constructedType) {
+                functions[it.name] = it
+            } else {
+                throw RuntimeException("Redeclaration of function '${fn.name}' with a different type")
+            }
+        }
+    }
+
+    private fun interpret(def: FunctionDefinition) {
+        if (def.name in functions) {
+            val declared = functions[def.name]!!
+            if (declared.implementation != null) {
+                throw RuntimeException("Redefinition of function '${def.name}' with a conflicting implementation")
+            }
+            if (!(declared.constructedType matches def.signature)) {
+                throw RuntimeException("Redeclaration of function '${def.name}' with a different type")
+            }
+        }
+        functions[def.name] = def.tilFunction
+    }
+
+    private fun interpret(lit: LiteralDeclaration) {
+        lit.literals.forEach {
+            if (it.value in symbolRepo) {
+                val declaredType = symbolRepo[it.value]!!
+                if (!(declaredType matches lit.type)) {
+                    throw RuntimeException("Redeclaration of symbol '${it.value}' with a different type")
+                }
+            } else {
+                symbolRepo.add(it)
+            }
+        }
+    }
+
+    private fun interpret(typedef: TypeDefinition) {
+        val alias = typedef.alias
+        if (alias.name in typeRepo) {
+            val declaredType = typeRepo[alias.name]!!
+            if (!(declaredType matches alias.type)) {
+                throw RuntimeException("Redeclaration of symbol '${alias.name}' with a different type")
+            }
+        } else {
+            typeRepo.process(alias)
+        }
+    }
+
+    private fun interpret(varDecl: VariableDeclaration) {
+        varDecl.variables.forEach {
+            if (it.name in topLevelFrame) {
+                val declared = topLevelFrame[it.name]!!
+                if (!(declared.constructedType matches it.constructedType)) {
+                    throw RuntimeException("Redeclaration of variable '${it.name}' with a different type")
+                }
+            } else {
+                topLevelFrame.putVar(it)
+            }
+        }
+    }
+
+    private fun interpret(varDef: VariableDefinition) {
+
+        if (varDef.name in topLevelFrame) {
+            val declared = topLevelFrame[varDef.name]!!
+
+            if (declared.value != null) {
+                throw RuntimeException("Redefinition of variable '${varDef.name}' with a new value")
+            }
+
+            if (!(declared.constructedType matches varDef.constructsType)) {
+                throw RuntimeException("Redeclaration of variable '${varDef.name}' with a different type")
+            }
+        }
+
+        val value = interpret(varDef.construction)
+
+        if (!(value.constructedType matches varDef.constructsType)) {
+            throw RuntimeException("Type of value assigned to variable '${varDef.name}' does not match expected type " +
+                    "(expected: ${varDef.constructsType}, received: ${value.constructedType})")
+        }
+
+        topLevelFrame.putVar(varDef.variable.withValue(value))
+    }
+
+    private fun interpret(declaration: Declaration) {
+        when (declaration) {
+            is FunctionDeclaration -> interpret(declaration)
+            is FunctionDefinition  -> interpret(declaration)
+            is LiteralDeclaration  -> interpret(declaration)
+            is TypeDefinition      -> interpret(declaration)
+            is VariableDeclaration -> interpret(declaration)
+            is VariableDefinition  -> interpret(declaration)
+        }
+    }
 
     fun interpret(sentence: Sentence) {
         when (sentence) {

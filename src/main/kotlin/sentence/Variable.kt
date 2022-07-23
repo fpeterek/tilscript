@@ -15,6 +15,8 @@ class Variable(
     val value: Construction? = null,
 ) : Construction(type, ConstructionType, srcPos, reports), Executable {
 
+    fun withValue(value: Construction) = Variable(name, position, constructedType, reports, value)
+
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =

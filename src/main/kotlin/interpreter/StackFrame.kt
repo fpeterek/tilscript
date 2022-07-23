@@ -8,9 +8,6 @@ class StackFrame(val parent: StackFrame?) {
     private val variables = mutableMapOf<String, Variable>()
 
     fun putVar(variable: Variable) {
-        if (variable.name in variables) {
-            throw RuntimeException("Redefinition of variable '${variable.name}'")
-        }
         variables[variable.name] = variable
     }
 
