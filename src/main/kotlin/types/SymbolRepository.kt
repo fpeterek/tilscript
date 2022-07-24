@@ -1,59 +1,69 @@
 package org.fpeterek.til.typechecking.types
 
-import org.fpeterek.til.typechecking.exceptions.RedefinitionOfSymbol
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Value
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.sentence.Variable
-import org.fpeterek.til.typechecking.tilscript.Builtins
 
 
-class SymbolRepository(vararg symbols: Construction, loadBuiltins: Boolean = false) {
+class SymbolRepository {
 
     companion object {
-        fun withBuiltins() = SymbolRepository(loadBuiltins=true)
+        fun withBuiltins() = SymbolRepository()
     }
 
     private val types = mutableMapOf<String, Type>()
 
-    init {
-        symbols.forEach(::add)
-        if (loadBuiltins) {
-            Builtins.builtinFunctions.forEach(::add)
-            Builtins.builtinValues.forEach(::add)
-        }
-    }
+    private val declared = mutableSetOf<String>()
+    private val defined = mutableSetOf<String>()
 
     val symbols get() = types.asSequence().map { it.key }
 
-    fun add(name: String, type: Type) {
-        val current = types[name]
+    fun declare(name: String, type: Type) {
+        declared.add(name)
+        types[name] = type
+    }
 
-        when {
-            current == null || current is Unknown -> types[name] = type
-            type !is Unknown -> throw RedefinitionOfSymbol(name)
-            else -> Unit
+    fun declare(variable: Variable) = declare(variable.name, variable.constructedType)
+    fun declare(function: TilFunction) = declare(function.name, function.constructedType)
+    fun declare(literal: Value) = declare(literal.toString(), literal.constructedType)
+
+    fun declare(construction: Construction) = when (construction) {
+        is Variable    -> declare(construction)
+        is TilFunction -> declare(construction)
+        is Value       -> declare(construction)
+        else           -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
+    }
+
+    fun declareAll(constructions: Iterable<Construction>) = constructions.forEach(::declare)
+
+    fun define(name: String, type: Type) {
+        if (name in defined) {
+            throw RuntimeException("Redefinition of symbol '$name'")
         }
+        defined.add(name)
+        declare(name, type)
     }
 
-    fun add(variable: Variable) = add(variable.name, variable.constructedType)
-    fun add(function: TilFunction) = add(function.name, function.constructedType)
-    fun add(literal: Value) = add(literal.toString(), literal.constructedType)
+    fun define(variable: Variable) = define(variable.name, variable.constructedType)
+    fun define(function: TilFunction) = define(function.name, function.constructedType)
+    fun define(literal: Value) = define(literal.toString(), literal.constructedType)
 
-    fun add(construction: Construction) = when (construction) {
-        is Variable -> add(construction)
-        is TilFunction -> add(construction)
-        is Value -> add(construction)
-        else -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
+    fun define(construction: Construction) = when (construction) {
+        is Variable    -> define(construction)
+        is TilFunction -> define(construction)
+        is Value       -> define(construction)
+        else           -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
     }
 
-    fun addAll(constructions: Iterable<Construction>) = constructions.forEach(::add)
+    fun defineAll(constructions: Iterable<Construction>) = constructions.forEach(::define)
 
     operator fun contains(name: String) = name in types
 
     operator fun get(name: String) = types[name]
 
-    fun isDefined(name: String) = contains(name)
+    fun isDefined(name: String) = name in defined
+    fun isDeclared(name: String) = name in declared
 
     fun isKnown(name: String) = when (types[name]) {
         null, is Unknown -> false

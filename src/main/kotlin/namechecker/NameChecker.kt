@@ -49,7 +49,7 @@ class NameChecker private constructor(
 
     private fun processClosureScoped(cl: Closure): Closure {
         cl.variables.forEach {
-            symbolRepository.add(it)
+            symbolRepository.define(it)
         }
 
         return Closure(
@@ -116,17 +116,17 @@ class NameChecker private constructor(
     }
 
     private fun processFnDecl(decl: FunctionDeclaration) = decl.apply {
-        functions.forEach(symbolRepository::add)
+        functions.forEach(symbolRepository::declare)
     }
 
     private fun processLitDecl(decl: LiteralDeclaration) = decl.apply {
-        literals.forEach(symbolRepository::add)
+        literals.forEach(symbolRepository::declare)
     }
 
     private fun processTypeDef(def: TypeDefinition) = def
 
     private fun processVarDecl(decl: VariableDeclaration) = decl.apply {
-        variables.forEach(symbolRepository::add)
+        variables.forEach(symbolRepository::declare)
     }
 
     private fun processDefnScoped(def: FunctionDefinition): FunctionDefinition {
@@ -136,9 +136,9 @@ class NameChecker private constructor(
             else -> def
         }
 
-        symbolRepository.add(withRedef.tilFunction)
+        symbolRepository.define(withRedef.tilFunction)
 
-        withRedef.args.forEach(symbolRepository::add)
+        withRedef.args.forEach(symbolRepository::define)
 
         return FunctionDefinition(
             withRedef.name,
@@ -156,7 +156,7 @@ class NameChecker private constructor(
         in symbolRepository -> def.withReport(Report("Redefinition of symbol '${def.name}'", def.position))
         else -> def
     }.apply {
-        symbolRepository.add(variable)
+        symbolRepository.define(variable)
     }
 
     private fun process(construction: Construction): Construction = when (construction) {

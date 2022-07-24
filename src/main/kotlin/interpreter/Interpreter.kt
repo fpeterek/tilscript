@@ -178,7 +178,7 @@ class Interpreter: InterpreterInterface {
                     throw RuntimeException("Redeclaration of symbol '${it.value}' with a different type")
                 }
             } else {
-                symbolRepo.add(it)
+                symbolRepo.declare(it)
             }
         }
     }

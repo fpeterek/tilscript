@@ -238,7 +238,7 @@ class TypeChecker private constructor(
                 else -> typed
             }
 
-            repo.add(checked)
+            repo.define(checked)
 
             checked
         }
@@ -284,11 +284,18 @@ class TypeChecker private constructor(
         typeRepo.process(symbol.constructedType),
         reports=symbol.reports
     ).apply {
-        repo.add(this)
+        repo.define(this)
     }
 
     private fun processSingleDecl(symbol: Symbol) = when (symbol.value) {
-        in repo -> symbol.withReport(Report("Redefinition of symbol '${symbol.value}'", symbol.position))
+        in repo -> {
+            val currentType = repo[symbol.value]!!
+            when {
+                !match(currentType, symbol.constructedType) ->
+                    symbol.withReport(Report("Redefinition of symbol '${symbol.value}' with a different type", symbol.position))
+                else -> symbol
+            }
+        }
         else -> addSymbol(symbol)
     }
 
@@ -298,14 +305,28 @@ class TypeChecker private constructor(
 
     private fun processTypeDefinition(def: TypeDefinition) = def.apply {
         when (alias.name) {
-            in typeRepo -> def.withReport(Report("Redefinition of type '${def.alias.name}'", def.position))
+            in typeRepo -> {
+                val currentType = typeRepo[alias.name]!!
+                when {
+                    !match(currentType, alias.type) ->
+                        def.withReport(Report("Redefinition of type alias '${def.alias.name}' with a different type", def.position))
+                    else -> alias
+                }
+            }
             else -> typeRepo.process(def.alias)
         }
     }
 
     private fun processSingleDecl(variable: Variable) = when (variable.name) {
-        in repo -> variable.withReport(Report("Redefinition of symbol '${variable.name}'", variable.position))
-        else -> variable.apply { repo.add(this) }
+        in repo -> {
+            val currentType = repo[variable.name]!!
+            when {
+                !match(currentType, variable.constructedType) ->
+                    variable.withReport(Report("Redefinition of variable '${variable.name}' with a different type", variable.position))
+                else -> variable
+            }
+        }
+        else -> variable.apply { repo.declare(this) }
 
     }
 
@@ -314,8 +335,15 @@ class TypeChecker private constructor(
     }
 
     private fun processSingleDecl(fn: TilFunction) = when (fn.name) {
-        in repo -> fn.withReport(Report("Redefinition of symbol '${fn.name}'", fn.position))
-        else -> fn.apply { repo.add(this) }
+        in repo -> {
+            val currentType = repo[fn.name]!!
+            when {
+                !match(currentType, fn.constructedType) ->
+                    fn.withReport(Report("Redefinition of symbol '${fn.name}' with a different type", fn.position))
+                else -> fn
+            }
+        }
+        else -> fn.apply { repo.declare(this) }
     }
 
     private fun processFunctionDeclaration(decl: FunctionDeclaration) = with(decl) {
@@ -323,12 +351,21 @@ class TypeChecker private constructor(
     }
 
     private fun processFunctionDefinitionForked(def: FunctionDefinition): FunctionDefinition {
-        val withReport = when (def.name) {
-            in repo -> def.withReport(Report("Redefinition of symbol '${def.name}'", def.position))
-            else -> def.apply { repo.add(tilFunction) }
+        val withReport = when  {
+            repo.isDefined(def.name) ->
+                def.withReport(Report("Redefinition of symbol '${def.name}' with a conflicting definition", def.position))
+            def.name in repo -> {
+                val currentType = repo[def.name]!!
+                when {
+                    !match(currentType, def.signature) ->
+                        def.withReport(Report("Redefinition of symbol '${def.name}' with a different type", def.position))
+                    else -> def
+                }
+            }
+            else -> def.apply { repo.define(tilFunction) }
         }
 
-        withReport.args.forEach(repo::add)
+        withReport.args.forEach(repo::define)
 
         val withConstruction = FunctionDefinition(
             withReport.name,
@@ -346,7 +383,7 @@ class TypeChecker private constructor(
             true -> withConstruction
             else -> withConstruction.withReport(
                 Report(
-                    "Type constructed by function body does not match function signature (expected: ${expType.javaClass}, received: ${received.javaClass})",
+                    "Type constructed by function body does not match function signature (expected: ${expType}, received: ${received})",
                     withConstruction.construction.position)
             )
         }
@@ -357,9 +394,18 @@ class TypeChecker private constructor(
 
     private fun processVariableDefinition(def: VariableDefinition): VariableDefinition {
 
-        val withRedef = when (def.name) {
-            in repo -> def.withReport(Report("Redefinition of symbol ${def.name}", def.position))
-            else    -> def
+        val withRedef = when {
+            repo.isDefined(def.name) ->
+                def.withReport(Report("Redefinition of symbol ${def.name} with a conflicting definition", def.position))
+            repo.isDeclared(def.name) -> {
+                val currentType = repo[def.name]!!
+                when {
+                    !match(currentType, def.constructsType) ->
+                        def.withReport(Report("Redefinition of symbol ${def.name} with a different type", def.position))
+                    else -> def
+                }
+            }
+            else -> def
         }
 
         val withConstruction = VariableDefinition(
@@ -373,7 +419,7 @@ class TypeChecker private constructor(
         return when (match(withConstruction.construction.constructedType, withConstruction.constructsType)) {
             true -> withConstruction
             else -> withConstruction.withReport(
-                Report("Type constructed by initializer does not match declared type", withConstruction.construction.position)
+                Report("Type constructed by variable initializer does not match declared type", withConstruction.construction.position)
             )
         }
     }
