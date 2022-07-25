@@ -275,7 +275,7 @@ class TypeChecker private constructor(
         is Execution      -> processExecution(construction)
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
-        is Value        -> processLiteral(construction)
+        is Value          -> processLiteral(construction)
     }
 
     private fun addSymbol(symbol: Symbol) = Symbol(

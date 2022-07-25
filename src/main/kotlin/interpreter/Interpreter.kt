@@ -22,6 +22,8 @@ class Interpreter: InterpreterInterface {
 
     private val functions = mutableMapOf<String, TilFunction>()
 
+    private val operatorFns = setOf("+", "-", "*", "/", "=")
+
     private fun pushFrame() = stack.add(StackFrame(parent = currentFrame))
     private fun popFrame() = stack.removeLast()
 
@@ -86,13 +88,13 @@ class Interpreter: InterpreterInterface {
         )
     }
 
-    private fun interpret(comp: Composition): Construction {
-        val fn = interpret(comp.function)
+    private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
 
-        if (fn !is TilFunction) {
-            throw RuntimeException("Only functions can be applied on arguments. $fn is not a function")
-        }
 
+        return nil
+    }
+
+    private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
         val fnImpl = when (fn.implementation) {
             null -> functions[fn.name]?.implementation
             else -> fn.implementation
@@ -100,6 +102,19 @@ class Interpreter: InterpreterInterface {
 
         return withFrame {
             fnImpl.apply(this, comp.args)
+        }
+    }
+
+    private fun interpret(comp: Composition): Construction {
+        val fn = interpret(comp.function)
+
+        if (fn !is TilFunction) {
+            throw RuntimeException("Only functions can be applied on arguments. $fn is not a function")
+        }
+
+        return when (fn.name) {
+            in operatorFns -> interpretOperator(fn, comp)
+            else           -> interpretFn(fn, comp)
         }
     }
 
