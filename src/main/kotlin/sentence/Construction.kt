@@ -21,7 +21,7 @@ sealed class Construction(
         is Closure        -> withReports(iterable)
         is Composition    -> withReports(iterable)
         is Execution      -> withReports(iterable)
-        is Value        -> withReports(iterable)
+        is Value          -> withReports(iterable)
         is TilFunction    -> withReports(iterable)
         is Trivialization -> withReports(iterable)
         is Variable       -> withReports(iterable)

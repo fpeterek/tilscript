@@ -19,6 +19,10 @@ class Trivialization(
     reports,
 ), Executable {
 
+    override fun equals(other: Any?): Boolean {
+        return other != null && other is Trivialization && construction == other.construction
+    }
+
     override fun toString() = "'$construction"
 
     override fun withReport(report: Report) = withReports(listOf(report))

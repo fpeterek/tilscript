@@ -15,6 +15,9 @@ class Variable(
     val value: Construction? = null,
 ) : Construction(type, ConstructionType, srcPos, reports), Executable {
 
+    override fun equals(other: Any?) =
+        other != null && other is Variable && other.name == name
+
     fun withValue(value: Construction) = Variable(name, position, constructedType, reports, value)
 
     override fun withReport(report: Report) = withReports(listOf(report))
@@ -23,4 +26,9 @@ class Variable(
         Variable(name, position, constructedType, reports + iterable)
 
     override fun toString() = name
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + (value?.hashCode() ?: 0)
+        return result
+    }
 }

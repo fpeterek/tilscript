@@ -176,10 +176,15 @@ class TypeChecker private constructor(
         val processedArgs = processOperatorArgs(args)
         val arityErrors = checkArity(composition, 2)
 
-        val isInt = processedArgs.isNotEmpty() && match(processedArgs.first().constructedType, Builtins.Int)
+        val isReal = processedArgs.isNotEmpty() && processedArgs.any { match(it.constructedType, Builtins.Real) }
+
+        val isInt = !isReal && processedArgs.isNotEmpty() &&
+                processedArgs.any { match(it.constructedType, Builtins.Int) }
+
         val opType = when {
-            isInt -> Builtins.Int
-            else -> Builtins.Real
+            isReal -> Builtins.Real
+            isInt  -> Builtins.Int
+            else   -> Unknown
         }
 
         val fn = TilFunction(op.name, op.position, FunctionType(opType, opType, opType), listOf()).trivialize()

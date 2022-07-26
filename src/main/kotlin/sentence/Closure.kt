@@ -8,6 +8,7 @@ import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SrcPosition
 
+
 class Closure(
     val variables: List<Variable>,
     val construction: Construction,
@@ -16,6 +17,19 @@ class Closure(
     reports: List<Report> = listOf(),
 ) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
 
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is Closure) {
+            return false
+        }
+
+        if (variables.size != other.variables.size) {
+            return false
+        }
+
+        return variables.zip(other.variables).all { (fst, snd) -> fst == snd }
+                && construction == other.construction
+    }
+
     val functionType = when {
         construction !is Composition                    -> Unknown
         construction.constructedType == Unknown         -> Unknown
@@ -23,6 +37,7 @@ class Closure(
 
         else -> FunctionType(construction.constructedType, variables.map { it.constructedType })
     }
+
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
@@ -30,4 +45,11 @@ class Closure(
 
     override fun toString() =
         "${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} $construction"
+
+    override fun hashCode(): Int {
+        var result = variables.hashCode()
+        result = 31 * result + construction.hashCode()
+        result = 31 * result + functionType.hashCode()
+        return result
+    }
 }

@@ -1,7 +1,9 @@
 package org.fpeterek.til.typechecking.interpreter
 
+import org.fpeterek.til.typechecking.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeMatcher
 import org.fpeterek.til.typechecking.types.SymbolRepository
 import org.fpeterek.til.typechecking.types.Type
@@ -23,6 +25,9 @@ class Interpreter: InterpreterInterface {
     private val functions = mutableMapOf<String, TilFunction>()
 
     private val operatorFns = setOf("+", "-", "*", "/", "=")
+
+    private val intOperators = mutableMapOf<String, OperatorFunction>()
+    private val realOperators = mutableMapOf<String, OperatorFunction>()
 
     private fun pushFrame() = stack.add(StackFrame(parent = currentFrame))
     private fun popFrame() = stack.removeLast()
@@ -90,8 +95,25 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
 
+        val interpreted = comp.args.map(::interpret)
 
-        return nil
+        if (interpreted.any { it is Nil }) {
+            return nil
+        }
+
+        val isReal = interpreted.all { it.constructionType matches Builtins.Real }
+        val isInt  = interpreted.all { it.constructionType matches Builtins.Int }
+
+        if (isReal == isInt) {
+            throw RuntimeException("Type mismatch for operator ${fn.name}")
+        }
+
+        val fnImpl = when {
+            isReal -> realOperators[fn.name]
+            else   -> intOperators[fn.name]
+        } ?: throw RuntimeException("No such operator '${fn.name}'")
+
+        return fnImpl.apply(this, interpreted)
     }
 
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {

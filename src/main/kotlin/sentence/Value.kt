@@ -36,10 +36,15 @@ class Symbol(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, type, reports) {
 
+    override fun equals(other: Any?) =
+        other != null && other is Symbol && other.value == value
+
     override fun withReports(iterable: Iterable<Report>) =
         Symbol(value, position, constructedType, reports + iterable)
 
     override fun toString() = value
+
+    override fun hashCode() = value.hashCode()
 }
 
 class Integral(
@@ -48,10 +53,15 @@ class Integral(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, Builtins.Int, reports) {
 
+    override fun equals(other: Any?) =
+        other != null && other is Integral && other.value == value
+
     override fun withReports(iterable: Iterable<Report>) =
         Integral(value, position, reports + iterable)
 
     override fun toString() = value.toString()
+
+    override fun hashCode() = value.hashCode()
 }
 
 class Real(
@@ -60,10 +70,15 @@ class Real(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, Builtins.Real, reports) {
 
+    override fun equals(other: Any?) =
+        other != null && other is Real && other.value == value
+
     override fun withReports(iterable: Iterable<Report>) =
         Real(value, position, reports + iterable)
 
     override fun toString() = value.toString()
+
+    override fun hashCode() = value.hashCode()
 }
 
 class Bool(
@@ -72,10 +87,15 @@ class Bool(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, Builtins.Bool, reports) {
 
+    override fun equals(other: Any?) =
+        other != null && other is Bool && other.value == value
+
     override fun withReports(iterable: Iterable<Report>) =
         Bool(value, position, reports + iterable)
 
     override fun toString() = if (value) { "True" } else { "False" }
+
+    override fun hashCode() = value.hashCode()
 }
 
 class Nil(
@@ -83,8 +103,12 @@ class Nil(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, Unknown, reports) {
 
+    override fun equals(other: Any?) = false
+
     override fun withReports(iterable: Iterable<Report>) =
         Nil(position, reports + iterable)
 
     override fun toString() = "Nil"
+
+    override fun hashCode() = javaClass.hashCode()
 }

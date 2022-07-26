@@ -16,6 +16,14 @@ class Execution(
     reports: List<Report> = listOf(),
 ) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
 
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is Execution) {
+            return false
+        }
+
+        return executionOrder == other.executionOrder && construction == other.construction
+    }
+
     init {
         if (executionOrder < 1 || executionOrder > 2) {
             throw InvalidExecutionOrder(executionOrder)
@@ -28,5 +36,10 @@ class Execution(
         Execution(construction, executionOrder, position, constructedType, reports + iterable)
 
     override fun toString() = "$executionOrder^$construction"
+    override fun hashCode(): Int {
+        var result = construction.hashCode()
+        result = 31 * result + executionOrder
+        return result
+    }
 
 }

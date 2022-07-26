@@ -17,6 +17,9 @@ class TilFunction(
 ) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition, reports),
     NonExecutable {
 
+    override fun equals(other: Any?) =
+        other != null && other is TilFunction && name == other.name
+
     override fun toString() = name
 
     val fullyTyped: Boolean
@@ -32,4 +35,10 @@ class TilFunction(
 
     override fun withReports(iterable: Iterable<Report>) =
         TilFunction(name, position, constructedType, reports + iterable)
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + (implementation?.hashCode() ?: 0)
+        return result
+    }
 }
