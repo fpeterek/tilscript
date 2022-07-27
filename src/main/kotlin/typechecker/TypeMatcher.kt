@@ -1,5 +1,6 @@
 package org.fpeterek.til.typechecking.typechecker
 
+import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
 
 class TypeMatcher private constructor(val types: TypeRepository) {
@@ -36,6 +37,13 @@ class TypeMatcher private constructor(val types: TypeRepository) {
 
         is GenericType, is TypeAlias -> throw RuntimeException("Error: Invalid state")
     }
+
+    fun matchFn(fn: FunctionType, returned: Type, args: List<Type>): List<Boolean> =
+        listOf(match(fn.imageType, returned)) +
+                fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
+
+    fun matchFn(fn: FunctionType, args: List<Type>): List<Boolean> =
+        fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
 
     fun match(l: Type, r: Type): Boolean = when {
         l is GenericType -> matchGenerics(l, r)

@@ -201,9 +201,23 @@ class TypeChecker private constructor(
 
         val arityErrors = checkArity(composition, fnArgs.size)
 
-        val processedArgs = processCompositionArgs(args, fnArgs)
+        val processedArgs = args.map(::execute) // processCompositionArgs(args, fnArgs)
 
-        Composition(fn, processedArgs, position, fnType.imageType, reports + arityErrors)
+        val genericTypes = fnType.argTypes.zip(processedArgs)
+            .filter { (exp, _) -> exp is GenericType }
+            .associate { (exp, rec) ->
+                exp as GenericType
+                exp.argNumber to rec.constructedType
+            }
+
+        val returnType = when (fnType.imageType) {
+            is GenericType -> genericTypes[fnType.imageType.argNumber] ?: Unknown
+            else           -> fnType.imageType
+        }
+
+        // TODO: Reporting
+
+        Composition(fn, processedArgs, position, returnType, reports + arityErrors)
     }
 
     // Double execution cannot be meaningfully type-checked
