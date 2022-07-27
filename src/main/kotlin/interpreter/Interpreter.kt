@@ -1,5 +1,8 @@
 package org.fpeterek.til.typechecking.interpreter
 
+import org.fpeterek.til.typechecking.interpreter.builtins.EqualityOperator
+import org.fpeterek.til.typechecking.interpreter.builtins.IntOperators
+import org.fpeterek.til.typechecking.interpreter.builtins.RealOperators
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.sentence.*
@@ -26,8 +29,19 @@ class Interpreter: InterpreterInterface {
 
     private val operatorFns = setOf("+", "-", "*", "/", "=")
 
-    private val intOperators = mutableMapOf<String, OperatorFunction>()
-    private val realOperators = mutableMapOf<String, OperatorFunction>()
+    private val intOperators = mutableMapOf(
+        "+" to IntOperators.Plus,
+        "-" to IntOperators.Minus,
+        "*" to IntOperators.Multiply,
+        "/" to IntOperators.Divide,
+    )
+
+    private val realOperators = mutableMapOf(
+        "+" to RealOperators.Plus,
+        "-" to RealOperators.Minus,
+        "*" to RealOperators.Multiply,
+        "/" to RealOperators.Divide,
+    )
 
     private fun pushFrame() = stack.add(StackFrame(parent = currentFrame))
     private fun popFrame() = stack.removeLast()
@@ -93,16 +107,13 @@ class Interpreter: InterpreterInterface {
         )
     }
 
-    private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
+    // TODO: Type-aware equality, probably built into the interpreter
+    private fun interpretEquality(args: List<Construction>) = EqualityOperator.apply(this, args)
 
-        val interpreted = comp.args.map(::interpret)
+    private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>): Construction {
 
-        if (interpreted.any { it is Nil }) {
-            return nil
-        }
-
-        val isReal = interpreted.all { it.constructionType matches Builtins.Real }
-        val isInt  = interpreted.all { it.constructionType matches Builtins.Int }
+        val isReal = args.all { it.constructionType matches Builtins.Real }
+        val isInt  = args.all { it.constructionType matches Builtins.Int }
 
         if (isReal == isInt) {
             throw RuntimeException("Type mismatch for operator ${fn.name}")
@@ -113,7 +124,25 @@ class Interpreter: InterpreterInterface {
             else   -> intOperators[fn.name]
         } ?: throw RuntimeException("No such operator '${fn.name}'")
 
-        return fnImpl.apply(this, interpreted)
+        return fnImpl.apply(this, args)
+    }
+
+    private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
+
+        if (comp.args.size != 2) {
+            throw RuntimeException("Operator '${fn.name}' expects 2 arguments (${comp.args.size} provided)")
+        }
+
+        val interpreted = comp.args.map(::interpret)
+
+        if (interpreted.any { it is Nil }) {
+            return nil
+        }
+
+        return when (fn.name) {
+            "="  -> interpretEquality(interpreted)
+            else -> interpretNumericOperator(fn, interpreted)
+        }
     }
 
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
