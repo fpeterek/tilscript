@@ -16,9 +16,13 @@ object EqualityOperator : OperatorFunction(
     )
 ) {
 
-    override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = when (args[0] == args[1]) {
-        true -> Builtins.True
-        else -> Builtins.False
-    }
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = args
+        .map(interpreter::interpret)
+        .let { intArgs ->
+            when (intArgs[0] == intArgs[1]) {
+                true -> Builtins.True
+                else -> Builtins.False
+            }
+        }
 
 }

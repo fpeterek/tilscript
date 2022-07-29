@@ -26,15 +26,22 @@ object IntOperators {
         protected abstract fun calcValue(fst: Integral, snd: Integral, interpreter: InterpreterInterface): Construction
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
-            if (!interpreter.typesMatch(args[0].constructionType, Builtins.Int)) {
+
+            val intArgs = args.map { interpreter.interpret(it) }
+
+            if (!interpreter.typesMatch(intArgs[0].constructionType, Builtins.Int)) {
                 return interpreter.nil
             }
 
-            if (!interpreter.typesMatch(args[1].constructionType, Builtins.Int)) {
+            if (!interpreter.typesMatch(intArgs[1].constructionType, Builtins.Int)) {
                 return interpreter.nil
             }
 
-            return calcValue(args[0] as Integral, args[1] as Integral, interpreter)
+            if (intArgs.any { it !is Integral }) {
+                return interpreter.nil
+            }
+
+            return calcValue(intArgs[0] as Integral, intArgs[1] as Integral, interpreter)
         }
 
     }
