@@ -51,13 +51,15 @@ class TypeChecker private constructor(
     private val Construction.isDoubleExecution
         get() = this is Execution && executionOrder == 2
 
-    private fun match(l: Type, r: Type) = l is Unknown || r is Unknown || TypeMatcher.match(l, r, typeRepo)
+    private fun match(l: Type, r: Type) = TypeMatcher.match(l, r, typeRepo)
+
+    private fun match(fn: FunctionType, args: List<Type>) = TypeMatcher.matchFnArgs(fn, args, typeRepo)
 
     private fun processTrivialization(trivialization: Trivialization): Trivialization {
 
         val processed = when (trivialization.construction) {
-            is TilFunction, is Value -> process(trivialization.construction, this, typeRepo)
-
+            is TilFunction -> processFunction(trivialization.construction)
+            is Value -> processLiteral(trivialization.construction)
             // Binding by trivialization -> variables from outer scopes
             // are inaccessible
             else -> process(trivialization.construction, outermostRepo, lambdaBound, typeRepo)
@@ -116,18 +118,12 @@ class TypeChecker private constructor(
         }
     }
 
-    private fun execute(construction: Construction) = when (construction) {
-        is Value -> construction.withReport(Report("Literals cannot be executed.", construction.position))
-        is TilFunction -> construction.withReport(Report("Functions cannot be executed.", construction.position))
-        else -> processConstruction(construction)
-    }
-
     private fun processCompositionFn(fn: Construction) = processConstruction(fn).let { processed ->
         when {
             processed is TilFunction -> processed.withReport(
                 Report("Functions cannot be executed, did you forget a trivialization?", processed.position)
             )
-            processed.constructedType !is FunctionType -> processed.withReport(
+            processed.constructedType !is FunctionType && processed.constructedType !is Unknown -> processed.withReport(
                 Report("Only functions can be applied on arguments using a composition", processed.position)
             )
             else -> processed
@@ -135,7 +131,7 @@ class TypeChecker private constructor(
     }
 
     private fun processOperatorArgs(args: List<Construction>): List<Construction> {
-        val isInt = match(execute(args.first()).constructedType, Builtins.Int)
+        val isInt = match(processConstruction(args.first()).constructedType, Builtins.Int)
         val expType = when {
             isInt -> Builtins.Int
             else -> Builtins.Real
@@ -157,7 +153,7 @@ class TypeChecker private constructor(
     private fun processCompositionArgs(args: List<Construction>, expected: List<Type>) = args
         .zip(expected)
         .map { (cons, expType) ->
-            val processed = execute(cons)
+            val processed = processConstruction(cons)
 
             when {
                 expType !is Unknown && !match(expType, processed.constructedType) -> processed.withReport(
@@ -201,7 +197,7 @@ class TypeChecker private constructor(
 
         val arityErrors = checkArity(composition, fnArgs.size)
 
-        val processedArgs = args.map(::execute) // processCompositionArgs(args, fnArgs)
+        val processedArgs = args.map(::processConstruction) // processCompositionArgs(args, fnArgs)
 
         val genericTypes = fnType.argTypes.zip(processedArgs)
             .filter { (exp, _) -> exp is GenericType }
@@ -215,9 +211,24 @@ class TypeChecker private constructor(
             else           -> fnType.imageType
         }
 
-        // TODO: Reporting
+        val returnTypeErrors = when {
+            fnType.imageType is GenericType && fnType.imageType.argNumber !in genericTypes ->
+                listOf(Report("Return type of generic function could not be deduced from type arguments", composition.position))
+            else -> listOf()
+        }
 
-        Composition(fn, processedArgs, position, returnType, reports + arityErrors)
+        val typeMatches = match(fnType, processedArgs.map { it.constructedType })
+
+        val argsWithReports = processedArgs.zip(typeMatches).zip(fnType.argTypes)
+            .map { (pair, exp) ->
+                val (arg, typeMatch) = pair
+                when (typeMatch) {
+                    true -> arg
+                    else -> arg.withReport(Report("Type mismatch in function application (expected: $exp, received: ${arg.constructedType})", arg.position))
+                }
+            }
+
+        Composition(fn, argsWithReports, position, returnType, reports + arityErrors + returnTypeErrors)
     }
 
     // Double execution cannot be meaningfully type-checked
@@ -293,8 +304,12 @@ class TypeChecker private constructor(
         is Trivialization -> processTrivialization(construction)
         is Execution      -> processExecution(construction)
         is Variable       -> processVariable(construction)
-        is TilFunction    -> processFunction(construction)
-        is Value          -> processLiteral(construction)
+
+        // The only way to reach this point is by attempting to execute literals or function names
+        // The only legal way to mention a value or a function is to use a trivialization, and a trivialization
+        // does not attempt to execute its argument
+        is Value          -> construction.withReport(Report("Literals cannot be executed.", construction.position))
+        is TilFunction    -> construction.withReport(Report("Functions cannot be executed.", construction.position))
     }
 
     private fun addSymbol(symbol: Symbol) = Symbol(

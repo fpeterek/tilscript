@@ -1,6 +1,5 @@
 package org.fpeterek.til.typechecking.typechecker
 
-import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
 
 class TypeMatcher private constructor(val types: TypeRepository) {
@@ -8,6 +7,12 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     companion object {
         fun match(l: Type, r: Type, types: TypeRepository) =
             TypeMatcher(types).match(l, r)
+
+        fun matchFnArgs(fn: FunctionType, args: List<Type>, types: TypeRepository) =
+            TypeMatcher(types).matchFnArgs(fn, args)
+
+        fun matchFn(fn: FunctionType, returned: Type, args: List<Type>, types: TypeRepository) =
+            TypeMatcher(types).matchFn(fn, returned, args)
     }
 
     private val generics = mutableMapOf<String, Type>()
@@ -38,18 +43,22 @@ class TypeMatcher private constructor(val types: TypeRepository) {
         is GenericType, is TypeAlias -> throw RuntimeException("Error: Invalid state")
     }
 
-    fun matchFn(fn: FunctionType, returned: Type, args: List<Type>): List<Boolean> =
-        listOf(match(fn.imageType, returned)) +
+    fun matchFn(fn: FunctionType, returned: Type, args: List<Type>): Pair<Boolean, List<Boolean>> =
+        match(fn.imageType, returned) to
                 fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
 
-    fun matchFn(fn: FunctionType, args: List<Type>): List<Boolean> =
+    fun matchFnArgs(fn: FunctionType, args: List<Type>): List<Boolean> =
         fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
 
     fun match(l: Type, r: Type): Boolean = when {
+        l is Unknown || r is Unknown -> true
+
         l is GenericType -> matchGenerics(l, r)
         r is GenericType -> matchGenerics(r, l)
+
         l is TypeAlias -> matchAlias(l, r)
         r is TypeAlias -> matchAlias(r, l)
+
         l.javaClass != r.javaClass -> false
         else -> matchInternal(l, r)
     }
