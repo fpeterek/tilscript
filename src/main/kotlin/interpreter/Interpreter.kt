@@ -231,9 +231,7 @@ class Interpreter: InterpreterInterface {
         } else {
             val fn = functions[it.name]!!
 
-            if (fn.constructedType matches it.constructedType) {
-                functions[it.name] = it
-            } else {
+            if (!(fn.constructedType matches it.constructedType)) {
                 throw RuntimeException("Redeclaration of function '${fn.name}' with a different type")
             }
         }
