@@ -8,9 +8,7 @@ import org.fpeterek.til.typechecking.interpreter.interpreterinterface.Interprete
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeMatcher
-import org.fpeterek.til.typechecking.types.SymbolRepository
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.TypeRepository
+import org.fpeterek.til.typechecking.types.*
 import java.util.StringJoiner
 
 
@@ -210,6 +208,20 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun interpret(decl: FunctionDeclaration) = decl.functions.forEach {
+
+        if (it.constructedType !is FunctionType) {
+            throw RuntimeException("Invalid function type")
+        }
+
+        if (it.constructedType.imageType is GenericType) {
+            val genTypes = it.constructedType.argTypes.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
+
+            if (it.constructedType.imageType.argNumber !in genTypes) {
+                throw RuntimeException("Image type of function ${it.name} could not be deduced from type arguments")
+            }
+        }
+
+
         if (it.name !in functions) {
             functions[it.name] = it
         } else {
@@ -224,6 +236,15 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun interpret(def: FunctionDefinition) {
+
+        if (def.signature.imageType is GenericType) {
+            val genTypes = def.args.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
+
+            if (def.signature.imageType.argNumber !in genTypes) {
+                throw RuntimeException("Image type of function ${def.name} could not be deduced from type arguments")
+            }
+        }
+
         if (def.name in functions) {
             val declared = functions[def.name]!!
             if (declared.implementation != null) {
@@ -238,6 +259,11 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(lit: LiteralDeclaration) {
         lit.literals.forEach {
+
+            if (it.constructedType is GenericType) {
+                invalidUseOfGenerics()
+            }
+
             if (it.value in symbolRepo) {
                 val declaredType = symbolRepo[it.value]!!
                 if (!(declaredType matches lit.type)) {
@@ -251,6 +277,11 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(typedef: TypeDefinition) {
         val alias = typedef.alias
+
+        if (alias.type is GenericType) {
+            invalidUseOfGenerics()
+        }
+
         if (alias.name in typeRepo) {
             val declaredType = typeRepo[alias.name]!!
             if (!(declaredType matches alias.type)) {
@@ -261,8 +292,16 @@ class Interpreter: InterpreterInterface {
         }
     }
 
+    private fun invalidUseOfGenerics(): Nothing =
+        throw RuntimeException("Generic types are only allowed in function definitions")
+
     private fun interpret(varDecl: VariableDeclaration) {
         varDecl.variables.forEach {
+
+            if (it.constructedType is GenericType) {
+                invalidUseOfGenerics()
+            }
+
             if (it.name in topLevelFrame) {
                 val declared = topLevelFrame[it.name]!!
                 if (!(declared.constructedType matches it.constructedType)) {
@@ -275,6 +314,10 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun interpret(varDef: VariableDefinition) {
+
+        if (varDef.constructsType is GenericType) {
+            invalidUseOfGenerics()
+        }
 
         if (varDef.name in topLevelFrame) {
             val declared = topLevelFrame[varDef.name]!!

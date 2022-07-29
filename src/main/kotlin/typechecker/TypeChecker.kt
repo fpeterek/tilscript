@@ -330,7 +330,11 @@ class TypeChecker private constructor(
                 else -> symbol
             }
         }
-        else -> addSymbol(symbol)
+        else -> when (symbol.constructedType) {
+            is GenericType ->
+                symbol.withReport(Report("Generic types are only allowed in function definitions", symbol.position))
+            else -> addSymbol(symbol)
+        }
     }
 
     private fun processLiteralDeclaration(decl: LiteralDeclaration) = decl.apply {
@@ -347,7 +351,11 @@ class TypeChecker private constructor(
                     else -> alias
                 }
             }
-            else -> typeRepo.process(def.alias)
+            else -> when (def.alias.type) {
+                is GenericType ->
+                    def.withReport(Report("Generic types are only allowed in function definitions", def.position))
+                else -> typeRepo.process(def.alias)
+            }
         }
     }
 
@@ -360,7 +368,10 @@ class TypeChecker private constructor(
                 else -> variable
             }
         }
-        else -> variable.apply { repo.declare(this) }
+        else -> when (variable.constructedType is GenericType) {
+            true -> variable.withReport(Report("Generic types are only allowed in function definitions", variable.position))
+            else -> variable.apply { repo.declare(this) }
+        }
 
     }
 
@@ -368,16 +379,33 @@ class TypeChecker private constructor(
         VariableDeclaration(variables.map(::processSingleDecl), position, reports)
     }
 
-    private fun processSingleDecl(fn: TilFunction) = when (fn.name) {
-        in repo -> {
-            val currentType = repo[fn.name]!!
-            when {
-                !match(currentType, fn.constructedType) ->
-                    fn.withReport(Report("Redefinition of symbol '${fn.name}' with a different type", fn.position))
-                else -> fn
+    private fun processSingleDecl(fn: TilFunction): TilFunction  {
+
+        val genError = when (fn.constructedType is FunctionType && fn.constructedType.imageType is GenericType) {
+            true -> {
+                val genNums = fn.constructedType.argTypes.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
+
+                when (fn.constructedType.imageType.argNumber !in genNums) {
+                    true -> fn.withReport(Report("Return type of generic function could not be deduced from type arguments", fn.position))
+
+                    false -> fn
+                }
             }
+
+            else -> fn
         }
-        else -> fn.apply { repo.declare(this) }
+
+        return when (genError.name) {
+            in repo -> {
+                val currentType = repo[genError.name]!!
+                when {
+                    !match(currentType, genError.constructedType) ->
+                        genError.withReport(Report("Redefinition of symbol '${genError.name}' with a different type", genError.position))
+                    else -> genError
+                }
+            }
+            else -> genError.apply { repo.declare(this) }
+        }
     }
 
     private fun processFunctionDeclaration(decl: FunctionDeclaration) = with(decl) {
@@ -413,12 +441,20 @@ class TypeChecker private constructor(
         val expType = withConstruction.construction.constructedType
         val received = withConstruction.constructsType
 
+        val genArgNums = def.args.map { it.constructedType }.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
+
+        val genericsError = when {
+            def.constructsType is GenericType && def.constructsType.argNumber !in genArgNums ->
+                withConstruction.withReport(Report("Return type of generic function cannot be deduced from type arguments", withConstruction.position))
+            else -> withConstruction
+        }
+
         return when (match(expType, received)) {
-            true -> withConstruction
-            else -> withConstruction.withReport(
+            true -> genericsError
+            else -> genericsError.withReport(
                 Report(
                     "Type constructed by function body does not match function signature (expected: ${expType}, received: ${received})",
-                    withConstruction.construction.position)
+                    genericsError.construction.position)
             )
         }
     }
@@ -450,10 +486,15 @@ class TypeChecker private constructor(
             withRedef.reports,
         )
 
-        return when (match(withConstruction.construction.constructedType, withConstruction.constructsType)) {
-            true -> withConstruction
-            else -> withConstruction.withReport(
-                Report("Type constructed by variable initializer does not match declared type", withConstruction.construction.position)
+        val withGenerics = when (withConstruction.constructsType) {
+            is GenericType -> withConstruction.withReport(Report("Generic types are only allowed in function definitions", withConstruction.position))
+            else -> withConstruction
+        }
+
+        return when (match(withGenerics.construction.constructedType, withGenerics.constructsType)) {
+            true -> withGenerics
+            else -> withGenerics.withReport(
+                Report("Type constructed by variable initializer does not match declared type", withGenerics.construction.position)
             )
         }
     }
