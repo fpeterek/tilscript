@@ -27,21 +27,19 @@ object IntOperators {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
 
-            val intArgs = args.map { interpreter.interpret(it) }
-
-            if (!interpreter.typesMatch(intArgs[0].constructionType, Builtins.Int)) {
+            if (!interpreter.typesMatch(args[0].constructionType, Builtins.Int)) {
                 return interpreter.nil
             }
 
-            if (!interpreter.typesMatch(intArgs[1].constructionType, Builtins.Int)) {
+            if (!interpreter.typesMatch(args[1].constructionType, Builtins.Int)) {
                 return interpreter.nil
             }
 
-            if (intArgs.any { it !is Integral }) {
+            if (args.any { it !is Integral }) {
                 return interpreter.nil
             }
 
-            return calcValue(intArgs[0] as Integral, intArgs[1] as Integral, interpreter)
+            return calcValue(args[0] as Integral, args[1] as Integral, interpreter)
         }
 
     }

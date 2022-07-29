@@ -27,22 +27,20 @@ object RealOperators {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
 
-            val intArgs = args.map(interpreter::interpret)
-
-            if (!interpreter.typesMatch(intArgs[0].constructionType, Builtins.Real)) {
+            if (!interpreter.typesMatch(args[0].constructionType, Builtins.Real)) {
                 return interpreter.nil
             }
 
-            if (!interpreter.typesMatch(intArgs[1].constructionType, Builtins.Real)) {
+            if (!interpreter.typesMatch(args[1].constructionType, Builtins.Real)) {
                 return interpreter.nil
             }
 
             // Return Nil for symbolic values, i.e. 'Pi, 'E, 'SqrtTwo
-            if (intArgs.any { it !is Real }) {
+            if (args.any { it !is Real }) {
                 return interpreter.nil
             }
 
-            return calcValue(intArgs[0] as Real, intArgs[1] as Real, interpreter)
+            return calcValue(args[0] as Real, args[1] as Real, interpreter)
         }
 
     }

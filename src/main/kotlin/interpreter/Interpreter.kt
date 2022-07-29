@@ -110,8 +110,12 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>): Construction {
 
-        val isReal = args.all { it.constructionType matches Builtins.Real }
-        val isInt  = args.all { it.constructionType matches Builtins.Int }
+        val isReal = args.any { it.constructionType matches Builtins.Real }
+        val isInt  = args.any { it.constructionType matches Builtins.Int }
+
+        if (args.any { !(it.constructionType matches Builtins.Real || it.constructionType matches Builtins.Int) }) {
+            throw RuntimeException("Type mismatch for operator ${fn.name}")
+        }
 
         if (isReal == isInt) {
             throw RuntimeException("Type mismatch for operator ${fn.name}")
