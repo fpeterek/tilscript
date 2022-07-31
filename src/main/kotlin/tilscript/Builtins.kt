@@ -4,6 +4,7 @@ import org.fpeterek.til.typechecking.sentence.Bool
 import org.fpeterek.til.typechecking.sentence.TilFunction
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.typechecking.sentence.Nil as NilType
 
 object Builtins {
 
@@ -13,9 +14,11 @@ object Builtins {
     val World = AtomicType("World", "Worlds")
     val Real = AtomicType("Real", "Real numbers")
     val Int = AtomicType("Int", "Whole numbers")
+    val Type = AtomicType("Type", "Type reference")
+    val Text = AtomicType("Text", "Strings")
 
     val builtinTypes = listOf(
-        Bool, Indiv, Time, World, Real, Int
+        Bool, Indiv, Time, World, Real, Int, Type
     )
 
     private val realOperation
@@ -49,16 +52,10 @@ object Builtins {
     private val noPosition = SrcPosition(-1, -1)
 
     val builtinFunctions = listOf(
-        // TODO: Idk whether integer promotion is supported in TILScript
         TilFunction("+", noPosition, realOperation),
         TilFunction("-", noPosition, realOperation),
         TilFunction("*", noPosition, realOperation),
         TilFunction("/", noPosition, realOperation),
-
-        // TilFunction("+", intOperation),
-        // TilFunction("-", intOperation),
-        // TilFunction("*", intOperation),
-        // TilFunction("/", intOperation),
 
         TilFunction("=", noPosition, equalityComparison),
 
@@ -93,6 +90,8 @@ object Builtins {
     val True = Bool(true, noPosition)
     val False = Bool(false, noPosition)
 
-    val builtinValues = listOf(True, False)
+    val Nil = NilType(noPosition)
+
+    val builtinValues = listOf(True, False, Nil)
 
 }

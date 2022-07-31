@@ -9,11 +9,13 @@ sealed class Entity(srcPos: SrcPosition) : IntermediateResult(srcPos) {
             is Numeric -> Number(ir.value, ir.position)
             is Symbol -> FnOrEntity(ir.symbol, ir.position)
             is EntityName -> FnOrEntity(ir.name, ir.position)
+            is StringLit -> ir
             else -> throw RuntimeException("Parser error: unexpected type ${ir.javaClass}")
         }
     }
 
     class Number(val value: String, srcPos: SrcPosition) : Entity(srcPos)
     class FnOrEntity(val value: String, srcPos: SrcPosition) : Entity(srcPos)
+    class StringLit(val value: String, srcPos: SrcPosition) : Entity(srcPos)
 
 }

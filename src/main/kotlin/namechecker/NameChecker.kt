@@ -98,7 +98,7 @@ class NameChecker private constructor(
     }
 
     private fun processLiteral(literal: Value) = when {
-        literal !is Symbol -> literal
+        literal !is Symbol        -> literal
         findSymbol(literal.value) -> literal
         else -> literal.withReport(
             Report("Undefined symbol '${literal.value}'", literal.position)
@@ -166,7 +166,7 @@ class NameChecker private constructor(
         is Execution      -> processExecution(construction)
         is Variable       -> processVariable(construction)
         is TilFunction    -> processFunction(construction)
-        is Value        -> processLiteral(construction)
+        is Value          -> processLiteral(construction)
     }
 
     private fun process(declaration: Declaration): Declaration = when (declaration) {

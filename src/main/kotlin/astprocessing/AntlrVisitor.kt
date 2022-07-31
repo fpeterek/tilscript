@@ -4,10 +4,11 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.apache.commons.text.StringEscapeUtils
 import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.result.*
-import org.fpeterek.til.typechecking.types.Unknown
+import org.fpeterek.til.typechecking.sentence.Text
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
@@ -127,9 +128,10 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     override fun visitTrivialization(ctx: TILScriptParser.TrivializationContext) = Construction.Execution(
         order=0,
         construction = when {
-            ctx.entity() != null -> visitEntity(ctx.entity())
+            ctx.entity()       != null -> visitEntity(ctx.entity())
             ctx.construction() != null -> visitConstruction(ctx.construction())
-            else -> invalidState()
+            ctx.dataType()     != null -> visitDataType(ctx.dataType())
+            else                       -> invalidState()
         },
         srcPos=ctx.position(),
     )
@@ -186,12 +188,24 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     override fun visitEntity(ctx: TILScriptParser.EntityContext) = Entity.from(
         when {
             ctx.entityName() != null -> visitEntityName(ctx.entityName())
-            ctx.keyword()    != null -> visitKeyword(ctx.keyword())
             ctx.number()     != null -> visitNumber(ctx.number())
             ctx.symbol()     != null -> visitSymbol(ctx.symbol())
+            ctx.string()     != null -> visitString(ctx.string())
 
             else -> invalidState()
         }
+    )
+
+    private fun String.unescape() = StringEscapeUtils.unescapeJava(this)
+
+    private fun formatStrLit(str: String) = str
+        .drop(1)
+        .dropLast(1)
+        .unescape()
+
+    override fun visitString(ctx: TILScriptParser.StringContext) = Entity.StringLit(
+        value = formatStrLit(ctx.text),
+        srcPos = ctx.position(),
     )
 
     override fun visitTypeName(ctx: TILScriptParser.TypeNameContext) =
@@ -202,8 +216,6 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 
     override fun visitVariableName(ctx: TILScriptParser.VariableNameContext) =
         VarName(visitLcname(ctx.lcname()))
-
-    override fun visitKeyword(ctx: TILScriptParser.KeywordContext) = Symbol(ctx.text, ctx.position())
 
     override fun visitSymbol(ctx: TILScriptParser.SymbolContext) = Symbol(ctx.text.trim(), ctx.position())
 

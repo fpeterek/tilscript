@@ -145,10 +145,16 @@ class ASTConverter private constructor() {
     private fun convertTilTrivialization(execution: Execution) = TilTrivialization(
         construction=when (execution.construction) {
             is Construction -> convertConstruction(execution.construction)
-            is Entity -> convertEntityRef(execution.construction)
-            else -> throw RuntimeException("Invalid parser state")
+            is Entity       -> convertEntityRef(execution.construction)
+            is DataType     -> convertTypeRef(execution.construction)
+            else            -> throw RuntimeException("Invalid parser state")
         },
         srcPos=execution.position,
+    )
+
+    private fun convertTypeRef(type: DataType) = TypeRef(
+        type = convertDataType(type),
+        srcPos = type.position
     )
 
     private fun convertEntityRef(entity: Entity): TilConstruction = when (entity) {
@@ -157,13 +163,17 @@ class ASTConverter private constructor() {
             in fns -> TilFunction(entity.value, entity.position)
             else -> convertNonNumLiteral(entity)
         }
+        is Entity.StringLit -> convertStringLiteral(entity)
     }
 
+    private fun convertStringLiteral(str: Entity.StringLit) = Text(str.value, str.position)
+
     private fun convertNonNumLiteral(entity: Entity.FnOrEntity) = when (entity.value) {
-        "Nil" -> Nil(entity.position)
-        "True" -> Bool(true, entity.position)
+        "Nil"   -> Nil(entity.position)
+        "True"  -> Bool(true, entity.position)
         "False" -> Bool(false, entity.position)
-        else -> Symbol(entity.value, entity.position)
+        in repo -> TypeRef(repo[entity.value]!!, entity.position)
+        else    -> Symbol(entity.value, entity.position)
     }
 
     private fun convertNumLiteral(entity: Entity.Number) = when {
@@ -174,10 +184,10 @@ class ASTConverter private constructor() {
     private fun convertVarRef(varRef: VarRef): TilVariable = TilVariable(varRef.name, varRef.position)
 
     private fun convertDataType(type: DataType): Type = when (type) {
-        is DataType.ClassType -> convertFnType(type)
-        is DataType.Collection.List -> convertList(type)
+        is DataType.ClassType        -> convertFnType(type)
+        is DataType.Collection.List  -> convertList(type)
         is DataType.Collection.Tuple -> convertTuple(type)
-        is DataType.PrimitiveType -> convertPrimitiveType(type)
+        is DataType.PrimitiveType    -> convertPrimitiveType(type)
     }
 
     private fun convertList(list: DataType.Collection.List) =

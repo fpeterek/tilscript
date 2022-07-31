@@ -43,7 +43,7 @@ compoundType : OPEN_PAR dataType (WS dataType)* CLOSE_PAR;
 
 variable : variableName;
 
-trivialization : TRIVIALIZE (construction | entity );
+trivialization : TRIVIALIZE (construction | entity | dataType);
 
 composition : OPEN_BRA construction (construction | (WS construction))+ CLOSE_BRA;
 
@@ -61,21 +61,13 @@ optTypedVariable : variableName (COLON dataType)?;
 
 typedVariable : variableName COLON dataType;
 
-entity : keyword | entityName | number | symbol;
+entity : entityName | number | symbol | string;
 
 typeName : ucname;
 
 entityName : ucname;
 
 variableName : lcname;
-
-keyword : 'True'
-        | 'False'
-        | 'If'
-        | 'Tr'
-        | 'Improper'
-        | 'Nil';
-
 
 // For some reason, Antlr seems unable to match a single forward
 // slash '/' and always matches the following space alongside the
@@ -90,6 +82,10 @@ number : NUMBER;
 
 ucname : UCNAME;
 lcname : LCNAME;
+
+string: STRING;
+
+STRING: '"([^\\"]|\\[^\n])*"';
 
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;

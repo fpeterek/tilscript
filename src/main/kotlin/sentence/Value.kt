@@ -47,6 +47,24 @@ class Symbol(
     override fun hashCode() = value.hashCode()
 }
 
+class TypeRef(
+    val type: Type,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, Builtins.Type, reports) {
+
+    override fun equals(other: Any?) =
+        other != null && other is TypeRef && other.type.name == type.name
+
+    override fun hashCode() = type.name.hashCode()
+
+    override fun toString() = type.name
+
+    override fun withReports(iterable: Iterable<Report>) =
+        TypeRef(type, position, reports + iterable)
+
+}
+
 class Integral(
     val value: Long,
     srcPos: SrcPosition,
@@ -79,6 +97,23 @@ class Real(
     override fun toString() = value.toString()
 
     override fun hashCode() = value.hashCode()
+}
+
+class Text(
+    val value: String,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, Builtins.Text, reports) {
+
+    override fun equals(other: Any?) =
+        other != null && other is Text && other.value == value
+
+    override fun hashCode() = value.hashCode()
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Text(value, position, reports + iterable)
+
+    override fun toString() = "\"$value\""
 }
 
 class Bool(
