@@ -49,6 +49,9 @@ object Builtins {
     private val singularizer
         get() = FunctionType(GenericType(1), FunctionType(Bool, GenericType(1)))
 
+    private val listCons
+        get() = FunctionType(ListType(GenericType(1)), GenericType(1), ListType(GenericType(1)))
+
     private val noPosition = SrcPosition(-1, -1)
 
     val builtinFunctions = listOf(
@@ -56,6 +59,8 @@ object Builtins {
         TilFunction("-", noPosition, realOperation),
         TilFunction("*", noPosition, realOperation),
         TilFunction("/", noPosition, realOperation),
+
+        TilFunction("Cons", noPosition, listCons),
 
         TilFunction("=", noPosition, equalityComparison),
 

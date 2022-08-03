@@ -191,7 +191,7 @@ class ASTConverter private constructor() {
     }
 
     private fun convertList(list: DataType.Collection.List) =
-        TilList(convertDataType(list.type))
+        ListType(convertDataType(list.type))
 
     private fun convertTuple(tuple: DataType.Collection.Tuple) =
         TilTuple(convertDataType(tuple.type))

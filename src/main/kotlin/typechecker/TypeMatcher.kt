@@ -18,7 +18,7 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     private val generics = mutableMapOf<String, Type>()
 
     private fun matchTuples(l: TilTuple, r: TilTuple) = match(l.type, r.type)
-    private fun matchLists(l: TilList, r: TilList) = match(l.type, r.type)
+    private fun matchLists(l: ListType, r: ListType) = match(l.type, r.type)
 
     private fun matchGenerics(l: GenericType, r: Type) = match(r, generics.getOrPut(l.name) { r })
 
@@ -35,7 +35,7 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     private fun matchInternal(l: Type, r: Type) = when (l) {
         is AtomicType -> matchAtomics(l, r as AtomicType)
         is FunctionType -> matchFunctions(l, r as FunctionType)
-        is TilList -> matchLists(l, r as TilList)
+        is ListType -> matchLists(l, r as ListType)
         is TilTuple -> matchTuples(l, r as TilTuple)
 
         ConstructionType, Unknown -> true

@@ -5,6 +5,7 @@ import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.types.AtomicType
+import org.fpeterek.til.typechecking.types.ListType
 import org.fpeterek.til.typechecking.types.Type
 import org.fpeterek.til.typechecking.types.Unknown
 import org.fpeterek.til.typechecking.util.SrcPosition
@@ -146,4 +147,41 @@ class Nil(
     override fun toString() = "Nil"
 
     override fun hashCode() = javaClass.hashCode()
+}
+
+class TilList(
+    val head: Construction,
+    val tail: TilList?,
+    valueType: Type,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, ListType(valueType), reports) {
+
+    val listType get() = constructionType as ListType
+    val valueType get() = listType.type
+
+    override fun equals(other: Any?): Boolean =
+        other != null && other is TilList && other.valueType == valueType && other.head == head &&
+                ((tail == null && other.tail == null) || tail == other.tail)
+
+    override fun withReports(iterable: Iterable<Report>) = TilList(
+        head, tail, valueType, position, reports + iterable
+    )
+
+    override fun hashCode(): Int {
+        var result = head.hashCode()
+        result = 31 * result + (tail?.hashCode() ?: 0)
+        result = 31 * result + valueType.hashCode()
+        return result
+    }
+
+    private fun tailStr(): String = when (tail) {
+        null -> ""
+        else -> ", ${tail.nonBracedStr()}"
+    }
+
+    private fun nonBracedStr(): String = "$head${tailStr()}"
+
+    override fun toString() = "{ ${nonBracedStr()} }"
+
 }

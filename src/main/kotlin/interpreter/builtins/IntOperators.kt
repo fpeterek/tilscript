@@ -10,7 +10,7 @@ import org.fpeterek.til.typechecking.util.SrcPosition
 
 object IntOperators {
 
-    val intArgs = listOf(
+    val intArgs get() = listOf(
         Variable("fst", SrcPosition(-1, -1), Builtins.Int),
         Variable("snd", SrcPosition(-1, -1), Builtins.Int),
     )
