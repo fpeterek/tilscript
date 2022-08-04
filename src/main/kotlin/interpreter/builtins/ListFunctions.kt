@@ -3,10 +3,9 @@ package org.fpeterek.til.typechecking.interpreter.builtins
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.EagerFunction
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.LazyFunction
-import org.fpeterek.til.typechecking.sentence.Construction
-import org.fpeterek.til.typechecking.sentence.Nil
-import org.fpeterek.til.typechecking.sentence.TilList
-import org.fpeterek.til.typechecking.sentence.Variable
+import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.typechecking.sentence.EmptyList
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.types.GenericType
 import org.fpeterek.til.typechecking.types.ListType
 import org.fpeterek.til.typechecking.util.SrcPosition
@@ -31,8 +30,8 @@ object ListFunctions {
             }
 
             if (tail is Nil) {
-                return TilList(
-                    head, null, head.constructionType, head.position
+                return ListCell(
+                    head, EmptyList(head.constructionType, head.position), head.constructionType, head.position
                 )
             }
 
@@ -44,7 +43,7 @@ object ListFunctions {
                 throw RuntimeException("Lists must be homogeneous (head type (${head.constructionType}) does not match list value type (${tail.valueType}))")
             }
 
-            return TilList(
+            return ListCell(
                 head, tail, tail.valueType, head.position
             )
         }
@@ -58,7 +57,12 @@ object ListFunctions {
             Variable("list", SrcPosition(-1, -1), ListType(GenericType(1))),
         ),
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TilList).head
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TilList).let { list ->
+            when (list) {
+                is EmptyList -> interpreter.nil
+                is ListCell -> list.head
+            }
+        }
     }
 
     object Tail : EagerFunction(
@@ -69,10 +73,34 @@ object ListFunctions {
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TilList).let { list ->
-            when (list.tail) {
-                null -> interpreter.nil
-                else -> list.tail
+            when (list) {
+                is EmptyList -> interpreter.nil
+                is ListCell -> list.tail
             }
         }
     }
+
+    object IsEmpty : EagerFunction(
+        "IsEmpty",
+        GenericType(1),
+        listOf(
+            Variable("list", SrcPosition(-1, -1), ListType(GenericType(1))),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TilList).let { list ->
+            when (list) {
+                is EmptyList -> Builtins.True
+                is ListCell -> Builtins.False
+            }
+        }
+    }
+
+//    object EmptyListOf : EagerFunction(
+//        "EmptyListOf",
+//        ListType(GenericType(1)),
+//        listOf(
+    // TODO: Type Type
+//            Variable("type", SrcPosition(-1, -1), Type),
+//        ),
+//    )
 }

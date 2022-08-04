@@ -149,9 +149,7 @@ class Nil(
     override fun hashCode() = javaClass.hashCode()
 }
 
-class TilList(
-    val head: Construction,
-    val tail: TilList?,
+sealed class TilList(
     valueType: Type,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
@@ -160,28 +158,55 @@ class TilList(
     val listType get() = constructionType as ListType
     val valueType get() = listType.type
 
-    override fun equals(other: Any?): Boolean =
-        other != null && other is TilList && other.valueType == valueType && other.head == head &&
-                ((tail == null && other.tail == null) || tail == other.tail)
+    abstract fun contentsStr(): String
 
-    override fun withReports(iterable: Iterable<Report>) = TilList(
+}
+
+class ListCell(
+    val head: Construction,
+    val tail: TilList,
+    valueType: Type,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : TilList(valueType, srcPos, reports) {
+
+    override fun equals(other: Any?): Boolean =
+        other != null && other is ListCell && other.valueType == valueType && other.head == head && tail == other.tail
+
+    override fun withReports(iterable: Iterable<Report>) = ListCell(
         head, tail, valueType, position, reports + iterable
     )
 
     override fun hashCode(): Int {
         var result = head.hashCode()
-        result = 31 * result + (tail?.hashCode() ?: 0)
+        result = 31 * result + tail.hashCode()
         result = 31 * result + valueType.hashCode()
         return result
     }
 
     private fun tailStr(): String = when (tail) {
-        null -> ""
-        else -> ", ${tail.nonBracedStr()}"
+        is EmptyList -> ""
+        else -> ", ${tail.contentsStr()}"
     }
 
-    private fun nonBracedStr(): String = "$head${tailStr()}"
+    override fun contentsStr(): String = "$head${tailStr()}"
 
-    override fun toString() = "{ ${nonBracedStr()} }"
+    override fun toString() = "{ ${contentsStr()} }"
+}
 
+class EmptyList(
+    valueType: Type,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : TilList(valueType, srcPos, reports) {
+
+    override fun withReports(iterable: Iterable<Report>) = EmptyList(valueType, position, reports + iterable)
+
+    override fun contentsStr() = ""
+
+    override fun toString() = "{}"
+
+    override fun hashCode() = valueType.hashCode()
+
+    override fun equals(other: Any?) = other != null && other is EmptyList && other.valueType == valueType
 }
