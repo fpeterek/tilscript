@@ -95,12 +95,16 @@ object ListFunctions {
         }
     }
 
-//    object EmptyListOf : EagerFunction(
-//        "EmptyListOf",
-//        ListType(GenericType(1)),
-//        listOf(
-    // TODO: Type Type
-//            Variable("type", SrcPosition(-1, -1), Type),
-//        ),
-//    )
+    object EmptyListOf : EagerFunction(
+        "EmptyListOf",
+        ListType(GenericType(1)),
+        listOf(
+            Variable("type", SrcPosition(-1, -1), Builtins.Type),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TypeRef).let { type ->
+            EmptyList(type.type, type.position)
+        }
+    }
+
 }
