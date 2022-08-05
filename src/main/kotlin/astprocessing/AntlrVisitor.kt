@@ -8,7 +8,11 @@ import org.apache.commons.text.StringEscapeUtils
 import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.result.*
+import org.fpeterek.til.typechecking.interpreter.builtins.ListFunctions
+import org.fpeterek.til.typechecking.sentence.Composition
 import org.fpeterek.til.typechecking.sentence.Text
+import org.fpeterek.til.typechecking.sentence.Trivialization
+import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
@@ -57,11 +61,12 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
     )
 
     override fun visitConstruction(ctx: TILScriptParser.ConstructionContext): Construction = when {
-        ctx.variable()       != null -> visitVariable(ctx.variable())
-        ctx.closure()        != null -> visitClosure(ctx.closure())
-        ctx.nExecution()     != null -> visitNExecution(ctx.nExecution())
-        ctx.composition()    != null -> visitComposition(ctx.composition())
-        ctx.trivialization() != null -> visitTrivialization(ctx.trivialization())
+        ctx.variable()        != null -> visitVariable(ctx.variable())
+        ctx.closure()         != null -> visitClosure(ctx.closure())
+        ctx.nExecution()      != null -> visitNExecution(ctx.nExecution())
+        ctx.composition()     != null -> visitComposition(ctx.composition())
+        ctx.trivialization()  != null -> visitTrivialization(ctx.trivialization())
+        ctx.listInitializer() != null -> visitListInitializer(ctx.listInitializer())
 
         else -> invalidState()
     }.let {
@@ -70,6 +75,9 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
             else -> it.extensionalize(ctx.WT().position())
         }
     }
+
+    override fun visitListInitializer(ctx: TILScriptParser.ListInitializerContext) =
+        ListInitializer(ctx.construction().map(::visitConstruction), ctx.position())
 
     override fun visitGlobalVarDecl(ctx: TILScriptParser.GlobalVarDeclContext) = GlobalVarDecl(
         ctx.variableName().map { visitVariableName(it) },

@@ -2,6 +2,7 @@ package org.fpeterek.til.typechecking.astprocessing
 
 import org.fpeterek.til.typechecking.astprocessing.result.*
 import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
+import org.fpeterek.til.typechecking.interpreter.builtins.ListFunctions
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.sentence.Symbol
 import org.fpeterek.til.typechecking.tilscript.Builtins
@@ -66,11 +67,21 @@ class ASTConverter private constructor() {
     }
 
     private fun convertConstruction(construction: Construction): TilConstruction = when (construction) {
-        is Closure     -> convertClosure(construction)
-        is Composition -> convertComposition(construction)
-        is Execution   -> convertExecution(construction)
-        is VarRef      -> convertVarRef(construction)
+        is Closure         -> convertClosure(construction)
+        is Composition     -> convertComposition(construction)
+        is Execution       -> convertExecution(construction)
+        is VarRef          -> convertVarRef(construction)
+        is ListInitializer -> convertListInitializer(construction)
     }
+
+    private fun convertListInitializer(init: ListInitializer): TilConstruction =
+        init.values.foldRight(TilTrivialization(Builtins.Nil, init.position) as TilConstruction) { cons, acc ->
+            TilComposition(
+                TilTrivialization(ListFunctions.Cons.tilFunction, init.position, constructedType = ListFunctions.Cons.signature),
+                args = listOf(convertConstruction(cons), acc),
+                srcPos = init.position
+            )
+        }
 
     private fun convertGlobalVarDecl(def: GlobalVarDecl) = convertDataType(def.type).let { type ->
         VariableDeclaration(

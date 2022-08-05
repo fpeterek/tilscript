@@ -23,7 +23,9 @@ funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataT
 
 entityDefinition : entityName (COMMA entityName)* FS_WITH_WS dataType;
 
-construction : (trivialization | variable | closure | nExecution | composition) WT?;
+construction : (trivialization | variable | closure | nExecution | composition | listInitializer) WT?;
+
+listInitializer : OPEN_CUR construction (COMMA construction)* CLOSE_CUR;
 
 globalVarDecl : LET WS variableName (COMMA variableName)* COLON dataType;
 
@@ -87,6 +89,8 @@ string: STRING;
 
 STRING: '"([^\\"]|\\[^\n])*"';
 
+LINE_COMMENT : '--' ~[\r\n]* -> skip;
+
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;
 
@@ -115,6 +119,8 @@ OPEN_BRA   : '[' OPT_WS;
 CLOSE_BRA  : OPT_WS ']';
 OPEN_PAR   : OPT_WS '(' OPT_WS;
 CLOSE_PAR  : OPT_WS ')' OPT_WS;
+OPEN_CUR   : OPT_WS '{' OPT_WS;
+CLOSE_CUR  : OPT_WS '}' OPT_WS;
 LESS       : OPT_WS '<' OPT_WS;
 GREATER    : OPT_WS '>' OPT_WS;
 ARROW      : OPT_WS '->' OPT_WS;
