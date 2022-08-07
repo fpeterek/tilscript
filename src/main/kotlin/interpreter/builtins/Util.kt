@@ -12,7 +12,6 @@ import org.fpeterek.til.typechecking.util.SrcPosition
 
 object Util {
 
-
     object Print : LazyFunction(
         "Print",
         Builtins.Bool,
@@ -41,6 +40,25 @@ object Util {
         }
     }
 
+    object If : LazyFunction(
+        "If",
+        GenericType(1),
+        listOf(
+            Variable("cond", SrcPosition(-1, -1), Builtins.Bool),
+            Variable("ignored", SrcPosition(-1, -1), GenericType(1)),
+            Variable("returned", SrcPosition(-1, -1), GenericType(1)),
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction =
+            when (val cond = interpreter.interpret(args.first())) {
+                is Bool -> when (cond.value) {
+                    true -> interpreter.interpret(args[1])
+                    else -> interpreter.interpret(args[2])
+                }
+                else -> Builtins.Nil
+            }
+    }
+
     object Chain : EagerFunction(
         "Chain",
         GenericType(2),
@@ -49,9 +67,7 @@ object Util {
             Variable("returned", SrcPosition(-1, -1), GenericType(2)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
-            return args.last()
-        }
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = args.last()
     }
 
     object RunAll : EagerFunction(

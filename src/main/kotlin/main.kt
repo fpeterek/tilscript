@@ -8,6 +8,7 @@ import org.fpeterek.til.typechecking.astprocessing.ASTConverter
 import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
 import org.fpeterek.til.typechecking.astprocessing.ErrorListener
 import org.fpeterek.til.typechecking.astprocessing.result.Sentences
+import org.fpeterek.til.typechecking.interpreter.Interpreter
 import org.fpeterek.til.typechecking.namechecker.NameChecker
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.reporting.ReportFormatter
@@ -76,6 +77,7 @@ fun checkScript(filename: String) {
         printErrorsForSentences(typeChecked, filename, "Type")
     }
 
+    Interpreter().interpret(typeChecked)
 }
 
 fun main(args: Array<String>) = args.forEach(::checkScript)
