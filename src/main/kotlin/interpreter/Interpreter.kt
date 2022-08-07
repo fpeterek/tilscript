@@ -41,15 +41,20 @@ class Interpreter: InterpreterInterface {
         "/" to RealOperators.Divide,
     )
 
-    private fun pushFrame() = stack.add(StackFrame(parent = currentFrame))
+    private fun defaultFrame() = StackFrame(parent = currentFrame)
+
+    private fun pushFrame(frame: StackFrame) = stack.add(frame)
+    private fun pushFrame() = pushFrame(defaultFrame())
     private fun popFrame() = stack.removeLast()
 
-    private fun <T> withFrame(fn: () -> T): T {
-        pushFrame()
+    private fun <T> withFrame(frame: StackFrame, fn: () -> T): T {
+        pushFrame(frame)
         val result = fn()
         popFrame()
         return result
     }
+
+    private fun <T> withFrame(fn: () -> T): T = withFrame(defaultFrame(), fn)
 
     private infix fun Type.matches(other: Type) = TypeMatcher.match(this, other, typeRepo)
 
@@ -86,9 +91,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(execution: Execution) = execute(execution.construction, execution.executionOrder)
 
-    private fun createLambdaCapture(closure: Closure) = LambdaContext(
-        LambdaCaptureCreator(currentFrame).captureVars(closure.construction)
-    )
+    private fun createLambdaCapture(closure: Closure) = LambdaContext(currentFrame)
 
     private fun interpret(closure: Closure): TilFunction = withFrame {
         // We want to put variables introduced by the closure on the stack even if we aren't calling the
@@ -147,14 +150,23 @@ class Interpreter: InterpreterInterface {
         }
     }
 
+    private fun interpretFn(fn: FunctionInterface, args: List<Construction>) = withFrame {
+        fn.apply(this, args)
+    }
+
+    private fun interpretLambda(fn: LambdaFunction, args: List<Construction>) = withFrame(fn.context.frame) {
+        fn.apply(this, args)
+    }
+
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
         val fnImpl = when (fn.implementation) {
             null -> functions[fn.name]?.implementation
             else -> fn.implementation
         } ?: throw RuntimeException("Function ${fn.name} is declared but undefined, application is impossible")
 
-        return withFrame {
-            fnImpl.apply(this, comp.args)
+        return when (fnImpl) {
+            is LambdaFunction -> interpretLambda(fnImpl, comp.args)
+            else              -> interpretFn(fnImpl, comp.args)
         }
     }
 
