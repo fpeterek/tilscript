@@ -3,7 +3,8 @@ package org.fpeterek.til.typechecking.typechecker
 
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.interpreter.builtins.FnDeclarations
+import org.fpeterek.til.typechecking.interpreter.builtins.Types
 import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.types.Util.trivialize
@@ -131,10 +132,10 @@ class TypeChecker private constructor(
     }
 
     private fun processOperatorArgs(args: List<Construction>): List<Construction> {
-        val isInt = match(processConstruction(args.first()).constructedType, Builtins.Int)
+        val isInt = match(processConstruction(args.first()).constructedType, Types.Int)
         val expType = when {
-            isInt -> Builtins.Int
-            else -> Builtins.Real
+            isInt -> Types.Int
+            else -> Types.Real
         }
 
         return processCompositionArgs(args, listOf(expType, expType))
@@ -172,14 +173,14 @@ class TypeChecker private constructor(
         val processedArgs = processOperatorArgs(args)
         val arityErrors = checkArity(composition, 2)
 
-        val isReal = processedArgs.isNotEmpty() && processedArgs.any { match(it.constructedType, Builtins.Real) }
+        val isReal = processedArgs.isNotEmpty() && processedArgs.any { match(it.constructedType, Types.Real) }
 
         val isInt = !isReal && processedArgs.isNotEmpty() &&
-                processedArgs.any { match(it.constructedType, Builtins.Int) }
+                processedArgs.any { match(it.constructedType, Types.Int) }
 
         val opType = when {
-            isReal -> Builtins.Real
-            isInt  -> Builtins.Int
+            isReal -> Types.Real
+            isInt  -> Types.Int
             else   -> Unknown
         }
 

@@ -5,19 +5,18 @@ import org.fpeterek.til.typechecking.interpreter.interpreterinterface.Interprete
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Real
 import org.fpeterek.til.typechecking.sentence.Variable
-import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object RealOperators {
 
     val realArgs get() = listOf(
-        Variable("fst", SrcPosition(-1, -1), Builtins.Real),
-        Variable("snd", SrcPosition(-1, -1), Builtins.Real),
+        Variable("fst", SrcPosition(-1, -1), Types.Real),
+        Variable("snd", SrcPosition(-1, -1), Types.Real),
     )
 
     abstract class RealOperatorBase(op: String) : OperatorFunction(
         op,
-        Builtins.Real,
+        Types.Real,
         realArgs
     ) {
 
@@ -27,11 +26,11 @@ object RealOperators {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
 
-            if (!interpreter.typesMatch(args[0].constructionType, Builtins.Real)) {
+            if (!interpreter.typesMatch(args[0].constructionType, Types.Real)) {
                 return interpreter.nil
             }
 
-            if (!interpreter.typesMatch(args[1].constructionType, Builtins.Real)) {
+            if (!interpreter.typesMatch(args[1].constructionType, Types.Real)) {
                 return interpreter.nil
             }
 

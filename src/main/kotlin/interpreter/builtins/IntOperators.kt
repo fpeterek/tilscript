@@ -5,19 +5,18 @@ import org.fpeterek.til.typechecking.interpreter.interpreterinterface.Interprete
 import org.fpeterek.til.typechecking.sentence.Construction
 import org.fpeterek.til.typechecking.sentence.Integral
 import org.fpeterek.til.typechecking.sentence.Variable
-import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object IntOperators {
 
     val intArgs get() = listOf(
-        Variable("fst", SrcPosition(-1, -1), Builtins.Int),
-        Variable("snd", SrcPosition(-1, -1), Builtins.Int),
+        Variable("fst", SrcPosition(-1, -1), Types.Int),
+        Variable("snd", SrcPosition(-1, -1), Types.Int),
     )
 
     abstract class IntOperatorBase(op: String) : OperatorFunction(
         op,
-        Builtins.Int,
+        Types.Int,
         intArgs
     ) {
 
@@ -27,11 +26,11 @@ object IntOperators {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
 
-            if (!interpreter.typesMatch(args[0].constructionType, Builtins.Int)) {
+            if (!interpreter.typesMatch(args[0].constructionType, Types.Int)) {
                 return interpreter.nil
             }
 
-            if (!interpreter.typesMatch(args[1].constructionType, Builtins.Int)) {
+            if (!interpreter.typesMatch(args[1].constructionType, Types.Int)) {
                 return interpreter.nil
             }
 

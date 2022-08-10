@@ -3,7 +3,7 @@ package org.fpeterek.til.typechecking.sentence
 import org.fpeterek.til.typechecking.exceptions.InvalidType
 import org.fpeterek.til.typechecking.reporting.Report
 import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
-import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.interpreter.builtins.Types
 import org.fpeterek.til.typechecking.types.AtomicType
 import org.fpeterek.til.typechecking.types.ListType
 import org.fpeterek.til.typechecking.types.Type
@@ -52,7 +52,7 @@ class TypeRef(
     val type: Type,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Builtins.Type, reports) {
+) : Value(srcPos, Types.Type, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is TypeRef && other.type.name == type.name
@@ -70,7 +70,7 @@ class Integral(
     val value: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Builtins.Int, reports) {
+) : Value(srcPos, Types.Int, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Integral && other.value == value
@@ -87,7 +87,7 @@ class Real(
     val value: Double,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Builtins.Real, reports) {
+) : Value(srcPos, Types.Real, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Real && other.value == value
@@ -104,7 +104,7 @@ class Text(
     val value: String,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Builtins.Text, reports) {
+) : Value(srcPos, Types.Text, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Text && other.value == value
@@ -121,7 +121,7 @@ class Bool(
     val value: Boolean,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Builtins.Bool, reports) {
+) : Value(srcPos, Types.Bool, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Bool && other.value == value

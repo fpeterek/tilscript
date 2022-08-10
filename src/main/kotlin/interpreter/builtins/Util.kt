@@ -4,7 +4,6 @@ import org.fpeterek.til.typechecking.interpreter.interpreterinterface.EagerFunct
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.LazyFunction
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.types.ConstructionType
 import org.fpeterek.til.typechecking.types.GenericType
 import org.fpeterek.til.typechecking.types.ListType
@@ -14,7 +13,7 @@ object Util {
 
     object Print : LazyFunction(
         "Print",
-        Builtins.Bool,
+        Types.Bool,
         listOf(
             Variable("arg", SrcPosition(-1, -1), GenericType(1)),
         )
@@ -22,13 +21,13 @@ object Util {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
             val arg = interpreter.interpret(args.first())
             print(arg)
-            return Builtins.True
+            return Values.True
         }
     }
 
     object Println : LazyFunction(
         "Println",
-        Builtins.Bool,
+        Types.Bool,
         listOf(
             Variable("arg", SrcPosition(-1, -1), GenericType(1)),
         )
@@ -36,7 +35,7 @@ object Util {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
             Print.apply(interpreter, args)
             println()
-            return Builtins.True
+            return Values.True
         }
     }
 
@@ -44,7 +43,7 @@ object Util {
         "If",
         GenericType(1),
         listOf(
-            Variable("cond", SrcPosition(-1, -1), Builtins.Bool),
+            Variable("cond", SrcPosition(-1, -1), Types.Bool),
             Variable("ignored", SrcPosition(-1, -1), GenericType(1)),
             Variable("returned", SrcPosition(-1, -1), GenericType(1)),
         )
@@ -55,7 +54,7 @@ object Util {
                     true -> interpreter.interpret(args[1])
                     else -> interpreter.interpret(args[2])
                 }
-                else -> Builtins.Nil
+                else -> Values.Nil
             }
     }
 
@@ -82,7 +81,7 @@ object Util {
             val list = args.first() as TilList
 
             if (list is EmptyList) {
-                return Builtins.Nil
+                return Values.Nil
             }
 
             var cell = list as ListCell

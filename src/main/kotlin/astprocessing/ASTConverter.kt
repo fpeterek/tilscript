@@ -5,7 +5,8 @@ import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
 import org.fpeterek.til.typechecking.interpreter.builtins.ListFunctions
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.sentence.Symbol
-import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.interpreter.builtins.FnDeclarations
+import org.fpeterek.til.typechecking.interpreter.builtins.Values
 import org.fpeterek.til.typechecking.tilscript.ScriptContext
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
@@ -29,10 +30,10 @@ class ASTConverter private constructor() {
     private val repo = TypeRepository.withBuiltins()
 
     init {
-        fns.addAll(Builtins.builtinFunctions.asSequence().map { it.name })
+        fns.addAll(FnDeclarations.builtinFunctions.asSequence().map { it.name })
         // Since we know built-ins will only ever be Symbols, Nil, or Booleans,
         // we can store their values as a String
-        lits.addAll(Builtins.builtinValues.asSequence().map { it.toString() })
+        lits.addAll(Values.all.asSequence().map { it.toString() })
     }
 
     private fun convert(sentences: Sentences) = ScriptContext(
@@ -75,7 +76,7 @@ class ASTConverter private constructor() {
     }
 
     private fun convertListInitializer(init: ListInitializer): TilConstruction =
-        init.values.foldRight(TilTrivialization(Builtins.Nil, init.position) as TilConstruction) { cons, acc ->
+        init.values.foldRight(TilTrivialization(Values.Nil, init.position) as TilConstruction) { cons, acc ->
             TilComposition(
                 TilTrivialization(ListFunctions.Cons.tilFunction, init.position, constructedType = ListFunctions.Cons.signature),
                 args = listOf(convertConstruction(cons), acc),

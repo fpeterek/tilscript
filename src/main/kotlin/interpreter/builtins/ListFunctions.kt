@@ -5,7 +5,6 @@ import org.fpeterek.til.typechecking.interpreter.interpreterinterface.Interprete
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.LazyFunction
 import org.fpeterek.til.typechecking.sentence.*
 import org.fpeterek.til.typechecking.sentence.EmptyList
-import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.types.GenericType
 import org.fpeterek.til.typechecking.types.ListType
 import org.fpeterek.til.typechecking.util.SrcPosition
@@ -89,8 +88,8 @@ object ListFunctions {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TilList).let { list ->
             when (list) {
-                is EmptyList -> Builtins.True
-                is ListCell -> Builtins.False
+                is EmptyList -> Values.True
+                is ListCell -> Values.False
             }
         }
     }
@@ -99,7 +98,7 @@ object ListFunctions {
         "EmptyListOf",
         ListType(GenericType(1)),
         listOf(
-            Variable("type", SrcPosition(-1, -1), Builtins.Type),
+            Variable("type", SrcPosition(-1, -1), Types.Type),
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = (args[0] as TypeRef).let { type ->

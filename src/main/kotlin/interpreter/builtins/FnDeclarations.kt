@@ -1,53 +1,39 @@
-package org.fpeterek.til.typechecking.tilscript
+package org.fpeterek.til.typechecking.interpreter.builtins
 
-import org.fpeterek.til.typechecking.sentence.Bool
 import org.fpeterek.til.typechecking.sentence.TilFunction
+import org.fpeterek.til.typechecking.tilscript.CommonTypes
 import org.fpeterek.til.typechecking.types.*
 import org.fpeterek.til.typechecking.util.SrcPosition
-import org.fpeterek.til.typechecking.sentence.Nil as NilType
 
-object Builtins {
-
-    val Bool = AtomicType("Bool", "Truth values")
-    val Indiv = AtomicType("Indiv", "Individuals")
-    val Time = AtomicType("Time", "Timestamps")
-    val World = AtomicType("World", "Worlds")
-    val Real = AtomicType("Real", "Real numbers")
-    val Int = AtomicType("Int", "Whole numbers")
-    val Type = AtomicType("Type", "Type reference")
-    val Text = AtomicType("Text", "Strings")
-
-    val builtinTypes = listOf(
-        Bool, Indiv, Time, World, Real, Int, Type
-    )
+object FnDeclarations {
 
     private val realOperation
-        get() = FunctionType(Real, Real, Real)
+        get() = FunctionType(Types.Real, Types.Real, Types.Real)
 
     private val intOperation
-        get() = FunctionType(Int, Int, Int)
+        get() = FunctionType(Types.Int, Types.Int, Types.Int)
 
     private val equalityComparison
-        get() = FunctionType(Bool, GenericType(1), GenericType(1))
+        get() = FunctionType(Types.Bool, GenericType(1), GenericType(1))
 
     private val nonrestrictedQuantifier
-        get() = FunctionType(Bool, FunctionType(Bool, GenericType(1)))
+        get() = FunctionType(Types.Bool, FunctionType(Types.Bool, GenericType(1)))
 
     private val restrictedQuantifier
-        get() = FunctionType(FunctionType(Bool, GenericType(1)), FunctionType(Bool, GenericType(1)))
+        get() = FunctionType(FunctionType(Types.Bool, GenericType(1)), FunctionType(Types.Bool, GenericType(1)))
 
     private val binaryBoolean
-        get() = FunctionType(Bool, Bool, Bool)
+        get() = FunctionType(Types.Bool, Types.Bool, Types.Bool)
     private val unaryBoolean
-        get() = FunctionType(Bool, Bool)
+        get() = FunctionType(Types.Bool, Types.Bool)
 
     private val constructionTruthiness
-        get() = FunctionType(Bool, ConstructionType)
+        get() = FunctionType(Types.Bool, ConstructionType)
     private val propositionTruthiness
-        get() = FunctionType(Bool, CommonTypes.proposition)
+        get() = FunctionType(Types.Bool, CommonTypes.proposition)
 
     private val singularizer
-        get() = FunctionType(GenericType(1), FunctionType(Bool, GenericType(1)))
+        get() = FunctionType(GenericType(1), FunctionType(Types.Bool, GenericType(1)))
 
     private val listCons
         get() = FunctionType(ListType(GenericType(1)), GenericType(1), ListType(GenericType(1)))
@@ -64,8 +50,8 @@ object Builtins {
 
         TilFunction("=", noPosition, equalityComparison),
 
-        TilFunction("ToInt", noPosition, FunctionType(Int, Real)),
-        TilFunction("ToReal", noPosition, FunctionType(Real, Int)),
+        TilFunction("ToTypes.Int", noPosition, FunctionType(Types.Int, Types.Real)),
+        TilFunction("ToTypes.Real", noPosition, FunctionType(Types.Real, Types.Int)),
 
         TilFunction("ForAll", noPosition, nonrestrictedQuantifier),
         TilFunction("Exist", noPosition, nonrestrictedQuantifier),
@@ -91,12 +77,5 @@ object Builtins {
         TilFunction("FalseP", noPosition, propositionTruthiness),
         TilFunction("UndefP", noPosition, propositionTruthiness),
     )
-
-    val True = Bool(true, noPosition)
-    val False = Bool(false, noPosition)
-
-    val Nil = NilType(noPosition)
-
-    val builtinValues = listOf(True, False, Nil)
 
 }

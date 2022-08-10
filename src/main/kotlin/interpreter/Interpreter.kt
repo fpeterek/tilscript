@@ -1,15 +1,11 @@
 package org.fpeterek.til.typechecking.interpreter
 
-import org.fpeterek.til.typechecking.interpreter.builtins.EqualityOperator
-import org.fpeterek.til.typechecking.interpreter.builtins.IntOperators
-import org.fpeterek.til.typechecking.interpreter.builtins.RealOperators
+import org.fpeterek.til.typechecking.interpreter.builtins.*
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.typechecker.TypeMatcher
 import org.fpeterek.til.typechecking.types.*
-import java.util.StringJoiner
 
 
 class Interpreter: InterpreterInterface {
@@ -91,7 +87,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(execution: Execution) = execute(execution.construction, execution.executionOrder)
 
-    private fun createLambdaCapture(closure: Closure) = LambdaContext(currentFrame)
+    private fun createLambdaCapture() = LambdaContext(currentFrame)
 
     private fun interpret(closure: Closure): TilFunction = withFrame {
         // We want to put variables introduced by the closure on the stack even if we aren't calling the
@@ -104,7 +100,7 @@ class Interpreter: InterpreterInterface {
             closure.position,
             closure.constructedType,
             closure.reports,
-            LambdaFunction(closure.variables, closure.construction, createLambdaCapture(closure)),
+            LambdaFunction(closure.variables, closure.construction, createLambdaCapture()),
         )
     }
 
@@ -113,10 +109,10 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>): Construction {
 
-        val isReal = args.any { it.constructionType matches Builtins.Real }
-        val isInt  = args.any { it.constructionType matches Builtins.Int }
+        val isReal = args.any { it.constructionType matches Types.Real }
+        val isInt  = args.any { it.constructionType matches Types.Int }
 
-        if (args.any { !(it.constructionType matches Builtins.Real || it.constructionType matches Builtins.Int) }) {
+        if (args.any { !(it.constructionType matches Types.Real || it.constructionType matches Types.Int) }) {
             throw RuntimeException("Type mismatch for operator ${fn.name}")
         }
 

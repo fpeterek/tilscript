@@ -1,19 +1,19 @@
 package org.fpeterek.til.typechecking.types
 
 import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.interpreter.builtins.Types
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object Util {
 
-    val w = Variable("w", SrcPosition(-1, -1), Builtins.World)
-    val t = Variable("t", SrcPosition(-1, -1), Builtins.Time)
+    val w = Variable("w", SrcPosition(-1, -1), Types.World)
+    val t = Variable("t", SrcPosition(-1, -1), Types.Time)
 
     fun FunctionType.intensionalize() =
-        FunctionType(FunctionType(this, Builtins.Time), Builtins.World)
+        FunctionType(FunctionType(this, Types.Time), Types.World)
 
     fun AtomicType.intensionalize() =
-        FunctionType(FunctionType(this, Builtins.Time), Builtins.World)
+        FunctionType(FunctionType(this, Types.Time), Types.World)
 
     fun Closure.intensionalize() =
         Closure(listOf(w), Closure(listOf(t), this, srcPos=position), srcPos=position)

@@ -8,11 +8,6 @@ import org.apache.commons.text.StringEscapeUtils
 import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
 import org.fpeterek.til.typechecking.astprocessing.result.*
-import org.fpeterek.til.typechecking.interpreter.builtins.ListFunctions
-import org.fpeterek.til.typechecking.sentence.Composition
-import org.fpeterek.til.typechecking.sentence.Text
-import org.fpeterek.til.typechecking.sentence.Trivialization
-import org.fpeterek.til.typechecking.tilscript.Builtins
 import org.fpeterek.til.typechecking.util.SrcPosition
 
 object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {

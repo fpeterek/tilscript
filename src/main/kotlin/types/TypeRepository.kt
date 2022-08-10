@@ -1,6 +1,6 @@
 package org.fpeterek.til.typechecking.types
 
-import org.fpeterek.til.typechecking.tilscript.Builtins
+import org.fpeterek.til.typechecking.interpreter.builtins.Types
 
 class TypeRepository(withBuiltins: Boolean = false) {
 
@@ -12,7 +12,7 @@ class TypeRepository(withBuiltins: Boolean = false) {
 
     init {
         if (withBuiltins) {
-            Builtins.builtinTypes.forEach(::addType)
+            Types.all.forEach(::addType)
         }
     }
 

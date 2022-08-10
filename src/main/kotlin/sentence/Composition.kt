@@ -21,8 +21,6 @@ class Composition(
             return false
         }
 
-        other as Composition
-
         if (args.size != other.args.size) {
             return false
         }
