@@ -1,9 +1,9 @@
-package org.fpeterek.til.typechecking.typechecker
+package org.fpeterek.til.interpreter.typechecker
 
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.types.ConstructionType
-import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.types.ConstructionType
+import org.fpeterek.til.interpreter.types.FunctionType
+import org.fpeterek.til.interpreter.types.Type
 
 object TypeAssignment {
     fun Variable.assignType(type: Type) = Variable(name, position, type, reports)

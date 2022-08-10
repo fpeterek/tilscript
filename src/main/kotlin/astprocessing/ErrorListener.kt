@@ -1,10 +1,10 @@
-package org.fpeterek.til.typechecking.astprocessing
+package org.fpeterek.til.interpreter.astprocessing
 
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 class ErrorListener : BaseErrorListener() {
 

@@ -1,10 +1,10 @@
-package org.fpeterek.til.typechecking.interpreter
+package org.fpeterek.til.interpreter.interpreter
 
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.EagerFunction
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.typechecking.sentence.Construction
-import org.fpeterek.til.typechecking.sentence.Variable
-import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.til.interpreter.sentence.Construction
+import org.fpeterek.til.interpreter.sentence.Variable
+import org.fpeterek.til.interpreter.types.Type
 
 open class DefaultFunction(
     name: String,

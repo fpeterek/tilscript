@@ -1,13 +1,13 @@
-package org.fpeterek.til.typechecking.interpreter.builtins
+package org.fpeterek.til.interpreter.interpreter.builtins
 
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.EagerFunction
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.LazyFunction
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.types.ConstructionType
-import org.fpeterek.til.typechecking.types.GenericType
-import org.fpeterek.til.typechecking.types.ListType
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.LazyFunction
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.types.ConstructionType
+import org.fpeterek.til.interpreter.types.GenericType
+import org.fpeterek.til.interpreter.types.ListType
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 object Util {
 

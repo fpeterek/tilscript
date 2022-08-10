@@ -1,21 +1,21 @@
-package org.fpeterek.til.typechecking.astprocessing
+package org.fpeterek.til.interpreter.astprocessing
 
-import org.fpeterek.til.typechecking.astprocessing.result.*
-import org.fpeterek.til.typechecking.astprocessing.result.Construction.*
-import org.fpeterek.til.typechecking.interpreter.builtins.ListFunctions
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.sentence.Symbol
-import org.fpeterek.til.typechecking.interpreter.builtins.FnDeclarations
-import org.fpeterek.til.typechecking.interpreter.builtins.Values
-import org.fpeterek.til.typechecking.tilscript.ScriptContext
-import org.fpeterek.til.typechecking.types.*
-import org.fpeterek.til.typechecking.types.TypeAlias as TilTypeAlias
-import org.fpeterek.til.typechecking.sentence.Construction as TilConstruction
-import org.fpeterek.til.typechecking.sentence.Execution as TilExecution
-import org.fpeterek.til.typechecking.sentence.Composition as TilComposition
-import org.fpeterek.til.typechecking.sentence.Closure as TilClosure
-import org.fpeterek.til.typechecking.sentence.Variable as TilVariable
-import org.fpeterek.til.typechecking.sentence.Trivialization as TilTrivialization
+import org.fpeterek.til.interpreter.astprocessing.result.*
+import org.fpeterek.til.interpreter.astprocessing.result.Construction.*
+import org.fpeterek.til.interpreter.interpreter.builtins.ListFunctions
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.sentence.Symbol
+import org.fpeterek.til.interpreter.interpreter.builtins.FnDeclarations
+import org.fpeterek.til.interpreter.interpreter.builtins.Values
+import org.fpeterek.til.interpreter.tilscript.ScriptContext
+import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.types.TypeAlias as TilTypeAlias
+import org.fpeterek.til.interpreter.sentence.Construction as TilConstruction
+import org.fpeterek.til.interpreter.sentence.Execution as TilExecution
+import org.fpeterek.til.interpreter.sentence.Composition as TilComposition
+import org.fpeterek.til.interpreter.sentence.Closure as TilClosure
+import org.fpeterek.til.interpreter.sentence.Variable as TilVariable
+import org.fpeterek.til.interpreter.sentence.Trivialization as TilTrivialization
 
 
 class ASTConverter private constructor() {

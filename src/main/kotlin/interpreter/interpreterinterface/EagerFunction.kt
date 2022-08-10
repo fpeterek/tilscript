@@ -1,9 +1,9 @@
-package org.fpeterek.til.typechecking.interpreter.interpreterinterface
+package org.fpeterek.til.interpreter.interpreter.interpreterinterface
 
-import org.fpeterek.til.typechecking.sentence.Construction
-import org.fpeterek.til.typechecking.sentence.Nil
-import org.fpeterek.til.typechecking.sentence.Variable
-import org.fpeterek.til.typechecking.types.Type
+import org.fpeterek.til.interpreter.sentence.Construction
+import org.fpeterek.til.interpreter.sentence.Nil
+import org.fpeterek.til.interpreter.sentence.Variable
+import org.fpeterek.til.interpreter.types.Type
 
 abstract class EagerFunction(name: String, returns: Type, args: List<Variable>): FunctionInterface(name, returns, args) {
 

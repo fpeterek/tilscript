@@ -1,10 +1,10 @@
-package org.fpeterek.til.typechecking.sentence
+package org.fpeterek.til.interpreter.sentence
 
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.sentence.isexecutable.IsExecutable
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.Unknown
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.sentence.isexecutable.IsExecutable
+import org.fpeterek.til.interpreter.types.Type
+import org.fpeterek.til.interpreter.types.Unknown
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 sealed class Construction(
     open val constructedType: Type = Unknown,

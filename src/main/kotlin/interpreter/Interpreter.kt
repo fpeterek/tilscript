@@ -1,11 +1,11 @@
-package org.fpeterek.til.typechecking.interpreter
+package org.fpeterek.til.interpreter.interpreter
 
-import org.fpeterek.til.typechecking.interpreter.builtins.*
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.FunctionInterface
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.typechecker.TypeMatcher
-import org.fpeterek.til.typechecking.types.*
+import org.fpeterek.til.interpreter.interpreter.builtins.*
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.FunctionInterface
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.typechecker.TypeMatcher
+import org.fpeterek.til.interpreter.types.*
 
 
 class Interpreter: InterpreterInterface {

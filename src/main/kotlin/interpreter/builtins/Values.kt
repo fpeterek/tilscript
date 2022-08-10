@@ -1,8 +1,8 @@
-package org.fpeterek.til.typechecking.interpreter.builtins
+package org.fpeterek.til.interpreter.interpreter.builtins
 
-import org.fpeterek.til.typechecking.sentence.Bool
-import org.fpeterek.til.typechecking.sentence.Nil as NilObject
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.sentence.Bool
+import org.fpeterek.til.interpreter.sentence.Nil as NilObject
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 object Values {
     val True = Bool(true, SrcPosition(-1, -1))

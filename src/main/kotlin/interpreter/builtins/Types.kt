@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.interpreter.builtins
+package org.fpeterek.til.interpreter.interpreter.builtins
 
-import org.fpeterek.til.typechecking.types.AtomicType
+import org.fpeterek.til.interpreter.types.AtomicType
 
 object Types {
     val Bool  = AtomicType("Bool", "Truth values")

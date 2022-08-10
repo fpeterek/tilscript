@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.interpreter.builtins
+package org.fpeterek.til.interpreter.interpreter.builtins
 
 object BuiltinsList {
     val all = listOf(

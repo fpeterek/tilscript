@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
 sealed class Type {
     abstract val name: String

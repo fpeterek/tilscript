@@ -1,9 +1,9 @@
-package org.fpeterek.til.typechecking.interpreter.builtins
+package org.fpeterek.til.interpreter.interpreter.builtins
 
-import org.fpeterek.til.typechecking.sentence.TilFunction
-import org.fpeterek.til.typechecking.tilscript.CommonTypes
-import org.fpeterek.til.typechecking.types.*
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.sentence.TilFunction
+import org.fpeterek.til.interpreter.tilscript.CommonTypes
+import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 object FnDeclarations {
 

@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.reporting
+package org.fpeterek.til.interpreter.reporting
 
 import java.io.File
 import kotlin.math.max

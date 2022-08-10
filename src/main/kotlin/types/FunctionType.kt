@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
-import org.fpeterek.til.typechecking.exceptions.InvalidFunctionSignature
+import org.fpeterek.til.interpreter.exceptions.InvalidFunctionSignature
 
 class FunctionType(
     val imageType: Type,

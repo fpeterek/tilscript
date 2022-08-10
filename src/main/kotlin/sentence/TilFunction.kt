@@ -1,11 +1,11 @@
-package org.fpeterek.til.typechecking.sentence
+package org.fpeterek.til.interpreter.sentence
 
-import org.fpeterek.til.typechecking.exceptions.InvalidType
-import org.fpeterek.til.typechecking.interpreter.interpreterinterface.FunctionInterface
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
-import org.fpeterek.til.typechecking.types.*
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.exceptions.InvalidType
+import org.fpeterek.til.interpreter.interpreter.interpreterinterface.FunctionInterface
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.sentence.isexecutable.NonExecutable
+import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 
 class TilFunction(

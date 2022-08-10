@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.reporting
+package org.fpeterek.til.interpreter.reporting
 
-import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.interpreter.sentence.*
 
 
 object Reporter {

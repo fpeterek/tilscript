@@ -1,14 +1,14 @@
-package org.fpeterek.til.typechecking.sentence
+package org.fpeterek.til.interpreter.sentence
 
-import org.fpeterek.til.typechecking.exceptions.InvalidType
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.sentence.isexecutable.NonExecutable
-import org.fpeterek.til.typechecking.interpreter.builtins.Types
-import org.fpeterek.til.typechecking.types.AtomicType
-import org.fpeterek.til.typechecking.types.ListType
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.Unknown
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.exceptions.InvalidType
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.sentence.isexecutable.NonExecutable
+import org.fpeterek.til.interpreter.interpreter.builtins.Types
+import org.fpeterek.til.interpreter.types.AtomicType
+import org.fpeterek.til.interpreter.types.ListType
+import org.fpeterek.til.interpreter.types.Type
+import org.fpeterek.til.interpreter.types.Unknown
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 sealed class Value(
     srcPos: SrcPosition,

@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
 
 class GenericType(val argNumber: Int) : Type() {

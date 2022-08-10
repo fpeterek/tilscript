@@ -1,7 +1,7 @@
-package org.fpeterek.til.typechecking.tilscript
+package org.fpeterek.til.interpreter.tilscript
 
-import org.fpeterek.til.typechecking.sentence.Sentence
-import org.fpeterek.til.typechecking.types.TypeRepository
+import org.fpeterek.til.interpreter.sentence.Sentence
+import org.fpeterek.til.interpreter.types.TypeRepository
 
 class ScriptContext(
     val sentences: List<Sentence>,

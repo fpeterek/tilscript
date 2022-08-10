@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.interpreter
+package org.fpeterek.til.interpreter.interpreter
 
-import org.fpeterek.til.typechecking.sentence.*
+import org.fpeterek.til.interpreter.sentence.*
 
 class LambdaCaptureCreator(private val lambdaFrame: StackFrame) {
 

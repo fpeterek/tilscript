@@ -48,7 +48,7 @@ test {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.fpeterek.til.typechecking.MainKt'
+        attributes 'Main-Class': 'org.fpeterek.til.interpreter.MainKt'
     }
     from {
         configurations.runtimeClasspath.collect {

@@ -1,9 +1,9 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
-import org.fpeterek.til.typechecking.sentence.Construction
-import org.fpeterek.til.typechecking.sentence.Value
-import org.fpeterek.til.typechecking.sentence.TilFunction
-import org.fpeterek.til.typechecking.sentence.Variable
+import org.fpeterek.til.interpreter.sentence.Construction
+import org.fpeterek.til.interpreter.sentence.Value
+import org.fpeterek.til.interpreter.sentence.TilFunction
+import org.fpeterek.til.interpreter.sentence.Variable
 
 
 class SymbolRepository {

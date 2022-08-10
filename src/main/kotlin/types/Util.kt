@@ -1,8 +1,8 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.interpreter.builtins.Types
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.interpreter.builtins.Types
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 object Util {
 

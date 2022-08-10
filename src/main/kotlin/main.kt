@@ -1,23 +1,23 @@
-package org.fpeterek.til.typechecking
+package org.fpeterek.til.interpreter
 
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
-import org.fpeterek.til.typechecking.astprocessing.ASTConverter
-import org.fpeterek.til.typechecking.astprocessing.AntlrVisitor
-import org.fpeterek.til.typechecking.astprocessing.ErrorListener
-import org.fpeterek.til.typechecking.astprocessing.result.Sentences
-import org.fpeterek.til.typechecking.interpreter.Interpreter
-import org.fpeterek.til.typechecking.namechecker.NameChecker
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.reporting.ReportFormatter
-import org.fpeterek.til.typechecking.reporting.Reporter
-import org.fpeterek.til.typechecking.sentence.Sentence
-import org.fpeterek.til.typechecking.typechecker.TypeChecker
-import org.fpeterek.til.typechecking.types.SymbolRepository
-import org.fpeterek.til.typechecking.types.TypeRepository
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.astprocessing.ASTConverter
+import org.fpeterek.til.interpreter.astprocessing.AntlrVisitor
+import org.fpeterek.til.interpreter.astprocessing.ErrorListener
+import org.fpeterek.til.interpreter.astprocessing.result.Sentences
+import org.fpeterek.til.interpreter.interpreter.Interpreter
+import org.fpeterek.til.interpreter.namechecker.NameChecker
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.reporting.ReportFormatter
+import org.fpeterek.til.interpreter.reporting.Reporter
+import org.fpeterek.til.interpreter.sentence.Sentence
+import org.fpeterek.til.interpreter.typechecker.TypeChecker
+import org.fpeterek.til.interpreter.types.SymbolRepository
+import org.fpeterek.til.interpreter.types.TypeRepository
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 fun printErrors(errors: Iterable<Report>, file: String, errorType: String) {
     println("-".repeat(80))

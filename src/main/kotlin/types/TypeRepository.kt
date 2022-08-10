@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
-import org.fpeterek.til.typechecking.interpreter.builtins.Types
+import org.fpeterek.til.interpreter.interpreter.builtins.Types
 
 class TypeRepository(withBuiltins: Boolean = false) {
 

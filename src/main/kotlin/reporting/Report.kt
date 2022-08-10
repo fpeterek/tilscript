@@ -1,6 +1,6 @@
-package org.fpeterek.til.typechecking.reporting
+package org.fpeterek.til.interpreter.reporting
 
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 data class Report(
     val message: String,

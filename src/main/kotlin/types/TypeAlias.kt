@@ -1,3 +1,3 @@
-package org.fpeterek.til.typechecking.types
+package org.fpeterek.til.interpreter.types
 
 class TypeAlias(override val name: String, val type: Type) : Type()

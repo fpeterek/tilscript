@@ -1,13 +1,12 @@
-package org.fpeterek.til.typechecking.typechecker
+package org.fpeterek.til.interpreter.typechecker
 
 
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.interpreter.builtins.FnDeclarations
-import org.fpeterek.til.typechecking.interpreter.builtins.Types
-import org.fpeterek.til.typechecking.typechecker.TypeAssignment.assignType
-import org.fpeterek.til.typechecking.types.*
-import org.fpeterek.til.typechecking.types.Util.trivialize
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.interpreter.builtins.Types
+import org.fpeterek.til.interpreter.typechecker.TypeAssignment.assignType
+import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.types.Util.trivialize
 
 class TypeChecker private constructor(
     private val parent: TypeChecker?,

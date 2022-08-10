@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.interpreter
+package org.fpeterek.til.interpreter.interpreter
 
 data class LambdaContext(
 //    val captureList: List<Variable>

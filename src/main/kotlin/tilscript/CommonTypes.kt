@@ -1,10 +1,9 @@
-package org.fpeterek.til.typechecking.tilscript
+package org.fpeterek.til.interpreter.tilscript
 
-import org.fpeterek.til.typechecking.interpreter.builtins.FnDeclarations
-import org.fpeterek.til.typechecking.interpreter.builtins.Types
-import org.fpeterek.til.typechecking.types.FunctionType
-import org.fpeterek.til.typechecking.types.Type
-import org.fpeterek.til.typechecking.types.Util.intensionalize
+import org.fpeterek.til.interpreter.interpreter.builtins.Types
+import org.fpeterek.til.interpreter.types.FunctionType
+import org.fpeterek.til.interpreter.types.Type
+import org.fpeterek.til.interpreter.types.Util.intensionalize
 
 object CommonTypes {
     val office get() = Types.Indiv.intensionalize()

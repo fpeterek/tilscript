@@ -1,4 +1,4 @@
-package org.fpeterek.til.typechecking.astprocessing
+package org.fpeterek.til.interpreter.astprocessing
 
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
@@ -7,8 +7,8 @@ import org.antlr.v4.runtime.tree.TerminalNode
 import org.apache.commons.text.StringEscapeUtils
 import org.fpeterek.til.parser.TILScriptBaseVisitor
 import org.fpeterek.til.parser.TILScriptParser
-import org.fpeterek.til.typechecking.astprocessing.result.*
-import org.fpeterek.til.typechecking.util.SrcPosition
+import org.fpeterek.til.interpreter.astprocessing.result.*
+import org.fpeterek.til.interpreter.util.SrcPosition
 
 object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
 

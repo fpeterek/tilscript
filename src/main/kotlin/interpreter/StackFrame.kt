@@ -1,7 +1,7 @@
-package org.fpeterek.til.typechecking.interpreter
+package org.fpeterek.til.interpreter.interpreter
 
-import org.fpeterek.til.typechecking.sentence.Construction
-import org.fpeterek.til.typechecking.sentence.Variable
+import org.fpeterek.til.interpreter.sentence.Construction
+import org.fpeterek.til.interpreter.sentence.Variable
 
 class StackFrame(val parent: StackFrame?) {
 

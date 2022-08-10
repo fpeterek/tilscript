@@ -1,9 +1,9 @@
-package org.fpeterek.til.typechecking.namechecker
+package org.fpeterek.til.interpreter.namechecker
 
-import org.fpeterek.til.typechecking.reporting.Report
-import org.fpeterek.til.typechecking.sentence.*
-import org.fpeterek.til.typechecking.types.SymbolRepository
-import org.fpeterek.til.typechecking.types.Unknown
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.types.SymbolRepository
+import org.fpeterek.til.interpreter.types.Unknown
 
 class NameChecker private constructor(
     private val symbolRepository: SymbolRepository,
