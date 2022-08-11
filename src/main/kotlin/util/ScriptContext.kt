@@ -1,4 +1,4 @@
-package org.fpeterek.til.interpreter.tilscript
+package org.fpeterek.til.interpreter.util
 
 import org.fpeterek.til.interpreter.sentence.Sentence
 import org.fpeterek.til.interpreter.types.TypeRepository

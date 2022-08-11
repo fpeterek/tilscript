@@ -11,7 +11,7 @@ class StackFrame(val parent: StackFrame?) {
         variables[variable.name] = variable
     }
 
-    fun getVar(name: String): Construction = variables.getOrElse(name) {
+    fun getVar(name: String): Variable = variables.getOrElse(name) {
         throw RuntimeException("No such variable '$name'")
     }
 

@@ -16,7 +16,7 @@ sealed class FunctionInterface constructor(
     val argTypes = args.map { it.constructedType }
 
     val signature = FunctionType(returns, argTypes)
-    val tilFunction = TilFunction(name, SrcPosition(-1, -1), signature)
+    val tilFunction = TilFunction(name, SrcPosition(-1, -1), signature, implementation = this)
 
     protected fun checkArgCount(fnArgs: List<Construction>) {
         if (fnArgs.size != args.size) {
@@ -24,15 +24,30 @@ sealed class FunctionInterface constructor(
         }
     }
 
-    protected fun checkArgTypeMatch(interpreter: InterpreterInterface, expected: Type, received: Type) {
-        if (!interpreter.typesMatch(expected, received)) {
-            throw RuntimeException("Invalid argument type in application of function '$name' (expected: $expected, received: $received)")
+    private fun handleArgMatches(matches: List<Boolean>, fnArgs: List<Type>) {
+        matches.forEachIndexed { idx, match ->
+            if (!match) {
+                val exp = argTypes[idx]
+                val rec = fnArgs[idx]
+                throw RuntimeException("Invalid argument type in application of function '$name' (expected: $exp, received: $rec)")
+            }
         }
     }
 
-    protected fun checkArgTypes(interpreter: InterpreterInterface, fnArgs: List<Construction>) = argTypes
-        .zip(fnArgs.map { it.constructedType })
-        .forEach { (expected, received) -> checkArgTypeMatch(interpreter, expected, received) }
+    protected fun checkArgTypes(interpreter: InterpreterInterface, fnArgs: List<Type>) = handleArgMatches(
+        interpreter.fnArgsMatch(signature, fnArgs),
+        fnArgs
+    )
+
+    protected fun checkSignature(interpreter: InterpreterInterface, returned: Type, fnArgs: List<Type>) {
+        val (retvalMatch, argsMatches) = interpreter.fnSignatureMatch(signature, returned, fnArgs)
+
+        if (!retvalMatch) {
+            throw RuntimeException("Returned type of function '$name' does not match expected return type (expected: $returns, received: $returned)")
+        }
+
+        handleArgMatches(argsMatches, fnArgs)
+    }
 
     abstract fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction
 

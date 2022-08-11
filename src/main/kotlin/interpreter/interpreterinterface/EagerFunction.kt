@@ -17,12 +17,16 @@ abstract class EagerFunction(name: String, returns: Type, args: List<Variable>):
         }
 
         checkArgCount(cons)
-        checkArgTypes(interpreter, cons)
+        checkArgTypes(interpreter, cons.map { it.constructionType })
         cons.zip(this.args).map { (value, variable) ->
             interpreter.createLocal(variable, value)
         }
 
-        return apply(interpreter, cons)
+        val retval = apply(interpreter, cons)
+
+        checkSignature(interpreter, retval.constructionType, cons.map { it.constructionType })
+
+        return retval
     }
 
 }

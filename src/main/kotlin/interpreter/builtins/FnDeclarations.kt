@@ -1,8 +1,8 @@
 package org.fpeterek.til.interpreter.interpreter.builtins
 
 import org.fpeterek.til.interpreter.sentence.TilFunction
-import org.fpeterek.til.interpreter.tilscript.CommonTypes
 import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.types.Util.intensionalize
 import org.fpeterek.til.interpreter.util.SrcPosition
 
 object FnDeclarations {
@@ -30,7 +30,7 @@ object FnDeclarations {
     private val constructionTruthiness
         get() = FunctionType(Types.Bool, ConstructionType)
     private val propositionTruthiness
-        get() = FunctionType(Types.Bool, CommonTypes.proposition)
+        get() = FunctionType(Types.Bool, Types.Bool.intensionalize())
 
     private val singularizer
         get() = FunctionType(GenericType(1), FunctionType(Types.Bool, GenericType(1)))

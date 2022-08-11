@@ -1,11 +1,21 @@
 package org.fpeterek.til.interpreter.interpreter
 
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.fpeterek.til.interpreter.astprocessing.ASTConverter
+import org.fpeterek.til.interpreter.astprocessing.AntlrVisitor
+import org.fpeterek.til.interpreter.astprocessing.ErrorListener
+import org.fpeterek.til.interpreter.astprocessing.result.Sentences
 import org.fpeterek.til.interpreter.interpreter.builtins.*
 import org.fpeterek.til.interpreter.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.til.interpreter.reporting.Report
+import org.fpeterek.til.interpreter.reporting.ReportFormatter
 import org.fpeterek.til.interpreter.sentence.*
-import org.fpeterek.til.interpreter.typechecker.TypeMatcher
 import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.til.parser.TILScriptLexer
+import org.fpeterek.til.parser.TILScriptParser
 
 
 class Interpreter: InterpreterInterface {
@@ -22,6 +32,15 @@ class Interpreter: InterpreterInterface {
     private val functions = mutableMapOf<String, TilFunction>()
 
     private val operatorFns = setOf("+", "-", "*", "/", "=")
+
+    init {
+        Types.all.forEach(typeRepo::process)
+
+        BuiltinsList.all.forEach { fn ->
+            symbolRepo.define(fn.tilFunction)
+            functions[fn.name] = fn.tilFunction
+        }
+    }
 
     private val intOperators = mutableMapOf(
         "+" to IntOperators.Plus,
@@ -62,6 +81,12 @@ class Interpreter: InterpreterInterface {
 
     private fun findVar(name: String) = findVar(currentFrame, name)
 
+    override fun fnArgsMatch(fn: FunctionType, types: List<Type>): List<Boolean> =
+        TypeMatcher.matchFnArgs(fn, types, typeRepo)
+
+    override fun fnSignatureMatch(fn: FunctionType, returned: Type, args: List<Type>): Pair<Boolean, List<Boolean>> =
+        TypeMatcher.matchFn(fn, returned, args, typeRepo)
+
     private fun interpret(variable: Variable): Construction {
 
         if (variable.value == null) {
@@ -77,7 +102,35 @@ class Interpreter: InterpreterInterface {
         return variable.value
     }
 
-    private fun interpret(triv: Trivialization) = triv.construction
+    fun getFunction(fn: String): TilFunction =
+        functions[fn] ?: throw RuntimeException("Function '$fn' is not declared")
+
+    fun getSymbol(symbol: String): Symbol = Symbol(
+        symbol,
+        SrcPosition(-1, -1),
+        symbolRepo[symbol] ?: throw RuntimeException("Unknown symbol '${symbol}'"),
+        listOf()
+    )
+
+    fun getSymbol(symbol: Symbol): Symbol = Symbol(
+        symbol.value,
+        symbol.position,
+        symbolRepo[symbol.value] ?: throw RuntimeException("Unknown symbol '${symbol.value}'"),
+        symbol.reports
+    )
+
+    fun getVariable(name: String): Variable = currentFrame.getVar(name)
+
+    private fun interpret(triv: Trivialization) = when {
+        triv.construction is TilFunction -> getFunction(triv.construction.name)
+
+        triv.construction is Symbol && triv.construction.constructionType is Unknown ->
+            getSymbol(triv.construction)
+
+        triv.construction is Variable -> getVariable(triv.construction.name)
+
+        else -> triv.construction
+    }
 
     private fun execute(construction: Construction, executions: Int): Construction = if (executions > 0) {
         execute(interpret(construction), executions-1)
@@ -362,20 +415,62 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    fun interpret(sentence: Sentence) {
+    private fun interpret(sentence: Sentence) {
         when (sentence) {
             is Construction -> interpret(sentence)
             is Declaration  -> interpret(sentence)
         }
     }
 
-    fun interpret(sentences: Iterable<Sentence>) = sentences.forEach {
+    private fun interpret(sentences: Iterable<Sentence>) = sentences.forEach {
         try {
             interpret(it)
         } catch (e: Exception) {
             println("Runtime error: ${e.message}")
             return@forEach
         }
+    }
+
+    private fun printErrors(errors: Iterable<Report>, file: String, errorType: String) {
+        println("-".repeat(80))
+        println("File: $file")
+        println("$errorType errors")
+
+        ReportFormatter(file).terminalOutput(errors)
+
+        println("-".repeat(80))
+        println("\n")
+    }
+
+    fun interpretFile(file: String) {
+
+        val stream = CharStreams.fromFileName(file)
+
+        val errorListener = ErrorListener()
+
+        val lexer = TILScriptLexer(stream)
+        lexer.removeErrorListeners()
+        lexer.addErrorListener(errorListener)
+        val parser = TILScriptParser(CommonTokenStream(lexer))
+        parser.removeErrorListeners()
+        parser.addErrorListener(errorListener)
+
+        val start = parser.start()
+
+        val sentences = try {
+            AntlrVisitor.visit(start)
+        } catch (ignored: Exception) {
+            Sentences(listOf(), SrcPosition(0, 0))
+        }
+
+        if (errorListener.hasErrors) {
+            printErrors(errorListener.errors, file, "Syntax")
+            return
+        }
+
+        val ctx = ASTConverter.convert(sentences)
+
+        interpret(ctx.sentences)
     }
 
 }

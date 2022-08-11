@@ -7,7 +7,7 @@ import org.fpeterek.til.interpreter.sentence.*
 import org.fpeterek.til.interpreter.sentence.Symbol
 import org.fpeterek.til.interpreter.interpreter.builtins.FnDeclarations
 import org.fpeterek.til.interpreter.interpreter.builtins.Values
-import org.fpeterek.til.interpreter.tilscript.ScriptContext
+import org.fpeterek.til.interpreter.util.ScriptContext
 import org.fpeterek.til.interpreter.types.*
 import org.fpeterek.til.interpreter.types.TypeAlias as TilTypeAlias
 import org.fpeterek.til.interpreter.sentence.Construction as TilConstruction

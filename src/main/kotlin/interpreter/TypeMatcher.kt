@@ -1,4 +1,4 @@
-package org.fpeterek.til.interpreter.typechecker
+package org.fpeterek.til.interpreter.interpreter
 
 import org.fpeterek.til.interpreter.types.*
 
