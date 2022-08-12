@@ -37,7 +37,7 @@ builtinType : BUILTIN_TYPE | ASTERISK;
 
 listType : LIST LESS dataType GREATER;
 
-tupleType : TUPLE LESS dataType GREATER;
+tupleType : TUPLE LESS dataType (COMMA dataType)* GREATER;
 
 userType : typeName;
 

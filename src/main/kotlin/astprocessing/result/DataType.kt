@@ -1,6 +1,7 @@
 package org.fpeterek.til.interpreter.astprocessing.result
 
 import org.fpeterek.til.interpreter.util.SrcPosition
+import kotlin.collections.List as KtList
 
 sealed class DataType(srcPos: SrcPosition) : IntermediateResult(srcPos) {
 
@@ -18,14 +19,14 @@ sealed class DataType(srcPos: SrcPosition) : IntermediateResult(srcPos) {
         srcPos
     )
 
-    sealed class Collection(val type: DataType, srcPos: SrcPosition) : DataType(srcPos) {
-        class Tuple(type: DataType, srcPos: SrcPosition) : Collection(type, srcPos)
-        class List(type: DataType, srcPos: SrcPosition) : Collection(type, srcPos)
+    sealed class Collection(srcPos: SrcPosition) : DataType(srcPos) {
+        class Tuple(val types: KtList<DataType>, srcPos: SrcPosition) : Collection(srcPos)
+        class List(val type: DataType, srcPos: SrcPosition) : Collection(srcPos)
     }
 
     class PrimitiveType(val typeName: TypeName, srcPos: SrcPosition) : DataType(srcPos) {
         val name get() = typeName.name
     }
 
-    class ClassType(val signature: List<DataType>, srcPos: SrcPosition) : DataType(srcPos)
+    class ClassType(val signature: KtList<DataType>, srcPos: SrcPosition) : DataType(srcPos)
 }

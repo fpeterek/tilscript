@@ -117,7 +117,7 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         DataType.Collection.List(visitDataType(ctx.dataType()), ctx.position())
 
     override fun visitTupleType(ctx: TILScriptParser.TupleTypeContext) =
-        DataType.Collection.Tuple(visitDataType(ctx.dataType()), ctx.position())
+        DataType.Collection.Tuple(ctx.dataType().map { visitDataType(it) }, ctx.position())
 
     override fun visitUserType(ctx: TILScriptParser.UserTypeContext) =
         DataType.PrimitiveType(visitTypeName(ctx.typeName()), ctx.position())

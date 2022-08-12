@@ -41,18 +41,17 @@ object FnDeclarations {
     private val noPosition = SrcPosition(-1, -1)
 
     val builtinFunctions = listOf(
-        TilFunction("+", noPosition, realOperation),
-        TilFunction("-", noPosition, realOperation),
-        TilFunction("*", noPosition, realOperation),
-        TilFunction("/", noPosition, realOperation),
 
-        TilFunction("Cons", noPosition, listCons),
+        // TODO: Implement
+        TilFunction("ToInt", noPosition, FunctionType(Types.Int, Types.Real)),
+        TilFunction("ToReal", noPosition, FunctionType(Types.Real, Types.Int)),
 
-        TilFunction("=", noPosition, equalityComparison),
+        TilFunction("And", noPosition, binaryBoolean),
+        TilFunction("Or", noPosition, binaryBoolean),
+        TilFunction("Implies", noPosition, binaryBoolean),
+        TilFunction("Not", noPosition, unaryBoolean),
 
-        TilFunction("ToTypes.Int", noPosition, FunctionType(Types.Int, Types.Real)),
-        TilFunction("ToTypes.Real", noPosition, FunctionType(Types.Real, Types.Int)),
-
+        // Won't receive implementation
         TilFunction("ForAll", noPosition, nonrestrictedQuantifier),
         TilFunction("Exist", noPosition, nonrestrictedQuantifier),
         TilFunction("Sing", noPosition, singularizer),
@@ -60,11 +59,6 @@ object FnDeclarations {
         TilFunction("Every", noPosition, restrictedQuantifier),
         TilFunction("Some", noPosition, restrictedQuantifier),
         TilFunction("No", noPosition, restrictedQuantifier),
-
-        TilFunction("And", noPosition, binaryBoolean),
-        TilFunction("Or", noPosition, binaryBoolean),
-        TilFunction("Implies", noPosition, binaryBoolean),
-        TilFunction("Not", noPosition, unaryBoolean),
 
         TilFunction("Sub", noPosition, FunctionType(ConstructionType, ConstructionType, ConstructionType, ConstructionType)),
         TilFunction("Tr", noPosition, FunctionType(ConstructionType, ConstructionType)),

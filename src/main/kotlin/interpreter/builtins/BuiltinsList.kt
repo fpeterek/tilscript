@@ -1,7 +1,8 @@
 package org.fpeterek.til.interpreter.interpreter.builtins
 
+
 object BuiltinsList {
-    val all = listOf(
+    val functions = listOf(
         ListFunctions.EmptyListOf,
         ListFunctions.Cons,
         ListFunctions.Head,
@@ -13,5 +14,13 @@ object BuiltinsList {
         Util.If,
         Util.Chain,
         Util.RunAll,
+
+        LogicFunctions.Not,
+        LogicFunctions.And,
+        LogicFunctions.Or,
+        LogicFunctions.Implies,
     )
+
+    val types get() = Types.all
+    val values get() = Values.all
 }

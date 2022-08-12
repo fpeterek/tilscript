@@ -13,6 +13,7 @@ import org.fpeterek.til.interpreter.reporting.Report
 import org.fpeterek.til.interpreter.reporting.ReportFormatter
 import org.fpeterek.til.interpreter.sentence.*
 import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.types.Util.isGeneric
 import org.fpeterek.til.interpreter.util.SrcPosition
 import org.fpeterek.til.parser.TILScriptLexer
 import org.fpeterek.til.parser.TILScriptParser
@@ -34,26 +35,20 @@ class Interpreter: InterpreterInterface {
     private val operatorFns = setOf("+", "-", "*", "/", "=")
 
     init {
-        Types.all.forEach(typeRepo::process)
+        BuiltinsList.types.forEach(typeRepo::process)
+        BuiltinsList.values.forEach(symbolRepo::define)
 
-        BuiltinsList.all.forEach { fn ->
+        BuiltinsList.functions.forEach { fn ->
             symbolRepo.define(fn.tilFunction)
             functions[fn.name] = fn.tilFunction
         }
     }
 
-    private val intOperators = mutableMapOf(
-        "+" to IntOperators.Plus,
-        "-" to IntOperators.Minus,
-        "*" to IntOperators.Multiply,
-        "/" to IntOperators.Divide,
-    )
-
-    private val realOperators = mutableMapOf(
-        "+" to RealOperators.Plus,
-        "-" to RealOperators.Minus,
-        "*" to RealOperators.Multiply,
-        "/" to RealOperators.Divide,
+    private val numericOperators = mutableMapOf(
+        "+" to NumericOperators.Plus,
+        "-" to NumericOperators.Minus,
+        "*" to NumericOperators.Multiply,
+        "/" to NumericOperators.Divide,
     )
 
     private fun defaultFrame() = StackFrame(parent = currentFrame)
@@ -160,26 +155,9 @@ class Interpreter: InterpreterInterface {
     // TODO: Type-aware equality, probably built into the interpreter
     private fun interpretEquality(args: List<Construction>) = EqualityOperator.apply(this, args)
 
-    private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>): Construction {
-
-        val isReal = args.any { it.constructionType matches Types.Real }
-        val isInt  = args.any { it.constructionType matches Types.Int }
-
-        if (args.any { !(it.constructionType matches Types.Real || it.constructionType matches Types.Int) }) {
-            throw RuntimeException("Type mismatch for operator ${fn.name}")
-        }
-
-        if (isReal == isInt) {
-            throw RuntimeException("Type mismatch for operator ${fn.name}")
-        }
-
-        val fnImpl = when {
-            isReal -> realOperators[fn.name]
-            else   -> intOperators[fn.name]
-        } ?: throw RuntimeException("No such operator '${fn.name}'")
-
-        return fnImpl.apply(this, args)
-    }
+    private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>): Construction =
+        (numericOperators[fn.name] ?: throw RuntimeException("No such operator '${fn.name}'"))
+            .apply(this, args)
 
     private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
 
@@ -187,15 +165,9 @@ class Interpreter: InterpreterInterface {
             throw RuntimeException("Operator '${fn.name}' expects 2 arguments (${comp.args.size} provided)")
         }
 
-        val interpreted = comp.args.map(::interpret)
-
-        if (interpreted.any { it is Nil }) {
-            return nil
-        }
-
         return when (fn.name) {
-            "="  -> interpretEquality(interpreted)
-            else -> interpretNumericOperator(fn, interpreted)
+            "="  -> interpretEquality(comp.args.map { interpret(it) })
+            else -> interpretNumericOperator(fn, comp.args)
         }
     }
 
@@ -323,7 +295,7 @@ class Interpreter: InterpreterInterface {
     private fun interpret(lit: LiteralDeclaration) {
         lit.literals.forEach {
 
-            if (it.constructedType is GenericType) {
+            if (it.constructedType.isGeneric) {
                 invalidUseOfGenerics()
             }
 
@@ -341,7 +313,7 @@ class Interpreter: InterpreterInterface {
     private fun interpret(typedef: TypeDefinition) {
         val alias = typedef.alias
 
-        if (alias.type is GenericType) {
+        if (alias.type.isGeneric) {
             invalidUseOfGenerics()
         }
 
@@ -361,7 +333,7 @@ class Interpreter: InterpreterInterface {
     private fun interpret(varDecl: VariableDeclaration) {
         varDecl.variables.forEach {
 
-            if (it.constructedType is GenericType) {
+            if (it.constructedType.isGeneric) {
                 invalidUseOfGenerics()
             }
 
@@ -378,7 +350,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(varDef: VariableDefinition) {
 
-        if (varDef.constructsType is GenericType) {
+        if (varDef.constructsType.isGeneric) {
             invalidUseOfGenerics()
         }
 

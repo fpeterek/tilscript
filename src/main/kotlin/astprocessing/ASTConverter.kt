@@ -206,7 +206,7 @@ class ASTConverter private constructor() {
         ListType(convertDataType(list.type))
 
     private fun convertTuple(tuple: DataType.Collection.Tuple) =
-        TilTuple(convertDataType(tuple.type))
+        TupleType(tuple.types.map(::convertDataType))
 
     // The original grammar grouped Any type among built-in primitives
     // This approach is fine from a grammar perspective, I, however, do not like
