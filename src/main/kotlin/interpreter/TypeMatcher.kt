@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter.interpreter
+package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.tilscript.interpreter.types.*
 
 class TypeMatcher private constructor(val types: TypeRepository) {
 

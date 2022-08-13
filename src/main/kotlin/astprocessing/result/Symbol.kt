@@ -1,5 +1,5 @@
-package org.fpeterek.til.interpreter.astprocessing.result
+package org.fpeterek.tilscript.interpreter.astprocessing.result
 
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 class Symbol(val symbol: String, srcPos: SrcPosition) : IntermediateResult(srcPos)

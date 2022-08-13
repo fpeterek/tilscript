@@ -1,9 +1,9 @@
-package org.fpeterek.til.interpreter.types
+package org.fpeterek.tilscript.interpreter.types
 
-import org.fpeterek.til.interpreter.sentence.Construction
-import org.fpeterek.til.interpreter.sentence.Value
-import org.fpeterek.til.interpreter.sentence.TilFunction
-import org.fpeterek.til.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.sentence.Construction
+import org.fpeterek.tilscript.interpreter.sentence.Value
+import org.fpeterek.tilscript.interpreter.sentence.TilFunction
+import org.fpeterek.tilscript.interpreter.sentence.Variable
 
 
 class SymbolRepository {

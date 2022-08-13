@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter.interpreter
+package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.tilscript.interpreter.sentence.*
 
 class LambdaCaptureCreator(private val lambdaFrame: StackFrame) {
 

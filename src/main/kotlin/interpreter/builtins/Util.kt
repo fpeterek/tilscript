@@ -1,13 +1,13 @@
-package org.fpeterek.til.interpreter.interpreter.builtins
+package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.EagerFunction
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.LazyFunction
-import org.fpeterek.til.interpreter.sentence.*
-import org.fpeterek.til.interpreter.types.ConstructionType
-import org.fpeterek.til.interpreter.types.GenericType
-import org.fpeterek.til.interpreter.types.ListType
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.LazyFunction
+import org.fpeterek.tilscript.interpreter.sentence.*
+import org.fpeterek.tilscript.interpreter.types.ConstructionType
+import org.fpeterek.tilscript.interpreter.types.GenericType
+import org.fpeterek.tilscript.interpreter.types.ListType
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object Util {
 

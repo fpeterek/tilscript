@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter.astprocessing.result
+package org.fpeterek.tilscript.interpreter.astprocessing.result
 
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 import kotlin.collections.List as KtList
 
 sealed class DataType(srcPos: SrcPosition) : IntermediateResult(srcPos) {

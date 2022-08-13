@@ -1,11 +1,11 @@
-package org.fpeterek.til.interpreter.sentence
+package org.fpeterek.tilscript.interpreter.sentence
 
-import org.fpeterek.til.interpreter.reporting.Report
-import org.fpeterek.til.interpreter.sentence.isexecutable.Executable
-import org.fpeterek.til.interpreter.types.ConstructionType
-import org.fpeterek.til.interpreter.types.Type
-import org.fpeterek.til.interpreter.types.Unknown
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.reporting.Report
+import org.fpeterek.tilscript.interpreter.sentence.isexecutable.Executable
+import org.fpeterek.tilscript.interpreter.types.ConstructionType
+import org.fpeterek.tilscript.interpreter.types.Type
+import org.fpeterek.tilscript.interpreter.types.Unknown
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 class Composition(
     val function: Construction,

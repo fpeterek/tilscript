@@ -1,4 +1,4 @@
-package org.fpeterek.til.interpreter.types
+package org.fpeterek.tilscript.interpreter.types
 
 class TupleType(val types: List<Type>) : Type() {
 

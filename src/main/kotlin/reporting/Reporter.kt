@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter.reporting
+package org.fpeterek.tilscript.interpreter.reporting
 
-import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.tilscript.interpreter.sentence.*
 
 
 object Reporter {

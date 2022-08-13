@@ -1,7 +1,7 @@
 grammar TILScript;
 
 @header {
-package org.fpeterek.til.parser;
+package org.fpeterek.tilscript.parser;
 }
 
 start : sentence*;

@@ -1,8 +1,8 @@
-package org.fpeterek.til.interpreter.interpreter.interpreterinterface
+package org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface
 
-import org.fpeterek.til.interpreter.sentence.Construction
-import org.fpeterek.til.interpreter.sentence.Variable
-import org.fpeterek.til.interpreter.types.Type
+import org.fpeterek.tilscript.interpreter.sentence.Construction
+import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.types.Type
 
 // This abstract class marks functions which make absolutely no assumptions about its arguments
 // and delegates all handling to the programmer

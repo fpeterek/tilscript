@@ -1,10 +1,10 @@
-package org.fpeterek.til.interpreter.sentence
+package org.fpeterek.tilscript.interpreter.sentence
 
-import org.fpeterek.til.interpreter.reporting.Report
-import org.fpeterek.til.interpreter.sentence.isexecutable.NonExecutable
-import org.fpeterek.til.interpreter.interpreter.builtins.Types
-import org.fpeterek.til.interpreter.types.*
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.reporting.Report
+import org.fpeterek.tilscript.interpreter.sentence.isexecutable.NonExecutable
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
+import org.fpeterek.tilscript.interpreter.types.*
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 sealed class Value(
     srcPos: SrcPosition,

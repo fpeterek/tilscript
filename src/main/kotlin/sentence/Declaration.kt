@@ -1,11 +1,11 @@
-package org.fpeterek.til.interpreter.sentence
+package org.fpeterek.tilscript.interpreter.sentence
 
-import org.fpeterek.til.interpreter.interpreter.DefaultFunction
-import org.fpeterek.til.interpreter.reporting.Report
-import org.fpeterek.til.interpreter.types.FunctionType
-import org.fpeterek.til.interpreter.types.Type
-import org.fpeterek.til.interpreter.types.TypeAlias
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.interpreter.DefaultFunction
+import org.fpeterek.tilscript.interpreter.reporting.Report
+import org.fpeterek.tilscript.interpreter.types.FunctionType
+import org.fpeterek.tilscript.interpreter.types.Type
+import org.fpeterek.tilscript.interpreter.types.TypeAlias
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 
 sealed class Declaration(srcPos: SrcPosition, reports: List<Report>) : Sentence(srcPos, reports)

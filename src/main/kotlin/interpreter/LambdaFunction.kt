@@ -1,7 +1,7 @@
-package org.fpeterek.til.interpreter.interpreter
+package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.fpeterek.til.interpreter.sentence.Construction
-import org.fpeterek.til.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.sentence.Construction
+import org.fpeterek.tilscript.interpreter.sentence.Variable
 
 class LambdaFunction(
     args: List<Variable>,

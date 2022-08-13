@@ -1,9 +1,9 @@
-package org.fpeterek.til.interpreter.interpreter.builtins
+package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.til.interpreter.sentence.TilFunction
-import org.fpeterek.til.interpreter.types.*
-import org.fpeterek.til.interpreter.types.Util.intensionalize
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.sentence.TilFunction
+import org.fpeterek.tilscript.interpreter.types.*
+import org.fpeterek.tilscript.interpreter.types.Util.intensionalize
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object FnDeclarations {
 

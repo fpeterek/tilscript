@@ -1,8 +1,8 @@
-package org.fpeterek.til.interpreter.interpreter.builtins
+package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.til.interpreter.sentence.Bool
-import org.fpeterek.til.interpreter.sentence.Nil as NilObject
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.sentence.Bool
+import org.fpeterek.tilscript.interpreter.sentence.Nil as NilObject
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object Values {
     val True = Bool(true, SrcPosition(-1, -1))

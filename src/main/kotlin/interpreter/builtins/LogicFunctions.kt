@@ -1,12 +1,12 @@
-package org.fpeterek.til.interpreter.interpreter.builtins
+package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.EagerFunction
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.interpreter.sentence.Bool
-import org.fpeterek.til.interpreter.sentence.Construction
-import org.fpeterek.til.interpreter.sentence.Symbol
-import org.fpeterek.til.interpreter.sentence.Variable
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.tilscript.interpreter.sentence.Bool
+import org.fpeterek.tilscript.interpreter.sentence.Construction
+import org.fpeterek.tilscript.interpreter.sentence.Symbol
+import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object LogicFunctions {
 

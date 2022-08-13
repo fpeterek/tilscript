@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter.reporting
+package org.fpeterek.tilscript.interpreter.reporting
 
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 data class Report(
     val message: String,

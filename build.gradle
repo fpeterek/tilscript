@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group 'org.fpeterek.til'
+group 'org.fpeterek.tilscript'
 version '1.0'
 
 sourceCompatibility = 1.8
@@ -48,7 +48,7 @@ test {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.fpeterek.til.interpreter.MainKt'
+        attributes 'Main-Class': 'org.fpeterek.tilscript.interpreter.MainKt'
     }
     from {
         configurations.runtimeClasspath.collect {

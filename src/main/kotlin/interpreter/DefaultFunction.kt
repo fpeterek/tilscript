@@ -1,10 +1,10 @@
-package org.fpeterek.til.interpreter.interpreter
+package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.EagerFunction
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.interpreter.sentence.Construction
-import org.fpeterek.til.interpreter.sentence.Variable
-import org.fpeterek.til.interpreter.types.Type
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.tilscript.interpreter.sentence.Construction
+import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.types.Type
 
 open class DefaultFunction(
     name: String,

@@ -1,11 +1,11 @@
-package org.fpeterek.til.interpreter.interpreter.interpreterinterface
+package org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface
 
-import org.fpeterek.til.interpreter.sentence.Construction
-import org.fpeterek.til.interpreter.sentence.TilFunction
-import org.fpeterek.til.interpreter.sentence.Variable
-import org.fpeterek.til.interpreter.types.FunctionType
-import org.fpeterek.til.interpreter.types.Type
-import org.fpeterek.til.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.sentence.Construction
+import org.fpeterek.tilscript.interpreter.sentence.TilFunction
+import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.types.FunctionType
+import org.fpeterek.tilscript.interpreter.types.Type
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 sealed class FunctionInterface constructor(
     val name: String,

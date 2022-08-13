@@ -1,8 +1,8 @@
-package org.fpeterek.til.interpreter.interpreter
+package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.LazyFunction
-import org.fpeterek.til.interpreter.sentence.Variable
-import org.fpeterek.til.interpreter.types.Type
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.LazyFunction
+import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.types.Type
 
 // Operators are lazy function because they require special handling on the side of the interpreter
 // Arguments have to be evaluated before the operator is applied, and thus, no evaluation or typechecking

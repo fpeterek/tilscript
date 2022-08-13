@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter
+package org.fpeterek.tilscript.interpreter
 
-import org.fpeterek.til.interpreter.interpreter.Interpreter
+import org.fpeterek.tilscript.interpreter.interpreter.Interpreter
 
 fun runScript(filename: String) {
     Interpreter().interpretFile(filename)

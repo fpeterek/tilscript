@@ -1,19 +1,19 @@
-package org.fpeterek.til.interpreter.astprocessing
+package org.fpeterek.tilscript.interpreter.astprocessing
 
-import org.fpeterek.til.interpreter.astprocessing.result.*
-import org.fpeterek.til.interpreter.astprocessing.result.Construction.*
-import org.fpeterek.til.interpreter.interpreter.builtins.*
-import org.fpeterek.til.interpreter.sentence.*
-import org.fpeterek.til.interpreter.sentence.Symbol
-import org.fpeterek.til.interpreter.util.ScriptContext
-import org.fpeterek.til.interpreter.types.*
-import org.fpeterek.til.interpreter.types.TypeAlias as TilTypeAlias
-import org.fpeterek.til.interpreter.sentence.Construction as TilConstruction
-import org.fpeterek.til.interpreter.sentence.Execution as TilExecution
-import org.fpeterek.til.interpreter.sentence.Composition as TilComposition
-import org.fpeterek.til.interpreter.sentence.Closure as TilClosure
-import org.fpeterek.til.interpreter.sentence.Variable as TilVariable
-import org.fpeterek.til.interpreter.sentence.Trivialization as TilTrivialization
+import org.fpeterek.tilscript.interpreter.astprocessing.result.*
+import org.fpeterek.tilscript.interpreter.astprocessing.result.Construction.*
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
+import org.fpeterek.tilscript.interpreter.sentence.*
+import org.fpeterek.tilscript.interpreter.sentence.Symbol
+import org.fpeterek.tilscript.interpreter.util.ScriptContext
+import org.fpeterek.tilscript.interpreter.types.*
+import org.fpeterek.tilscript.interpreter.types.TypeAlias as TilTypeAlias
+import org.fpeterek.tilscript.interpreter.sentence.Construction as TilConstruction
+import org.fpeterek.tilscript.interpreter.sentence.Execution as TilExecution
+import org.fpeterek.tilscript.interpreter.sentence.Composition as TilComposition
+import org.fpeterek.tilscript.interpreter.sentence.Closure as TilClosure
+import org.fpeterek.tilscript.interpreter.sentence.Variable as TilVariable
+import org.fpeterek.tilscript.interpreter.sentence.Trivialization as TilTrivialization
 
 
 class ASTConverter private constructor() {

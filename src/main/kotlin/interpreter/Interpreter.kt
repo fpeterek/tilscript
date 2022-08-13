@@ -1,23 +1,22 @@
-package org.fpeterek.til.interpreter.interpreter
+package org.fpeterek.tilscript.interpreter.interpreter
 
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.fpeterek.til.interpreter.astprocessing.ASTConverter
-import org.fpeterek.til.interpreter.astprocessing.AntlrVisitor
-import org.fpeterek.til.interpreter.astprocessing.ErrorListener
-import org.fpeterek.til.interpreter.astprocessing.result.Sentences
-import org.fpeterek.til.interpreter.interpreter.builtins.*
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.FunctionInterface
-import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.til.interpreter.reporting.Report
-import org.fpeterek.til.interpreter.reporting.ReportFormatter
-import org.fpeterek.til.interpreter.sentence.*
-import org.fpeterek.til.interpreter.types.*
-import org.fpeterek.til.interpreter.types.Util
-import org.fpeterek.til.interpreter.types.Util.isGeneric
-import org.fpeterek.til.interpreter.util.SrcPosition
-import org.fpeterek.til.parser.TILScriptLexer
-import org.fpeterek.til.parser.TILScriptParser
+import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
+import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
+import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
+import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FunctionInterface
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
+import org.fpeterek.tilscript.interpreter.reporting.Report
+import org.fpeterek.tilscript.interpreter.reporting.ReportFormatter
+import org.fpeterek.tilscript.interpreter.sentence.*
+import org.fpeterek.tilscript.interpreter.types.*
+import org.fpeterek.tilscript.interpreter.types.Util.isGeneric
+import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.parser.TILScriptLexer
+import org.fpeterek.tilscript.parser.TILScriptParser
 
 
 class Interpreter: InterpreterInterface {

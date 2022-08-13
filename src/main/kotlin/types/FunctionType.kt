@@ -1,6 +1,6 @@
-package org.fpeterek.til.interpreter.types
+package org.fpeterek.tilscript.interpreter.types
 
-import org.fpeterek.til.interpreter.exceptions.InvalidFunctionSignature
+import org.fpeterek.tilscript.interpreter.exceptions.InvalidFunctionSignature
 
 class FunctionType(
     val imageType: Type,
