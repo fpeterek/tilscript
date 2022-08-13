@@ -6,7 +6,7 @@ let pi: Real = '3.14159.
 ['/ '6 '2].
 let fromConstruction: Int = ['/ '4 '2].
 
-fromConstruction.
+['Println fromConstruction].
 
 defn Divisible(num: Int, divisor: Int) -> Bool =
     ['If ['= num '0]
