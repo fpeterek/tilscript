@@ -215,7 +215,7 @@ class ASTConverter private constructor() {
     private fun convertPrimitiveType(type: DataType.PrimitiveType) = when {
         type.isGenericType -> convertGenericType(type)
         // The following case handles aliases as well as already processed atomics
-        type.name == "*" -> ConstructionType
+        type.name == "Construction" -> ConstructionType
         type.name in repo -> repo[type.name]!!
         else -> convertAtomicType(type)
     }

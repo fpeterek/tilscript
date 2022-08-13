@@ -33,7 +33,7 @@ globalVarDecl : DEF WS variableName (COMMA variableName)* COLON dataType;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
-builtinType : BUILTIN_TYPE | ASTERISK;
+builtinType : BUILTIN_TYPE;
 
 listType : LIST LESS dataType GREATER;
 
@@ -89,7 +89,7 @@ string: STRING;
 
 STRING: '"([^\\"]|\\[^\n])*"';
 
-LINE_COMMENT : '--' ~[\r\n]* -> skip;
+LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
 
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;
@@ -106,6 +106,7 @@ BUILTIN_TYPE : 'Bool'
              | 'World'
              | 'Real'
              | 'Int'
+             | 'Construction'
              | ANY;
 
 ANY : 'Any' LESS DIGIT* GREATER;

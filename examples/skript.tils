@@ -15,17 +15,20 @@ defn Divisible(num: Int, divisor: Int) -> Bool =
             'False
             ['Divisible ['- num divisor] divisor]]].
 
--- pica
+['* '3 '4].
 
+['* '3 '4].
 Tilman/Indiv.
 
-Seek / ( Bool Indiv *) @tw.
+Seek / ( Bool Indiv Construction) @tw.
 
 Lastdec/(Int Real).
 
 Pi/Real.
 
-[\w: World [\t:Time['Seek@wt 'Tilman '['Lastdec 'Pi]]]].
+['* '3 '4].
+
+['Println [\w: World [\t:Time['Seek@wt 'Tilman '['Lastdec 'Pi]]]]].
 
 defn DruhaMocnina(x: Int) -> Int = ['* x x].
 
