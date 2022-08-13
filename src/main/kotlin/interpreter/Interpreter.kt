@@ -84,17 +84,17 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(variable: Variable): Construction {
 
-        if (variable.value == null) {
+        val frameVar = findVar(variable.name)
+
+        if (frameVar.value == null) {
             throw RuntimeException("Variable '${variable.name}' is declared but undefined")
         }
-
-        val frameVar = findVar(variable.name)
 
         if (!(frameVar.constructedType matches variable.constructedType)) {
             throw RuntimeException("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${frameVar.constructedType})")
         }
 
-        return variable.value
+        return frameVar.value
     }
 
     fun getFunction(fn: String): TilFunction =
