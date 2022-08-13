@@ -19,6 +19,9 @@ object BuiltinsList {
         LogicFunctions.And,
         LogicFunctions.Or,
         LogicFunctions.Implies,
+
+        TupleFunctions.MkTuple,
+        TupleFunctions.Get
     )
 
     val types get() = Types.all

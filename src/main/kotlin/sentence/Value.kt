@@ -4,10 +4,7 @@ import org.fpeterek.til.interpreter.exceptions.InvalidType
 import org.fpeterek.til.interpreter.reporting.Report
 import org.fpeterek.til.interpreter.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.interpreter.interpreter.builtins.Types
-import org.fpeterek.til.interpreter.types.AtomicType
-import org.fpeterek.til.interpreter.types.ListType
-import org.fpeterek.til.interpreter.types.Type
-import org.fpeterek.til.interpreter.types.Unknown
+import org.fpeterek.til.interpreter.types.*
 import org.fpeterek.til.interpreter.util.SrcPosition
 
 sealed class Value(
@@ -64,6 +61,40 @@ class TypeRef(
     override fun withReports(iterable: Iterable<Report>) =
         TypeRef(type, position, reports + iterable)
 
+}
+
+class World(
+    val world: Long,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, Types.World, reports) {
+
+    override fun equals(other: Any?) =
+        other != null && other is World && other.world == world
+
+    override fun withReports(iterable: Iterable<Report>) =
+        World(world, position, reports + iterable)
+
+    override fun toString() = world.toString()
+
+    override fun hashCode() = world.hashCode()
+}
+
+class Timestamp(
+    val time: Long,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, Types.Time, reports) {
+
+    override fun equals(other: Any?) =
+        other != null && other is Timestamp && other.time == time
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Timestamp(time, position, reports + iterable)
+
+    override fun toString() = time.toString()
+
+    override fun hashCode() = time.hashCode()
 }
 
 class Integral(
@@ -147,6 +178,24 @@ class Nil(
     override fun toString() = "Nil"
 
     override fun hashCode() = javaClass.hashCode()
+}
+
+class TilTuple(
+    val values: List<Construction>,
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, TupleType(values.map { it.constructionType }), reports) {
+
+    override fun withReports(iterable: Iterable<Report>) =
+        TilTuple(values, position, reports + iterable)
+
+    override fun toString() = "(${values.joinToString(", ")})"
+
+    override fun equals(other: Any?) =
+        other != null && other is TilTuple && other.constructionType == constructionType && other.values == values
+
+    override fun hashCode() = values.hashCode()
+
 }
 
 sealed class TilList(
