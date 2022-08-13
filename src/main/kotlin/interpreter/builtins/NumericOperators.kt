@@ -3,6 +3,7 @@ package org.fpeterek.til.interpreter.interpreter.builtins
 import org.fpeterek.til.interpreter.interpreter.OperatorFunction
 import org.fpeterek.til.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.til.interpreter.sentence.*
+import org.fpeterek.til.interpreter.types.Type
 import org.fpeterek.til.interpreter.util.SrcPosition
 
 object NumericOperators {
@@ -12,9 +13,9 @@ object NumericOperators {
         Variable("snd", SrcPosition(-1, -1), Types.Real),
     )
 
-    abstract class NumericOperatorBase(op: String) : OperatorFunction(
+    abstract class NumericOperatorBase(op: String, returnType: Type) : OperatorFunction(
         op,
-        Types.Real,
+        returnType,
         realArgs
     ) {
 
@@ -58,7 +59,7 @@ object NumericOperators {
 
     }
 
-    object Plus : NumericOperatorBase("+") {
+    object Plus : NumericOperatorBase("+", Types.Real) {
         override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) =
             Integral(fst.value + snd.value, noPos)
 
@@ -66,7 +67,7 @@ object NumericOperators {
             Real(fst.value + snd.value, noPos)
     }
 
-    object Minus : NumericOperatorBase("-") {
+    object Minus : NumericOperatorBase("-", Types.Real) {
         override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) =
             Integral(fst.value - snd.value, noPos)
 
@@ -74,7 +75,7 @@ object NumericOperators {
             Real(fst.value - snd.value, noPos)
     }
 
-    object Multiply : NumericOperatorBase("*") {
+    object Multiply : NumericOperatorBase("*", Types.Real) {
         override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) =
             Integral(fst.value * snd.value, noPos)
 
@@ -82,7 +83,7 @@ object NumericOperators {
             Real(fst.value * snd.value, noPos)
     }
 
-    object Divide : NumericOperatorBase("/") {
+    object Divide : NumericOperatorBase("/", Types.Real) {
         override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) = when (snd.value) {
             0L   -> interpreter.nil
             else -> Integral(fst.value / snd.value, noPos)
@@ -91,6 +92,30 @@ object NumericOperators {
         override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) = when (snd.value) {
             0.0  -> interpreter.nil
             else -> Real(fst.value / snd.value, noPos)
+        }
+    }
+
+    object Less : NumericOperatorBase("<", Types.Bool) {
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) = when {
+            fst.value < snd.value -> Values.True
+            else -> Values.False
+        }
+
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) = when {
+            fst.value < snd.value -> Values.True
+            else -> Values.False
+        }
+    }
+
+    object Greater : NumericOperatorBase(">", Types.Bool) {
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) = when {
+            fst.value > snd.value -> Values.True
+            else -> Values.False
+        }
+
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) = when {
+            fst.value > snd.value -> Values.True
+            else -> Values.False
         }
     }
 

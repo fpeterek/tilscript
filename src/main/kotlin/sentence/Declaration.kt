@@ -1,5 +1,6 @@
 package org.fpeterek.til.interpreter.sentence
 
+import org.fpeterek.til.interpreter.interpreter.DefaultFunction
 import org.fpeterek.til.interpreter.reporting.Report
 import org.fpeterek.til.interpreter.types.FunctionType
 import org.fpeterek.til.interpreter.types.Type
@@ -104,7 +105,14 @@ class FunctionDefinition(
 
     val signature = FunctionType(listOf(constructsType) + args.map { it.constructedType })
 
-    val tilFunction = TilFunction(name, srcPos, signature, reports)
+    val function = DefaultFunction(
+        name,
+        constructsType,
+        args,
+        construction
+    )
+
+    val tilFunction = TilFunction(name, srcPos, signature, reports, implementation = function)
 
     override fun withReports(iterable: Iterable<Report>) = FunctionDefinition(
         name, args, constructsType, construction, position, reports + iterable

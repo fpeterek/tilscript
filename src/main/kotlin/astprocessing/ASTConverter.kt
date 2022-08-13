@@ -41,13 +41,17 @@ class ASTConverter private constructor() {
         types=repo,
     )
 
-    private fun convertDefn(def: FunDefinition) = FunctionDefinition(
-        name = def.name.name,
-        args = def.args.map(::convertTypedVar),
-        constructsType = convertDataType(def.consType),
-        construction = convertConstruction(def.cons),
-        srcPos = def.position
-    )
+    private fun convertDefn(def: FunDefinition): FunctionDefinition {
+        fns.add(def.name.name)
+
+        return FunctionDefinition(
+            name = def.name.name,
+            args = def.args.map(::convertTypedVar),
+            constructsType = convertDataType(def.consType),
+            construction = convertConstruction(def.cons),
+            srcPos = def.position
+        )
+    }
 
     private fun convertGlobalVarDef(def: GlobalVarDef) = VariableDefinition(
         def.varName.name,

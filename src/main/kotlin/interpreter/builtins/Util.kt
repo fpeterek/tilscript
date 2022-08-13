@@ -19,8 +19,11 @@ object Util {
         )
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
-            val arg = interpreter.interpret(args.first())
-            print(arg)
+            val str = when (val arg = interpreter.interpret(args.first())) {
+                is Text -> arg.value
+                else -> arg.toString()
+            }
+            print(str)
             return Values.True
         }
     }

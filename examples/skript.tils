@@ -32,7 +32,7 @@ Pi/Real.
 
 defn DruhaMocnina(x: Int) -> Int = ['* x x].
 
-['Println [\y:Int[\x:Int['+ y  x]]]].
+['Println '[\y:Int[\x:Int['+ y  x]]]].
 
 defn Add(x: Int, y: Int) -> Int = ['+ x y].
 
@@ -40,8 +40,9 @@ let list: List<Int> = { '1, '2, '3 }.
 
 ['Println '['DruhaMocnina '2]].
 ['Println list].
-['Println ['Cons ['Plus '1 '2] 'Nil]].
+['Println ['Cons ['+ '1 '2] 'Nil]].
 ['Println ['MkTuple '1 '2 '"asdf"]].
 ['Println ['+ pi '1.5]].
-['Println ['Divisible '4 '2]].
-['Println ['Divisible '5 '2]].
+
+['Print '['Divisible '4 '2]]. ['Print '": "]. ['Println ['Divisible '4 '2]].
+['Print '['Divisible '5 '2]]. ['Print '": "]. ['Println ['Divisible '5 '2]].

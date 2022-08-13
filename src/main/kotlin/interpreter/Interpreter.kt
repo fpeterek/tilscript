@@ -13,6 +13,7 @@ import org.fpeterek.til.interpreter.reporting.Report
 import org.fpeterek.til.interpreter.reporting.ReportFormatter
 import org.fpeterek.til.interpreter.sentence.*
 import org.fpeterek.til.interpreter.types.*
+import org.fpeterek.til.interpreter.types.Util
 import org.fpeterek.til.interpreter.types.Util.isGeneric
 import org.fpeterek.til.interpreter.util.SrcPosition
 import org.fpeterek.til.parser.TILScriptLexer
@@ -32,7 +33,9 @@ class Interpreter: InterpreterInterface {
 
     private val functions = mutableMapOf<String, TilFunction>()
 
-    private val operatorFns = setOf("+", "-", "*", "/", "=")
+    private val operatorFns = setOf("+", "-", "*", "/", "=", "<", ">")
+
+    private val equalityOperator = EqualityOperator
 
     init {
         BuiltinsList.types.forEach(typeRepo::process)
@@ -49,6 +52,8 @@ class Interpreter: InterpreterInterface {
         "-" to NumericOperators.Minus,
         "*" to NumericOperators.Multiply,
         "/" to NumericOperators.Divide,
+        ">" to NumericOperators.Greater,
+        "<" to NumericOperators.Less,
     )
 
     private fun defaultFrame() = StackFrame(parent = currentFrame)
@@ -120,6 +125,8 @@ class Interpreter: InterpreterInterface {
         triv.construction is TilFunction && triv.construction.name in numericOperators ->
             numericOperators[triv.construction.name]!!.tilFunction
 
+        triv.construction is TilFunction && triv.construction.name == "=" -> EqualityOperator.tilFunction
+
         triv.construction is TilFunction -> getFunction(triv.construction.name)
 
         triv.construction is Symbol && triv.construction.constructionType is Unknown ->
@@ -175,11 +182,11 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun interpretFn(fn: FunctionInterface, args: List<Construction>) = withFrame {
-        fn.apply(this, args)
+        fn(this, args)
     }
 
     private fun interpretLambda(fn: LambdaFunction, args: List<Construction>) = withFrame(fn.context.frame) {
-        fn.apply(this, args)
+        fn(this, args)
     }
 
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
@@ -392,7 +399,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(sentence: Sentence) {
         when (sentence) {
-            is Construction -> println(interpret(sentence))
+            is Construction -> interpret(sentence)
             is Declaration  -> interpret(sentence)
         }
     }

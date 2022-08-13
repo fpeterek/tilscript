@@ -1,6 +1,5 @@
 package org.fpeterek.til.interpreter.sentence
 
-import org.fpeterek.til.interpreter.exceptions.InvalidType
 import org.fpeterek.til.interpreter.reporting.Report
 import org.fpeterek.til.interpreter.sentence.isexecutable.NonExecutable
 import org.fpeterek.til.interpreter.interpreter.builtins.Types
@@ -12,15 +11,6 @@ sealed class Value(
     type: Type = Unknown,
     reports: List<Report> = listOf(),
 ) : Construction(constructedType=type, constructionType=type, srcPos, reports), NonExecutable {
-
-    init {
-        when (type) {
-            is AtomicType, Unknown -> Unit
-            else -> {
-                throw InvalidType("Literal type must be either AtomicType or Unknown")
-            }
-        }
-    }
 
     override fun withReport(report: Report): Value = withReports(listOf(report))
     abstract override fun withReports(iterable: Iterable<Report>): Value

@@ -87,7 +87,7 @@ lcname : LCNAME;
 
 string: STRING;
 
-STRING: '"([^\\"]|\\[^\n])*"';
+STRING: '"' ( ~'"' | '\\' '"' )* '"' ;
 
 LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
 
