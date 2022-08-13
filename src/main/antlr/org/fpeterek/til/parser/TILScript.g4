@@ -17,9 +17,9 @@ sentenceContent : globalVarDecl
 
 terminator : TERMINATOR;
 
-typeDefinition : TYPEDEF WS typeName ASSIGN dataType;
+typeDefinition : TYPEDEF WS typeName EQUAL_WS dataType;
 
-funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType ASSIGN construction;
+funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType EQUAL_WS construction;
 
 entityDefinition : entityName (COMMA entityName)* FS_WITH_WS dataType;
 
@@ -27,9 +27,9 @@ construction : (trivialization | variable | closure | nExecution | composition |
 
 listInitializer : OPEN_CUR construction (COMMA construction)* CLOSE_CUR;
 
-globalVarDecl : LET WS variableName (COMMA variableName)* COLON dataType;
+globalVarDef : LET WS variableName COLON dataType EQUAL_WS construction;
 
-globalVarDef : LET WS variableName COLON dataType ASSIGN construction;
+globalVarDecl : DEF WS variableName (COMMA variableName)* COLON dataType;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
@@ -78,7 +78,7 @@ variableName : lcname;
 // symbols, no idea why
 // Thus, I include optional whitespace as a part of the lexer rule
 // and I'll have to trim the whitespace afterwards
-symbol : SYMBOLS | ASTERISK | FS_WITH_WS;
+symbol : PLUS_WS | MINUS_WS | EQUAL_WS | ASTERISK_WS | FS_WITH_WS | LESS | GREATER;
 
 number : NUMBER;
 
@@ -108,34 +108,36 @@ BUILTIN_TYPE : 'Bool'
              | 'Int'
              | ANY;
 
-SYMBOLS : ('+' | '-' | '=');
-
 ANY : 'Any' LESS DIGIT* GREATER;
 
-EXEC       : '^' NONZERO OPT_WS;
-LAMBDA     : '\\' OPT_WS;
-TRIVIALIZE : '\'' OPT_WS;
-OPEN_BRA   : '[' OPT_WS;
-CLOSE_BRA  : OPT_WS ']';
-OPEN_PAR   : OPT_WS '(' OPT_WS;
-CLOSE_PAR  : OPT_WS ')' OPT_WS;
-OPEN_CUR   : OPT_WS '{' OPT_WS;
-CLOSE_CUR  : OPT_WS '}' OPT_WS;
-LESS       : OPT_WS '<' OPT_WS;
-GREATER    : OPT_WS '>' OPT_WS;
-ARROW      : OPT_WS '->' OPT_WS;
-TERMINATOR : OPT_WS '.' OPT_WS;
-ASSIGN     : OPT_WS '=' OPT_WS;
-COMMA      : OPT_WS ',' OPT_WS;
-COLON      : OPT_WS ':' OPT_WS;
-FS_WITH_WS : OPT_WS '/' OPT_WS;
-FS         : '/';
-ASTERISK   : '*';
-TYPEDEF    : 'typedef';
-LIST       : 'List';
-TUPLE      : 'Tuple';
-DEFN       : 'defn';
-LET        : 'let';
+EXEC        : '^' NONZERO OPT_WS;
+LAMBDA      : '\\' OPT_WS;
+TRIVIALIZE  : '\'' OPT_WS;
+OPEN_BRA    : '[' OPT_WS;
+CLOSE_BRA   : OPT_WS ']';
+OPEN_PAR    : OPT_WS '(' OPT_WS;
+CLOSE_PAR   : OPT_WS ')' OPT_WS;
+OPEN_CUR    : OPT_WS '{' OPT_WS;
+CLOSE_CUR   : OPT_WS '}' OPT_WS;
+LESS        : OPT_WS '<' OPT_WS;
+GREATER     : OPT_WS '>' OPT_WS;
+ARROW       : OPT_WS '->' OPT_WS;
+TERMINATOR  : OPT_WS '.' OPT_WS;
+COMMA       : OPT_WS ',' OPT_WS;
+COLON       : OPT_WS ':' OPT_WS;
+FS_WITH_WS  : OPT_WS '/' OPT_WS;
+ASTERISK_WS : OPT_WS '*' OPT_WS;
+PLUS_WS     : OPT_WS '+' OPT_WS;
+MINUS_WS    : OPT_WS '-' OPT_WS;
+EQUAL_WS    : OPT_WS '=' OPT_WS;
+FS          : '/';
+ASTERISK    : '*';
+TYPEDEF     : 'typedef';
+LIST        : 'List';
+TUPLE       : 'Tuple';
+DEFN        : 'defn';
+DEF         : 'def';
+LET         : 'let';
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;

@@ -117,6 +117,9 @@ class Interpreter: InterpreterInterface {
     fun getVariable(name: String): Variable = currentFrame.getVar(name)
 
     private fun interpret(triv: Trivialization) = when {
+        triv.construction is TilFunction && triv.construction.name in numericOperators ->
+            numericOperators[triv.construction.name]!!.tilFunction
+
         triv.construction is TilFunction -> getFunction(triv.construction.name)
 
         triv.construction is Symbol && triv.construction.constructionType is Unknown ->
@@ -389,7 +392,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(sentence: Sentence) {
         when (sentence) {
-            is Construction -> interpret(sentence)
+            is Construction -> println(interpret(sentence))
             is Declaration  -> interpret(sentence)
         }
     }

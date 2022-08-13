@@ -1,21 +1,21 @@
-let variable: Int.
+def variable: Int.
 
 let pi: Real = '3.14159.
 
 ['/ '4 '2].
+['/ '6 '2].
 let fromConstruction: Int = ['/ '4 '2].
 
--- defn ChainCalls(fst: Any<1>, snd: Any<2>) -> Any<2> = snd.
---
--- If/(Any<1> Boolean Any<1> Any<1>).
---
--- defn Divisible(num: Int, divisor: Int) -> Bool =
---     ['If ['= num 0]
---         'True
---         ['If ['< num 0]
---             'False
---             ['Divisible ['- num divisor] divisor]]].
+fromConstruction.
 
+defn Divisible(num: Int, divisor: Int) -> Bool =
+    ['If ['= num '0]
+        'True
+        ['If ['< num '0]
+            'False
+            ['Divisible ['- num divisor] divisor]]].
+
+-- pica
 
 Tilman/Indiv.
 
@@ -29,7 +29,7 @@ Pi/Real.
 
 defn DruhaMocnina(x: Int) -> Int = ['* x x].
 
-[\y:Int[\x:Int['+ y  x]]].
+['Println [\y:Int[\x:Int['+ y  x]]]].
 
 defn Add(x: Int, y: Int) -> Int = ['+ x y].
 
@@ -37,3 +37,8 @@ let list: List<Int> = { '1, '2, '3 }.
 
 ['Println '['DruhaMocnina '2]].
 ['Println list].
+['Println ['Cons ['Plus '1 '2] 'Nil]].
+['Println ['MkTuple '1 '2 '"asdf"]].
+['Println ['+ pi '1.5]].
+['Println ['Divisible '4 '2]].
+['Println ['Divisible '5 '2]].

@@ -2,11 +2,9 @@ package org.fpeterek.til.interpreter.astprocessing
 
 import org.fpeterek.til.interpreter.astprocessing.result.*
 import org.fpeterek.til.interpreter.astprocessing.result.Construction.*
-import org.fpeterek.til.interpreter.interpreter.builtins.ListFunctions
+import org.fpeterek.til.interpreter.interpreter.builtins.*
 import org.fpeterek.til.interpreter.sentence.*
 import org.fpeterek.til.interpreter.sentence.Symbol
-import org.fpeterek.til.interpreter.interpreter.builtins.FnDeclarations
-import org.fpeterek.til.interpreter.interpreter.builtins.Values
 import org.fpeterek.til.interpreter.util.ScriptContext
 import org.fpeterek.til.interpreter.types.*
 import org.fpeterek.til.interpreter.types.TypeAlias as TilTypeAlias
@@ -31,6 +29,8 @@ class ASTConverter private constructor() {
 
     init {
         fns.addAll(FnDeclarations.builtinFunctions.asSequence().map { it.name })
+        fns.addAll(BuiltinsList.functions.asSequence().map { it.name })
+        fns.addAll(listOf("<", ">", "=", "*", "/", "+", "-"))
         // Since we know built-ins will only ever be Symbols, Nil, or Booleans,
         // we can store their values as a String
         lits.addAll(Values.all.asSequence().map { it.toString() })
