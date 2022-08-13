@@ -45,5 +45,12 @@ let list: List<Int> = { '1, '2, '3 }.
 ['Println ['+ pi '1.5]].
 ['Println ['+ 'Pi '1.5]].
 
-['Print '['Divisible '4 '2]]. ['Print '": "]. ['Println ['Divisible '4 '2]].
-['Print '['Divisible '5 '2]]. ['Print '": "]. ['Println ['Divisible '5 '2]].
+defn PrintRes(cons: Construction) -> Bool =
+    ['Chain
+        ['Print cons]
+        ['Chain
+            ['Print '": "]
+            ['Println ^2 cons]]].
+
+['PrintRes '['Divisible '4 '2]].
+['PrintRes '['Divisible '5 '2]].
