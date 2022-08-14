@@ -403,12 +403,13 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    private fun interpret(sentences: Iterable<Sentence>) = sentences.forEach {
+    private fun interpret(sentences: Iterable<Sentence>) = sentences.forEachIndexed { index, sentence ->
         try {
-            interpret(it)
+            println("[$index]: $sentence")
+            interpret(sentence)
         } catch (e: Exception) {
             println("Runtime error: ${e.message}")
-            return@forEach
+            return@interpret
         }
     }
 

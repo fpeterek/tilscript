@@ -15,6 +15,11 @@ defn Divisible(num: Int, divisor: Int) -> Bool =
             'False
             ['Divisible ['- num divisor] divisor]]].
 
+*
+
+-- sdf f asdf asd
+-- s df asdf asd
+-- d af
 ['* '3 '4].
 
 ['* '3 '4].
@@ -53,4 +58,4 @@ defn PrintRes(cons: Construction) -> Bool =
             ['Println ^2 cons]]].
 
 ['PrintRes '['Divisible '4 '2]].
-['PrintRes '['Divisible '5 '2]].
+--['PrintRes '['Divisible '5 '2]].

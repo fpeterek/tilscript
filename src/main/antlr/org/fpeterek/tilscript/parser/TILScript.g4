@@ -17,9 +17,9 @@ sentenceContent : globalVarDecl
 
 terminator : TERMINATOR;
 
-typeDefinition : TYPEDEF WS typeName EQUAL_WS dataType;
+typeDefinition : TYPEDEF typeName EQUAL_WS dataType;
 
-funDefinition : DEFN WS entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType EQUAL_WS construction;
+funDefinition : DEFN entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType EQUAL_WS construction;
 
 entityDefinition : entityName (COMMA entityName)* FS_WITH_WS dataType;
 
@@ -27,9 +27,9 @@ construction : (trivialization | variable | closure | nExecution | composition |
 
 listInitializer : OPEN_CUR construction (COMMA construction)* CLOSE_CUR;
 
-globalVarDef : LET WS variableName COLON dataType EQUAL_WS construction;
+globalVarDef : LET variableName COLON dataType EQUAL_WS construction;
 
-globalVarDecl : DEF WS variableName (COMMA variableName)* COLON dataType;
+globalVarDecl : DEF variableName (COMMA variableName)* COLON dataType;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
@@ -89,7 +89,7 @@ string: STRING;
 
 STRING: '"' ( ~'"' | '\\' '"' )* '"' ;
 
-LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
+LINE_COMMENT : '--' ~[\r\n]* ('\r'? '\n') -> skip;
 
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;
@@ -136,9 +136,9 @@ ASTERISK    : '*';
 TYPEDEF     : 'typedef';
 LIST        : 'List';
 TUPLE       : 'Tuple';
-DEFN        : 'defn';
-DEF         : 'def';
-LET         : 'let';
+DEFN        : 'defn' WS;
+DEF         : 'def' WS;
+LET         : 'let' WS;
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
