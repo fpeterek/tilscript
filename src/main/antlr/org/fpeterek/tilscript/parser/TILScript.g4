@@ -17,17 +17,17 @@ sentenceContent : globalVarDecl
 
 terminator : TERMINATOR;
 
-typeDefinition : TYPEDEF typeName EQUAL_WS dataType;
+typeDefinition : TYPEDEF typeName EQUAL dataType;
 
-funDefinition : DEFN entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType EQUAL_WS construction;
+funDefinition : DEFN entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType EQUAL construction;
 
-entityDefinition : entityName (COMMA entityName)* FS_WITH_WS dataType;
+entityDefinition : entityName (COMMA entityName)* FS dataType;
 
 construction : (trivialization | variable | closure | nExecution | composition | listInitializer) WT?;
 
 listInitializer : OPEN_CUR construction (COMMA construction)* CLOSE_CUR;
 
-globalVarDef : LET variableName COLON dataType EQUAL_WS construction;
+globalVarDef : LET variableName COLON dataType EQUAL construction;
 
 globalVarDecl : DEF variableName (COMMA variableName)* COLON dataType;
 
@@ -41,15 +41,15 @@ tupleType : TUPLE LESS dataType (COMMA dataType)* GREATER;
 
 userType : typeName;
 
-compoundType : OPEN_PAR dataType (WS dataType)* CLOSE_PAR;
+compoundType : OPEN_PAR dataType (dataType)* CLOSE_PAR;
 
 variable : variableName;
 
 trivialization : TRIVIALIZE (construction | entity | dataType);
 
-composition : OPEN_BRA construction (construction | (WS construction))+ CLOSE_BRA;
+composition : OPEN_BRA construction (construction | (construction))+ CLOSE_BRA;
 
-closure : OPEN_BRA lambdaVariables (construction | (WS construction)) CLOSE_BRA;
+closure : OPEN_BRA lambdaVariables (construction | (construction)) CLOSE_BRA;
 
 lambdaVariables : LAMBDA optTypedVariables;
 
@@ -78,7 +78,7 @@ variableName : lcname;
 // symbols, no idea why
 // Thus, I include optional whitespace as a part of the lexer rule
 // and I'll have to trim the whitespace afterwards
-symbol : PLUS_WS | MINUS_WS | EQUAL_WS | ASTERISK_WS | FS_WITH_WS | LESS | GREATER;
+symbol : PLUS | MINUS | EQUAL | ASTERISK | FS | LESS | GREATER;
 
 number : NUMBER;
 
@@ -120,8 +120,6 @@ fragment S_CHAR : ~["\\\r\n]
                | '\\\n'
                | '\\\r\n';
 
-LINE_COMMENT : '--' ~[\r\n]* -> skip;
-
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;
 
@@ -142,42 +140,42 @@ BUILTIN_TYPE : 'Bool'
 
 ANY : 'Any' LESS DIGIT* GREATER;
 
-EXEC        : '^' [12] OPT_WS;
-LAMBDA      : '\\' OPT_WS;
-TRIVIALIZE  : '\'' OPT_WS;
-OPEN_BRA    : '[' OPT_WS;
-CLOSE_BRA   : OPT_WS ']';
-OPEN_PAR    : OPT_WS '(' OPT_WS;
-CLOSE_PAR   : OPT_WS ')' OPT_WS;
-OPEN_CUR    : OPT_WS '{' OPT_WS;
-CLOSE_CUR   : OPT_WS '}' OPT_WS;
-LESS        : OPT_WS '<' OPT_WS;
-GREATER     : OPT_WS '>' OPT_WS;
-ARROW       : OPT_WS '->' OPT_WS;
-TERMINATOR  : OPT_WS '.' OPT_WS;
-COMMA       : OPT_WS ',' OPT_WS;
-COLON       : OPT_WS ':' OPT_WS;
-FS_WITH_WS  : OPT_WS '/' OPT_WS;
-ASTERISK_WS : OPT_WS '*' OPT_WS;
-PLUS_WS     : OPT_WS '+' OPT_WS;
-MINUS_WS    : OPT_WS '-' OPT_WS;
-EQUAL_WS    : OPT_WS '=' OPT_WS;
+EXEC        : '^' [12];
+LAMBDA      : '\\';
+TRIVIALIZE  : '\'';
+OPEN_BRA    : '[';
+CLOSE_BRA   : ']';
+OPEN_PAR    : '(';
+CLOSE_PAR   : ')';
+OPEN_CUR    : '{';
+CLOSE_CUR   : '}';
+LESS        : '<';
+GREATER     : '>';
+ARROW       : '->';
+TERMINATOR  : '.';
+COMMA       : ',';
+COLON       : ':';
+PLUS        : '+';
+MINUS       : '-';
+EQUAL       : '=';
 FS          : '/';
 ASTERISK    : '*';
 TYPEDEF     : 'typedef';
 LIST        : 'List';
 TUPLE       : 'Tuple';
-DEFN        : 'defn' WS;
-DEF         : 'def' WS;
-LET         : 'let' WS;
+DEFN        : 'defn';
+DEF         : 'def';
+LET         : 'let';
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 
-WT : OPT_WS '@wt';
-TW : OPT_WS '@tw';
+WT : '@wt';
+TW : '@tw';
 
-WS              : WS_CHARS+;
-fragment OPT_WS : WS_CHARS*;
+LINE_COMMENT : '--' ~[\r\n]* -> skip;
 
-WS_CHARS : ('\r' | '\n' | '\t' | ' ');
+WS_CHARS : ('\r' | '\n' | '\t' | ' ') -> skip;
+
+//NEWLINE : ('\n' | '\r') -> skip;
+

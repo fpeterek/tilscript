@@ -17,7 +17,13 @@ defn Divisible(num: Int, divisor: Int) -> Bool =
 
 
 
-['* '3 '4].
+[
+'*
+'3
+'4
+]
+.
+
 
 ['* '3 '4].
 Tilman/Indiv.
@@ -55,4 +61,4 @@ defn PrintRes(cons: Construction) -> Bool =
             ['Println ^2 cons]]].
 
 ['PrintRes '['Divisible '4 '2]].
---['PrintRes '['Divisible '5 '2]].
+['PrintRes '['Divisible '5 '2]].

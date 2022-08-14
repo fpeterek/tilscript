@@ -450,6 +450,11 @@ class Interpreter: InterpreterInterface {
             printErrors(errorListener.errors, file, "Syntax")
             return
         }
+        if (parser.numberOfSyntaxErrors > 0) {
+            println("Parsing failed (likely due to a syntax error)")
+            return
+        }
+
         println(sentences.sentences.size)
 
         val ctx = ASTConverter.convert(sentences)
