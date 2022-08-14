@@ -433,6 +433,7 @@ class Interpreter: InterpreterInterface {
         val lexer = TILScriptLexer(stream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(errorListener)
+
         val parser = TILScriptParser(CommonTokenStream(lexer))
         parser.removeErrorListeners()
         parser.addErrorListener(errorListener)
@@ -449,6 +450,7 @@ class Interpreter: InterpreterInterface {
             printErrors(errorListener.errors, file, "Syntax")
             return
         }
+        println(sentences.sentences.size)
 
         val ctx = ASTConverter.convert(sentences)
 

@@ -1,10 +1,14 @@
 package org.fpeterek.tilscript.interpreter.astprocessing
 
 import org.antlr.v4.runtime.BaseErrorListener
+import org.antlr.v4.runtime.Parser
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
+import org.antlr.v4.runtime.atn.ATNConfigSet
+import org.antlr.v4.runtime.dfa.DFA
 import org.fpeterek.tilscript.interpreter.reporting.Report
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import java.util.*
 
 class ErrorListener : BaseErrorListener() {
 

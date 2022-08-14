@@ -85,11 +85,42 @@ number : NUMBER;
 ucname : UCNAME;
 lcname : LCNAME;
 
-string: STRING;
+string: STRING_LITERAL;
 
-STRING: '"' ( ~'"' | '\\' '"' )* '"' ;
+// String literals were kindly borrowed from over here
+// https://github.com/antlr/grammars-v4/blob/master/c/C.g4
+// Because string literals are an absolute pain to deal with
 
-LINE_COMMENT : '--' ~[\r\n]* ('\r'? '\n') -> skip;
+fragment ESCAPE_SEQUENCE : SIMPLE_ESCAPE_SEQUENCE
+                         | OCTAL_ESCAPE_SEQUENCE
+                         | HEXADECIMAL_ESCAPE_SEQUENCE
+                         | UNIVERSAL_CHARACTER_NAME;
+
+fragment UNIVERSAL_CHARACTER_NAME : '\\u' HEX_QUAD
+                                  | '\\U' HEX_QUAD HEX_QUAD;
+
+fragment HEX_QUAD : HEXADECIMAL_DIGIT HEXADECIMAL_DIGIT HEXADECIMAL_DIGIT HEXADECIMAL_DIGIT;
+
+fragment HEXADECIMAL_DIGIT : [0-9a-fA-F];
+
+fragment OCTAL_DIGIT : [0-7];
+
+fragment SIMPLE_ESCAPE_SEQUENCE : '\\' ['"?abfnrtv\\];
+
+fragment OCTAL_ESCAPE_SEQUENCE : '\\' OCTAL_DIGIT OCTAL_DIGIT? OCTAL_DIGIT?;
+
+fragment HEXADECIMAL_ESCAPE_SEQUENCE : '\\x' HEXADECIMAL_DIGIT+;
+
+STRING_LITERAL : '"' S_CHAR_SEQUENCE? '"';
+
+fragment S_CHAR_SEQUENCE : S_CHAR+;
+
+fragment S_CHAR : ~["\\\r\n]
+               | ESCAPE_SEQUENCE
+               | '\\\n'
+               | '\\\r\n';
+
+LINE_COMMENT : '--' ~[\r\n]* -> skip;
 
 NUMBER : DIGIT DIGIT*
        | DIGIT DIGIT* '.' DIGIT DIGIT*;
@@ -111,7 +142,7 @@ BUILTIN_TYPE : 'Bool'
 
 ANY : 'Any' LESS DIGIT* GREATER;
 
-EXEC        : '^' NONZERO OPT_WS;
+EXEC        : '^' [12] OPT_WS;
 LAMBDA      : '\\' OPT_WS;
 TRIVIALIZE  : '\'' OPT_WS;
 OPEN_BRA    : '[' OPT_WS;
