@@ -15,8 +15,6 @@ defn Divisible(num: Int, divisor: Int) -> Bool =
             'False
             ['Divisible ['- num divisor] divisor]]].
 
-
-
 [
 '*
 '3

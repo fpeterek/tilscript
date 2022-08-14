@@ -91,6 +91,8 @@ string: STRING_LITERAL;
 // https://github.com/antlr/grammars-v4/blob/master/c/C.g4
 // Because string literals are an absolute pain to deal with
 
+STRING_LITERAL : '"' S_CHAR_SEQUENCE? '"';
+
 fragment ESCAPE_SEQUENCE : SIMPLE_ESCAPE_SEQUENCE
                          | OCTAL_ESCAPE_SEQUENCE
                          | HEXADECIMAL_ESCAPE_SEQUENCE
@@ -110,8 +112,6 @@ fragment SIMPLE_ESCAPE_SEQUENCE : '\\' ['"?abfnrtv\\];
 fragment OCTAL_ESCAPE_SEQUENCE : '\\' OCTAL_DIGIT OCTAL_DIGIT? OCTAL_DIGIT?;
 
 fragment HEXADECIMAL_ESCAPE_SEQUENCE : '\\x' HEXADECIMAL_DIGIT+;
-
-STRING_LITERAL : '"' S_CHAR_SEQUENCE? '"';
 
 fragment S_CHAR_SEQUENCE : S_CHAR+;
 
