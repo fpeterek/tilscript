@@ -12,7 +12,7 @@ object BuiltinsList {
         Util.Print,
         Util.Println,
         Util.If,
-        Util.Chain,
+        Util.Progn,
         Util.RunAll,
 
         LogicFunctions.Not,
@@ -21,7 +21,13 @@ object BuiltinsList {
         LogicFunctions.Implies,
 
         TupleFunctions.MkTuple,
-        TupleFunctions.Get
+        TupleFunctions.Get,
+
+        TextFunctions.HeadS,
+        TextFunctions.TailS,
+        TextFunctions.CatS,
+        TextFunctions.Char,
+        TextFunctions.LenS,
     )
 
     val types get() = Types.all

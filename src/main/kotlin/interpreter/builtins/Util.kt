@@ -1,5 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.BuiltinBareFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.LazyFunction
@@ -61,15 +62,25 @@ object Util {
             }
     }
 
-    object Chain : EagerFunction(
-        "Chain",
-        GenericType(2),
+    object Progn : BuiltinBareFunction(
+        "Progn",
+        GenericType(1),
         listOf(
-            Variable("ignored", SrcPosition(-1, -1), GenericType(1)),
-            Variable("returned", SrcPosition(-1, -1), GenericType(2)),
+            Variable("placeholder", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = args.last()
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+
+            for ((idx, arg) in args.withIndex()) {
+                val int = interpreter.interpret(arg)
+
+                if (int is Nil || idx == args.lastIndex) {
+                    return int
+                }
+            }
+
+            return Values.Nil
+        }
     }
 
     object RunAll : EagerFunction(

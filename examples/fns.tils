@@ -7,11 +7,10 @@ defn Divisible(num: Int, divisor: Int) -> Bool =
             ['Divisible ['- num divisor] divisor]]].
 
 defn PrintRes(cons: Construction) -> Bool =
-    ['Chain
+    ['Progn
         ['Print cons]
-        ['Chain
-            ['Print '": \\\\\""]
-            ['Println ^2 cons]]].
+        ['Print '": "]
+        ['Println ^2 cons]].
 
 defn DruhaMocnina(x: Int) -> Int = ['* x x].
 

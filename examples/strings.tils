@@ -1,0 +1,11 @@
+import "examples/fns.tils".
+
+['PrintRes '['CatS '"VSB -" '" TUO"]].
+
+['PrintRes '['Char '"VSB - TUO" '2]].
+
+['PrintRes '['TailS '"VSB - TUO"]].
+
+['PrintRes '['HeadS '"VSB - TUO"]].
+
+['PrintRes '['LenS '"VSB - TUO"]].
