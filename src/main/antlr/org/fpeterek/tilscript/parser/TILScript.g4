@@ -13,7 +13,10 @@ sentenceContent : globalVarDecl
                 | funDefinition
                 | typeDefinition
                 | entityDefinition
-                | construction;
+                | construction
+                | importStatement;
+
+importStatement : IMPORT string;
 
 terminator : TERMINATOR;
 
@@ -166,6 +169,7 @@ TUPLE       : 'Tuple';
 DEFN        : 'defn';
 DEF         : 'def';
 LET         : 'let';
+IMPORT      : 'import';
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;

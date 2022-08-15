@@ -4,14 +4,30 @@ import java.io.File
 import kotlin.math.max
 import kotlin.math.min
 
-class ReportFormatter(file: String) {
+class ReportFormatter {
 
-    private val lines = when {
-        file.isEmpty() -> listOf()
-        else -> File(file).readLines()
+    private val files = mutableMapOf<String, List<String>>()
+
+    private fun ensureFileIsLoaded(file: String) {
+
+        if (file in files) {
+            return
+        }
+
+        files[file] = when {
+            file.isEmpty() -> listOf()
+            else -> File(file).readLines()
+        }
     }
 
     private fun formatReport(report: Report): String {
+
+        if (report.line < 0 && report.char < 0) {
+            return report.message
+        }
+
+        ensureFileIsLoaded(report.file)
+        val lines = files[report.file]!!
 
         val line = lines[report.line-1]
         val rightAvailable = line.length - report.char - 1

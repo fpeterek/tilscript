@@ -9,6 +9,7 @@ data class Report(
 
     val line get() = position.line
     val char get() = position.char
+    val file get() = position.file
 
-    override fun toString() = "($line, $char): $message"
+    override fun toString() = "($file: $line, $char): $message"
 }

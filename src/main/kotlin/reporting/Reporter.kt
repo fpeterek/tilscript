@@ -40,6 +40,9 @@ object Reporter {
     private fun containsReports(def: VariableDefinition): Boolean =
         def.hasReports || containsReports(def.variable) || containsReports(def.construction)
 
+    private fun containsReports(importStatement: ImportStatement): Boolean =
+        importStatement.hasReports
+
     private fun containsReports(def: Declaration): Boolean = when (def) {
         is FunctionDeclaration -> containsReports(def)
         is LiteralDeclaration  -> containsReports(def)
@@ -53,15 +56,16 @@ object Reporter {
         is Closure        -> containsReports(construction)
         is Composition    -> containsReports(construction)
         is Execution      -> containsReports(construction)
-        is Value        -> containsReports(construction)
+        is Value          -> containsReports(construction)
         is TilFunction    -> containsReports(construction)
         is Trivialization -> containsReports(construction)
         is Variable       -> containsReports(construction)
     }
 
     fun containsReports(sentence: Sentence): Boolean = when (sentence) {
-        is Declaration   -> containsReports(sentence)
-        is Construction -> containsReports(sentence)
+        is Declaration     -> containsReports(sentence)
+        is Construction    -> containsReports(sentence)
+        is ImportStatement -> containsReports(sentence)
     }
 
     fun containsReports(sentences: Iterable<Sentence>): Boolean = sentences.any(::containsReports)
@@ -99,6 +103,9 @@ object Reporter {
     private fun reportsAsList(def: VariableDefinition): List<Report> =
         def.reports + reportsAsList(def.variable) + reportsAsList(def.construction)
 
+    private fun reportsAsList(importStatement: ImportStatement): List<Report> =
+        importStatement.reports
+
     private fun reportsAsList(def: Declaration): List<Report> = when (def) {
         is FunctionDeclaration -> reportsAsList(def)
         is LiteralDeclaration  -> reportsAsList(def)
@@ -112,15 +119,16 @@ object Reporter {
         is Closure        -> reportsAsList(construction)
         is Composition    -> reportsAsList(construction)
         is Execution      -> reportsAsList(construction)
-        is Value        -> reportsAsList(construction)
+        is Value          -> reportsAsList(construction)
         is TilFunction    -> reportsAsList(construction)
         is Trivialization -> reportsAsList(construction)
         is Variable       -> reportsAsList(construction)
     }
 
     fun reportsAsList(sentence: Sentence): List<Report> = when (sentence) {
-        is Declaration   -> reportsAsList(sentence)
-        is Construction -> reportsAsList(sentence)
+        is Declaration     -> reportsAsList(sentence)
+        is Construction    -> reportsAsList(sentence)
+        is ImportStatement -> reportsAsList(sentence)
     }
 
     fun reportsAsList(sentences: Iterable<Sentence>): List<Report> = sentences.flatMap(::reportsAsList)

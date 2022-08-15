@@ -2,6 +2,7 @@ package org.fpeterek.tilscript.interpreter.astprocessing
 
 import org.fpeterek.tilscript.interpreter.astprocessing.result.*
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Construction.*
+import org.fpeterek.tilscript.interpreter.astprocessing.result.ImportStatement
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.sentence.Symbol
@@ -14,6 +15,7 @@ import org.fpeterek.tilscript.interpreter.sentence.Composition as TilComposition
 import org.fpeterek.tilscript.interpreter.sentence.Closure as TilClosure
 import org.fpeterek.tilscript.interpreter.sentence.Variable as TilVariable
 import org.fpeterek.tilscript.interpreter.sentence.Trivialization as TilTrivialization
+import org.fpeterek.tilscript.interpreter.sentence.ImportStatement as TilImport
 
 
 class ASTConverter private constructor() {
@@ -61,12 +63,13 @@ class ASTConverter private constructor() {
     )
 
     private fun convertSentence(sentence: IntermediateResult) = when (sentence) {
-        is Construction  -> convertConstruction(sentence)
-        is GlobalVarDecl -> convertGlobalVarDecl(sentence)
-        is EntityDef     -> convertEntityDef(sentence)
-        is TypeAlias     -> convertTypeAlias(sentence)
-        is FunDefinition -> convertDefn(sentence)
-        is GlobalVarDef  -> convertGlobalVarDef(sentence)
+        is Construction    -> convertConstruction(sentence)
+        is GlobalVarDecl   -> convertGlobalVarDecl(sentence)
+        is EntityDef       -> convertEntityDef(sentence)
+        is TypeAlias       -> convertTypeAlias(sentence)
+        is FunDefinition   -> convertDefn(sentence)
+        is GlobalVarDef    -> convertGlobalVarDef(sentence)
+        is ImportStatement -> convertImportStatement(sentence)
 
         else -> throw RuntimeException("Invalid parser state")
     }
@@ -78,6 +81,8 @@ class ASTConverter private constructor() {
         is VarRef          -> convertVarRef(construction)
         is ListInitializer -> convertListInitializer(construction)
     }
+
+    private fun convertImportStatement(imp: ImportStatement) = TilImport(imp.file, imp.position)
 
     private fun convertListInitializer(init: ListInitializer): TilConstruction =
         init.values.foldRight(TilTrivialization(Values.Nil, init.position) as TilConstruction) { cons, acc ->

@@ -10,11 +10,11 @@ import org.fpeterek.tilscript.parser.TILScriptParser
 import org.fpeterek.tilscript.interpreter.astprocessing.result.*
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
-object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
+class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<IntermediateResult>() {
 
     private fun invalidState(): Nothing = throw RuntimeException("Invalid parser state")
 
-    private fun Token.position() = SrcPosition(line, charPositionInLine)
+    private fun Token.position() = SrcPosition(line, charPositionInLine, filename)
 
     private fun ParserRuleContext.position() = start.position()
 
@@ -39,9 +39,13 @@ object AntlrVisitor : TILScriptBaseVisitor<IntermediateResult>() {
         ctx.globalVarDecl()    != null -> visitGlobalVarDecl(ctx.globalVarDecl())
         ctx.typeDefinition()   != null -> visitTypeDefinition(ctx.typeDefinition())
         ctx.entityDefinition() != null -> visitEntityDefinition(ctx.entityDefinition())
+        ctx.importStatement()  != null -> visitImportStatement(ctx.importStatement())
 
         else -> invalidState()
     }
+
+    override fun visitImportStatement(ctx: TILScriptParser.ImportStatementContext) =
+        ImportStatement(ctx.string().text.drop(1).dropLast(1), ctx.position())
 
     override fun visitTypeDefinition(ctx: TILScriptParser.TypeDefinitionContext) = TypeAlias(
         name=visitTypeName(ctx.typeName()),

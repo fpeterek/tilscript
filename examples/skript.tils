@@ -1,19 +1,12 @@
-def variable: Int.
-
-let pi: Real = '3.14159.
+import "examples/symbols.tils".
+import "examples/vars.tils".
+import "examples/fns.tils".
 
 ['/ '4 '2].
 ['/ '6 '2].
-let fromConstruction: Int = ['/ '4 '2].
 
 ['Println fromConstruction].
 
-defn Divisible(num: Int, divisor: Int) -> Bool =
-    ['If ['= num '0]
-        'True
-        ['If ['< num '0]
-            'False
-            ['Divisible ['- num divisor] divisor]]].
 
 [
 '*
@@ -24,25 +17,12 @@ defn Divisible(num: Int, divisor: Int) -> Bool =
 
 
 ['* '3 '4].
-Tilman/Indiv.
-
-Seek / ( Bool Indiv Construction) @tw.
-
-Lastdec/(Int Real).
-
-Pi/Real.
 
 ['* '3 '4].
 
 ['Println [\w: World [\t:Time['Seek@wt 'Tilman '['Lastdec 'Pi]]]]].
 
-defn DruhaMocnina(x: Int) -> Int = ['* x x].
-
 ['Println '[\y:Int[\x:Int['+ y  x]]]].
-
-defn Add(x: Int, y: Int) -> Int = ['+ x y].
-
-let list: List<Int> = { '1, '2, '3 }.
 
 ['Println '['DruhaMocnina '2]].
 ['Println list].
@@ -51,12 +31,6 @@ let list: List<Int> = { '1, '2, '3 }.
 ['Println ['+ pi '1.5]].
 ['Println ['+ 'Pi '1.5]].
 
-defn PrintRes(cons: Construction) -> Bool =
-    ['Chain
-        ['Print cons]
-        ['Chain
-            ['Print '": \\\\\""]
-            ['Println ^2 cons]]].
 
 ['PrintRes '['Divisible '4 '2]].
 ['PrintRes '['Divisible '5 '2]].

@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
 import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
 import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
+import org.fpeterek.tilscript.interpreter.exceptions.SyntaxErrorException
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
@@ -17,6 +18,7 @@ import org.fpeterek.tilscript.interpreter.types.Util.isGeneric
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
 import org.fpeterek.tilscript.parser.TILScriptLexer
 import org.fpeterek.tilscript.parser.TILScriptParser
+import java.util.UnknownFormatConversionException
 
 
 class Interpreter: InterpreterInterface {
@@ -106,7 +108,7 @@ class Interpreter: InterpreterInterface {
 
     fun getSymbol(symbol: String): Symbol = Symbol(
         symbol,
-        SrcPosition(-1, -1),
+        SrcPosition(-1, -1, ""),
         symbolRepo[symbol] ?: throw RuntimeException("Unknown symbol '${symbol}'"),
         listOf()
     )
@@ -127,6 +129,10 @@ class Interpreter: InterpreterInterface {
         triv.construction is TilFunction && triv.construction.name == "=" -> EqualityOperator.tilFunction
 
         triv.construction is TilFunction -> getFunction(triv.construction.name)
+
+        // If the function was not known at parse-time, it could have been incorrectly detected as a Symbol instead
+        triv.construction is Symbol && triv.construction.constructionType is Unknown &&
+                triv.construction.value in functions -> getFunction(triv.construction.value)
 
         triv.construction is Symbol && triv.construction.constructionType is Unknown ->
             getSymbol(triv.construction)
@@ -398,8 +404,9 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(sentence: Sentence) {
         when (sentence) {
-            is Construction -> interpret(sentence)
-            is Declaration  -> interpret(sentence)
+            is Construction    -> interpret(sentence)
+            is Declaration     -> interpret(sentence)
+            is ImportStatement -> interpretFile(sentence.file)
         }
     }
 
@@ -413,12 +420,11 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    private fun printErrors(errors: Iterable<Report>, file: String, errorType: String) {
+    private fun printErrors(errors: Iterable<Report>, errorType: String) {
         println("-".repeat(80))
-        println("File: $file")
         println("$errorType errors")
 
-        ReportFormatter(file).terminalOutput(errors)
+        ReportFormatter().terminalOutput(errors)
 
         println("-".repeat(80))
         println("\n")
@@ -441,21 +447,19 @@ class Interpreter: InterpreterInterface {
         val start = parser.start()
 
         val sentences = try {
-            AntlrVisitor.visit(start)
+            AntlrVisitor(file).visit(start)
         } catch (ignored: Exception) {
-            Sentences(listOf(), SrcPosition(0, 0))
+            Sentences(listOf(), SrcPosition(0, 0, file))
         }
 
         if (errorListener.hasErrors) {
-            printErrors(errorListener.errors, file, "Syntax")
-            return
+            printErrors(errorListener.errors, "Syntax")
+            throw SyntaxErrorException()
         }
         if (parser.numberOfSyntaxErrors > 0) {
-            println("Parsing failed (likely due to a syntax error)")
-            return
+            println("Parsing failed (likely due to a syntax error which couldn't be properly detected)")
+            throw SyntaxErrorException()
         }
-
-        println(sentences.sentences.size)
 
         val ctx = ASTConverter.convert(sentences)
 
