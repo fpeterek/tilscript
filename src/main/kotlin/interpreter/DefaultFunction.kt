@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter
 
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.Construction
 import org.fpeterek.tilscript.interpreter.sentence.Variable
@@ -14,7 +15,7 @@ open class DefaultFunction(
 ) : EagerFunction(name, returns, args) {
 
     // Args have been handled by parent class already
-    override fun apply(interpreter: InterpreterInterface, args: List<Construction>) =
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
         interpreter.interpret(body)
 
 }

@@ -49,7 +49,7 @@ sealed class FunctionInterface constructor(
         handleArgMatches(argsMatches, fnArgs)
     }
 
-    abstract fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction
+    abstract fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction
 
-    abstract operator fun invoke(interpreter: InterpreterInterface, args: List<Construction>): Construction
+    abstract operator fun invoke(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction
 }

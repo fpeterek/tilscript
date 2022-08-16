@@ -1,9 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.BuiltinBareFunction
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.LazyFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.*
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.ConstructionType
 import org.fpeterek.tilscript.interpreter.types.GenericType
@@ -19,7 +16,7 @@ object Util {
             Variable("arg", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val str = when (val arg = interpreter.interpret(args.first())) {
                 is Text -> arg.value
                 else -> arg.toString()
@@ -36,8 +33,8 @@ object Util {
             Variable("arg", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
-            Print.apply(interpreter, args)
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+            Print.apply(interpreter, args, ctx)
             println()
             return Values.True
         }
@@ -52,13 +49,13 @@ object Util {
             Variable("returned", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction =
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction =
             when (val cond = interpreter.interpret(args.first())) {
                 is Bool -> when (cond.value) {
                     true -> interpreter.interpret(args[1])
                     else -> interpreter.interpret(args[2])
                 }
-                else -> Values.Nil
+                else -> Nil(ctx.position, reason="If condition cannot be a symbolic value")
             }
     }
 
@@ -69,7 +66,7 @@ object Util {
             Variable("placeholder", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
 
             for ((idx, arg) in args.withIndex()) {
                 val int = interpreter.interpret(arg)
@@ -79,32 +76,7 @@ object Util {
                 }
             }
 
-            return Values.Nil
-        }
-    }
-
-    object RunAll : EagerFunction(
-        "RunAll",
-        GenericType(2),
-        listOf(
-            Variable("constructions", SrcPosition(-1, -1), ListType(ConstructionType)),
-        )
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
-
-            val list = args.first() as TilList
-
-            if (list is EmptyList) {
-                return Values.Nil
-            }
-
-            var cell = list as ListCell
-
-            while (cell.tail !is EmptyList) {
-                cell = cell.tail as ListCell
-            }
-
-            return cell.head
+            return Nil(ctx.position, reason="No arguments were passed to Progn")
         }
     }
 

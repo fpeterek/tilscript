@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
@@ -18,12 +19,12 @@ object TextFunctions {
             idxVar
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val str = args.first()
             val idx = args[1]
 
             if (idx !is Integral || str !is Text) {
-                return Values.Nil
+                return Nil(ctx.position, reason="Char arguments must be non-symbolic")
             }
 
             val idxVal = idx.value.toInt()
@@ -45,12 +46,12 @@ object TextFunctions {
             text2Var,
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val str = args.first()
             val str2 = args[1]
 
             if (str2 !is Text || str !is Text) {
-                return Values.Nil
+                return Nil(ctx.position, reason="Cannot concatenate symbolic values")
             }
 
             return Text(str.value + str2.value, str.position)
@@ -65,11 +66,11 @@ object TextFunctions {
             textVar,
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val str = args.first()
 
             if (str !is Text) {
-                return Values.Nil
+                return Nil(ctx.position, reason="Cannot take the head of a symbolic value")
             }
 
             if (str.value.isEmpty()) {
@@ -87,11 +88,11 @@ object TextFunctions {
             textVar,
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val str = args.first()
 
             if (str !is Text || str.value.isEmpty()) {
-                return Values.Nil
+                return Nil(ctx.position, reason="Cannot take the tail of a symbolic value")
             }
 
             return Text(str.value.drop(1), str.position)
@@ -105,11 +106,11 @@ object TextFunctions {
             textVar,
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val str = args.first()
 
             if (str !is Text || str.value.isEmpty()) {
-                return Values.Nil
+                return Nil(ctx.position, reason="Cannot compute the length of a symbolic string")
             }
 
             return Integral(str.value.length.toLong(), str.position)

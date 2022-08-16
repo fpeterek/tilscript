@@ -6,9 +6,9 @@ import org.fpeterek.tilscript.interpreter.types.Type
 
 abstract class LazyFunction(name: String, returns: Type, args: List<Variable>): FunctionInterface(name, returns, args) {
 
-    override fun invoke(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+    override fun invoke(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
         checkArgCount(args)
-        return apply(interpreter, args)
+        return apply(interpreter, args, ctx)
     }
 
 }

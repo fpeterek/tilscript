@@ -10,6 +10,7 @@ import org.fpeterek.tilscript.interpreter.types.Type
 abstract class BuiltinBareFunction(
     name: String, returns: Type, args: List<Variable>): FunctionInterface(name, returns, args) {
 
-    override fun invoke(interpreter: InterpreterInterface, args: List<Construction>) = apply(interpreter, args)
+    override fun invoke(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+        apply(interpreter, args, ctx)
 
 }

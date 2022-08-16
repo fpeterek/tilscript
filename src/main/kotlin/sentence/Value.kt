@@ -158,6 +158,7 @@ class Bool(
 class Nil(
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
+    val reason: String = "",
 ) : Value(srcPos, Unknown, reports) {
 
     override fun equals(other: Any?) = false

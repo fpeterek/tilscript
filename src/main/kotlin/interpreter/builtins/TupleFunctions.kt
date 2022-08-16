@@ -2,6 +2,7 @@ package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.BuiltinBareFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.GenericType
@@ -17,7 +18,7 @@ object TupleFunctions {
         )
     ) {
 
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val int = args.map(interpreter::interpret)
 
             val nil = int.firstOrNull { it is Nil }
@@ -42,7 +43,7 @@ object TupleFunctions {
             Variable("idx", SrcPosition(-1, -1), Types.Int)
         ),
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             val tuple = args[0]
             val idx = args[1]
 
@@ -51,7 +52,7 @@ object TupleFunctions {
             }
 
             if (idx is Symbol) {
-                return Values.Nil
+                return Nil(ctx.position, reason="Cannot index a tuple using a symbolic index")
             }
 
             idx as Integral

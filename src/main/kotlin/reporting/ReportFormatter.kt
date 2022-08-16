@@ -58,6 +58,8 @@ class ReportFormatter {
                 padding + report.message
     }
 
+    fun terminalOutput(report: Report) = println(formatReport(report))
+
     fun terminalOutput(reports: Iterable<Report>) = reports
         .asSequence()
         .map(::formatReport)

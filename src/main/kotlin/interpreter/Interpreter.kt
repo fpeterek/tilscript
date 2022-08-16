@@ -6,8 +6,10 @@ import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
 import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
 import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
+import org.fpeterek.tilscript.interpreter.exceptions.NilException
 import org.fpeterek.tilscript.interpreter.exceptions.SyntaxErrorException
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.reporting.Report
@@ -18,7 +20,6 @@ import org.fpeterek.tilscript.interpreter.types.Util.isGeneric
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
 import org.fpeterek.tilscript.parser.TILScriptLexer
 import org.fpeterek.tilscript.parser.TILScriptParser
-import java.util.UnknownFormatConversionException
 
 
 class Interpreter: InterpreterInterface {
@@ -29,6 +30,8 @@ class Interpreter: InterpreterInterface {
     private val topLevelFrame = StackFrame(parent = null)
 
     private val stack: MutableList<StackFrame> = mutableListOf(topLevelFrame)
+
+    private val importedFiles = mutableSetOf<String>()
 
     private val currentFrame get() = stack.last()
 
@@ -168,11 +171,11 @@ class Interpreter: InterpreterInterface {
     }
 
     // TODO: Type-aware equality, probably built into the interpreter
-    private fun interpretEquality(args: List<Construction>) = EqualityOperator.apply(this, args)
+    private fun interpretEquality(args: List<Construction>, ctx: FnCallContext) = EqualityOperator.apply(this, args, ctx)
 
-    private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>): Construction =
+    private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>, ctx: FnCallContext): Construction =
         (numericOperators[fn.name] ?: throw RuntimeException("No such operator '${fn.name}'"))
-            .apply(this, args)
+            .apply(this, args, ctx)
 
     private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
 
@@ -180,18 +183,20 @@ class Interpreter: InterpreterInterface {
             throw RuntimeException("Operator '${fn.name}' expects 2 arguments (${comp.args.size} provided)")
         }
 
+        val ctx = FnCallContext(comp.function.position)
+
         return when (fn.name) {
-            "="  -> interpretEquality(comp.args.map { interpret(it) })
-            else -> interpretNumericOperator(fn, comp.args)
+            "="  -> interpretEquality(comp.args.map { interpret(it) }, ctx)
+            else -> interpretNumericOperator(fn, comp.args, ctx)
         }
     }
 
-    private fun interpretFn(fn: FunctionInterface, args: List<Construction>) = withFrame {
-        fn(this, args)
+    private fun interpretFn(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext) = withFrame {
+        fn(this, args, ctx)
     }
 
-    private fun interpretLambda(fn: LambdaFunction, args: List<Construction>) = withFrame(fn.context.frame) {
-        fn(this, args)
+    private fun interpretLambda(fn: LambdaFunction, args: List<Construction>, ctx: FnCallContext) = withFrame(fn.context.frame) {
+        fn(this, args, ctx)
     }
 
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
@@ -200,9 +205,11 @@ class Interpreter: InterpreterInterface {
             else -> fn.implementation
         } ?: throw RuntimeException("Function ${fn.name} is declared but undefined, application is impossible")
 
+        val ctx = FnCallContext(comp.function.position)
+
         return when (fnImpl) {
-            is LambdaFunction -> interpretLambda(fnImpl, comp.args)
-            else              -> interpretFn(fnImpl, comp.args)
+            is LambdaFunction -> interpretLambda(fnImpl, comp.args, ctx)
+            else              -> interpretFn(fnImpl, comp.args, ctx)
         }
     }
 
@@ -219,7 +226,6 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    // TODO: Test
     override fun interpret(construction: Construction): Construction = when (construction) {
         is Closure        -> interpret(construction)
         is Composition    -> interpret(construction)
@@ -404,7 +410,13 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(sentence: Sentence) {
         when (sentence) {
-            is Construction    -> interpret(sentence)
+            is Construction    -> {
+                val res = interpret(sentence)
+                if (res is Nil) {
+                    ReportFormatter().terminalOutput(Report(res.reason, res.position))
+                    throw NilException()
+                }
+            }
             is Declaration     -> interpret(sentence)
             is ImportStatement -> interpretFile(sentence.file)
         }
@@ -431,6 +443,12 @@ class Interpreter: InterpreterInterface {
     }
 
     fun interpretFile(file: String) {
+
+        if (file in importedFiles) {
+            return
+        }
+
+        importedFiles.add(file)
 
         val stream = CharStreams.fromFileName(file)
 

@@ -7,7 +7,7 @@ import org.fpeterek.tilscript.interpreter.types.Type
 
 abstract class EagerFunction(name: String, returns: Type, args: List<Variable>): FunctionInterface(name, returns, args) {
 
-    override fun invoke(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+    override fun invoke(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
         val cons = args.map(interpreter::interpret)
 
         val nilArg = cons.firstOrNull { it is Nil }
@@ -22,7 +22,7 @@ abstract class EagerFunction(name: String, returns: Type, args: List<Variable>):
             interpreter.createLocal(variable, value)
         }
 
-        val retval = apply(interpreter, cons)
+        val retval = apply(interpreter, cons, ctx)
 
         checkSignature(interpreter, retval.constructionType, cons.map { it.constructionType })
 

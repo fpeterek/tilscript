@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
 import org.fpeterek.tilscript.interpreter.interpreter.OperatorFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.Type
@@ -21,10 +22,10 @@ object NumericOperators {
 
         protected val noPos get() = SrcPosition(-1, -1)
 
-        protected abstract fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface): Construction
-        protected abstract fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface): Construction
+        protected abstract fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext): Construction
+        protected abstract fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext): Construction
 
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>): Construction {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
 
             val int = args.map(interpreter::interpret)
 
@@ -48,72 +49,72 @@ object NumericOperators {
             }
 
             if (int.any { it !is Integral && it !is Real }) {
-                return interpreter.nil
+                return Nil(ctx.position, reason="Cannot perform arithmetic operations on symbolic values")
             }
 
             return when (int[0]) {
-                is Integral -> calcIntegral(int[0] as Integral, int[1] as Integral, interpreter)
-                else        -> calcReal(int[0] as Real, int[1] as Real, interpreter)
+                is Integral -> calcIntegral(int[0] as Integral, int[1] as Integral, interpreter, ctx)
+                else        -> calcReal(int[0] as Real, int[1] as Real, interpreter, ctx)
             }
         }
 
     }
 
     object Plus : NumericOperatorBase("+", Types.Real) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) =
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) =
             Integral(fst.value + snd.value, noPos)
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) =
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) =
             Real(fst.value + snd.value, noPos)
     }
 
     object Minus : NumericOperatorBase("-", Types.Real) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) =
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) =
             Integral(fst.value - snd.value, noPos)
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) =
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) =
             Real(fst.value - snd.value, noPos)
     }
 
     object Multiply : NumericOperatorBase("*", Types.Real) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) =
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) =
             Integral(fst.value * snd.value, noPos)
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) =
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) =
             Real(fst.value * snd.value, noPos)
     }
 
     object Divide : NumericOperatorBase("/", Types.Real) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) = when (snd.value) {
-            0L   -> interpreter.nil
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) = when (snd.value) {
+            0L   -> Nil(ctx.position, reason="Division by zero")
             else -> Integral(fst.value / snd.value, noPos)
         }
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) = when (snd.value) {
-            0.0  -> interpreter.nil
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) = when (snd.value) {
+            0.0  -> Nil(ctx.position, reason="Division by zero")
             else -> Real(fst.value / snd.value, noPos)
         }
     }
 
     object Less : NumericOperatorBase("<", Types.Bool) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) = when {
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
             fst.value < snd.value -> Values.True
             else -> Values.False
         }
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) = when {
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
             fst.value < snd.value -> Values.True
             else -> Values.False
         }
     }
 
     object Greater : NumericOperatorBase(">", Types.Bool) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface) = when {
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
             fst.value > snd.value -> Values.True
             else -> Values.False
         }
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface) = when {
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
             fst.value > snd.value -> Values.True
             else -> Values.False
         }

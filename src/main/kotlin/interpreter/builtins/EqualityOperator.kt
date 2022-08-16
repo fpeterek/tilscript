@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
 import org.fpeterek.tilscript.interpreter.interpreter.OperatorFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.GenericType
@@ -15,7 +16,7 @@ object EqualityOperator : OperatorFunction(
     )
 ) {
 
-    override fun apply(interpreter: InterpreterInterface, args: List<Construction>) = when {
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) = when {
         args[0] is Nil || args[1] is Nil -> Values.False
         args[0] == args[1] -> Values.True
         else -> Values.False
