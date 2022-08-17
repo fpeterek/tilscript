@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter
 
 import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.util.die
 
 class StackFrame(val parent: StackFrame?) {
 
@@ -11,7 +12,7 @@ class StackFrame(val parent: StackFrame?) {
     }
 
     fun getVar(name: String): Variable = variables.getOrElse(name) {
-        throw RuntimeException("No such variable '$name'")
+        die("No such variable '$name'")
     }
 
     fun hasVar(name: String) = name in variables

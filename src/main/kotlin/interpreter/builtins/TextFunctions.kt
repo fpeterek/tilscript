@@ -30,7 +30,7 @@ object TextFunctions {
             val idxVal = idx.value.toInt()
 
             if (idxVal !in str.value.indices) {
-                throw RuntimeException("Text index out of range")
+                return Nil(ctx.position, reason="Text index out of range")
             }
 
             return Text(str.value[idxVal].toString(), str.position)
@@ -74,7 +74,7 @@ object TextFunctions {
             }
 
             if (str.value.isEmpty()) {
-                throw RuntimeException("Attempting to get the head of an empty string")
+                return Nil(ctx.position, reason="Attempting to get the head of an empty string")
             }
 
             return Text(str.value.take(1), str.position)

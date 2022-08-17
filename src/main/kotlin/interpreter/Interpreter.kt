@@ -18,11 +18,14 @@ import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.*
 import org.fpeterek.tilscript.interpreter.types.Util.isGeneric
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.die
 import org.fpeterek.tilscript.parser.TILScriptLexer
 import org.fpeterek.tilscript.parser.TILScriptParser
 
 
 class Interpreter: InterpreterInterface {
+
+    private val reportFormatter = ReportFormatter()
 
     private val symbolRepo = SymbolRepository()
     private val typeRepo = TypeRepository()
@@ -78,7 +81,7 @@ class Interpreter: InterpreterInterface {
     private infix fun Type.matches(other: Type) = TypeMatcher.match(this, other, typeRepo)
 
     private fun findVar(frame: StackFrame?, name: String): Variable = when {
-        frame == null -> throw RuntimeException("Variable not found '$name'")
+        frame == null -> die("Variable not found '$name'")
         name in frame -> frame[name]!!
         else          -> findVar(frame.parent, name)
     }
@@ -96,30 +99,30 @@ class Interpreter: InterpreterInterface {
         val frameVar = findVar(variable.name)
 
         if (frameVar.value == null) {
-            throw RuntimeException("Variable '${variable.name}' is declared but undefined")
+            die("Variable '${variable.name}' is declared but undefined")
         }
 
         if (!(frameVar.constructedType matches variable.constructedType)) {
-            throw RuntimeException("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${frameVar.constructedType})")
+            die("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${frameVar.constructedType})")
         }
 
         return frameVar.value
     }
 
     fun getFunction(fn: String): TilFunction =
-        functions[fn] ?: throw RuntimeException("Function '$fn' is not declared")
+        functions[fn] ?: die("Function '$fn' is not declared")
 
     fun getSymbol(symbol: String): Symbol = Symbol(
         symbol,
         SrcPosition(-1, -1, ""),
-        symbolRepo[symbol] ?: throw RuntimeException("Unknown symbol '${symbol}'"),
+        symbolRepo[symbol] ?: die("Unknown symbol '${symbol}'"),
         listOf()
     )
 
     fun getSymbol(symbol: Symbol): Symbol = Symbol(
         symbol.value,
         symbol.position,
-        symbolRepo[symbol.value] ?: throw RuntimeException("Unknown symbol '${symbol.value}'"),
+        symbolRepo[symbol.value] ?: die("Unknown symbol '${symbol.value}'"),
         symbol.reports
     )
 
@@ -174,13 +177,13 @@ class Interpreter: InterpreterInterface {
     private fun interpretEquality(args: List<Construction>, ctx: FnCallContext) = EqualityOperator.apply(this, args, ctx)
 
     private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>, ctx: FnCallContext): Construction =
-        (numericOperators[fn.name] ?: throw RuntimeException("No such operator '${fn.name}'"))
+        (numericOperators[fn.name] ?: die("No such operator '${fn.name}'"))
             .apply(this, args, ctx)
 
     private fun interpretOperator(fn: TilFunction, comp: Composition): Construction {
 
         if (comp.args.size != 2) {
-            throw RuntimeException("Operator '${fn.name}' expects 2 arguments (${comp.args.size} provided)")
+            die("Operator '${fn.name}' expects 2 arguments (${comp.args.size} provided)")
         }
 
         val ctx = FnCallContext(comp.function.position)
@@ -203,7 +206,7 @@ class Interpreter: InterpreterInterface {
         val fnImpl = when (fn.implementation) {
             null -> functions[fn.name]?.implementation
             else -> fn.implementation
-        } ?: throw RuntimeException("Function ${fn.name} is declared but undefined, application is impossible")
+        } ?: die("Function ${fn.name} is declared but undefined, application is impossible")
 
         val ctx = FnCallContext(comp.function.position)
 
@@ -217,7 +220,7 @@ class Interpreter: InterpreterInterface {
         val fn = interpret(comp.function)
 
         if (fn !is TilFunction) {
-            throw RuntimeException("Only functions can be applied on arguments. $fn is not a function")
+            die("Only functions can be applied on arguments. $fn is not a function")
         }
 
         return when (fn.name) {
@@ -244,14 +247,14 @@ class Interpreter: InterpreterInterface {
 
     override fun ensureMatch(expected: Type, received: Type) {
         if (!(expected matches received)) {
-            throw RuntimeException("Type mismatch (expected: $expected, received: $received)")
+            die("Type mismatch (expected: $expected, received: $received)")
         }
     }
 
     override fun createLocal(variable: Variable, value: Construction) {
 
         if (variable.name in currentFrame) {
-            throw RuntimeException("Redefinition of variable '${variable.name}'")
+            die("Redefinition of variable '${variable.name}'")
         }
 
         val varWithValue = Variable(
@@ -268,14 +271,14 @@ class Interpreter: InterpreterInterface {
     private fun interpret(decl: FunctionDeclaration) = decl.functions.forEach {
 
         if (it.constructedType !is FunctionType) {
-            throw RuntimeException("Invalid function type")
+            die("Invalid function type")
         }
 
         if (it.constructedType.imageType is GenericType) {
             val genTypes = it.constructedType.argTypes.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
 
             if (it.constructedType.imageType.argNumber !in genTypes) {
-                throw RuntimeException("Image type of function ${it.name} could not be deduced from type arguments")
+                die("Image type of function ${it.name} could not be deduced from type arguments")
             }
         }
 
@@ -286,7 +289,7 @@ class Interpreter: InterpreterInterface {
             val fn = functions[it.name]!!
 
             if (!(fn.constructedType matches it.constructedType)) {
-                throw RuntimeException("Redeclaration of function '${fn.name}' with a different type")
+                die("Redeclaration of function '${fn.name}' with a different type")
             }
         }
     }
@@ -297,17 +300,17 @@ class Interpreter: InterpreterInterface {
             val genTypes = def.args.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
 
             if (def.signature.imageType.argNumber !in genTypes) {
-                throw RuntimeException("Image type of function ${def.name} could not be deduced from type arguments")
+                die("Image type of function ${def.name} could not be deduced from type arguments")
             }
         }
 
         if (def.name in functions) {
             val declared = functions[def.name]!!
             if (declared.implementation != null) {
-                throw RuntimeException("Redefinition of function '${def.name}' with a conflicting implementation")
+                die("Redefinition of function '${def.name}' with a conflicting implementation")
             }
             if (!(declared.constructedType matches def.signature)) {
-                throw RuntimeException("Redeclaration of function '${def.name}' with a different type")
+                die("Redeclaration of function '${def.name}' with a different type")
             }
         }
         functions[def.name] = def.tilFunction
@@ -323,7 +326,7 @@ class Interpreter: InterpreterInterface {
             if (it.value in symbolRepo) {
                 val declaredType = symbolRepo[it.value]!!
                 if (!(declaredType matches lit.type)) {
-                    throw RuntimeException("Redeclaration of symbol '${it.value}' with a different type")
+                    die("Redeclaration of symbol '${it.value}' with a different type")
                 }
             } else {
                 symbolRepo.declare(it)
@@ -341,7 +344,7 @@ class Interpreter: InterpreterInterface {
         if (alias.name in typeRepo) {
             val declaredType = typeRepo[alias.name]!!
             if (!(declaredType matches alias.type)) {
-                throw RuntimeException("Redeclaration of symbol '${alias.name}' with a different type")
+                die("Redeclaration of symbol '${alias.name}' with a different type")
             }
         } else {
             typeRepo.process(alias)
@@ -349,7 +352,7 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun invalidUseOfGenerics(): Nothing =
-        throw RuntimeException("Generic types are only allowed in function definitions")
+        die("Generic types are only allowed in function definitions")
 
     private fun interpret(varDecl: VariableDeclaration) {
         varDecl.variables.forEach {
@@ -361,7 +364,7 @@ class Interpreter: InterpreterInterface {
             if (it.name in topLevelFrame) {
                 val declared = topLevelFrame[it.name]!!
                 if (!(declared.constructedType matches it.constructedType)) {
-                    throw RuntimeException("Redeclaration of variable '${it.name}' with a different type")
+                    die("Redeclaration of variable '${it.name}' with a different type")
                 }
             } else {
                 topLevelFrame.putVar(it)
@@ -379,18 +382,18 @@ class Interpreter: InterpreterInterface {
             val declared = topLevelFrame[varDef.name]!!
 
             if (declared.value != null) {
-                throw RuntimeException("Redefinition of variable '${varDef.name}' with a new value")
+                die("Redefinition of variable '${varDef.name}' with a new value")
             }
 
             if (!(declared.constructedType matches varDef.constructsType)) {
-                throw RuntimeException("Redeclaration of variable '${varDef.name}' with a different type")
+                die("Redeclaration of variable '${varDef.name}' with a different type")
             }
         }
 
         val value = interpret(varDef.construction)
 
         if (!(value.constructedType matches varDef.constructsType)) {
-            throw RuntimeException("Type of value assigned to variable '${varDef.name}' does not match expected type " +
+            die("Type of value assigned to variable '${varDef.name}' does not match expected type " +
                     "(expected: ${varDef.constructsType}, received: ${value.constructedType})")
         }
 
@@ -414,13 +417,17 @@ class Interpreter: InterpreterInterface {
                 val res = interpret(sentence)
                 if (res is Nil) {
                     ReportFormatter().terminalOutput(Report(res.reason, res.position))
-                    throw NilException()
+                    die("Nil constructed by a top level construction. Aborting execution.")
                 }
             }
             is Declaration     -> interpret(sentence)
             is ImportStatement -> interpretFile(sentence.file)
         }
     }
+
+    private fun report(r: Report) = reportFormatter.terminalOutput(r)
+
+    private fun report(nil: Nil) = report(Report(nil.reason, nil.position))
 
     private fun interpret(sentences: Iterable<Sentence>) = sentences.forEachIndexed { index, sentence ->
         try {
@@ -436,7 +443,7 @@ class Interpreter: InterpreterInterface {
         println("-".repeat(80))
         println("$errorType errors")
 
-        ReportFormatter().terminalOutput(errors)
+        reportFormatter.terminalOutput(errors)
 
         println("-".repeat(80))
         println("\n")
@@ -472,11 +479,11 @@ class Interpreter: InterpreterInterface {
 
         if (errorListener.hasErrors) {
             printErrors(errorListener.errors, "Syntax")
-            throw SyntaxErrorException()
+            die("Syntax error occurred")
         }
         if (parser.numberOfSyntaxErrors > 0) {
             println("Parsing failed (likely due to a syntax error which couldn't be properly detected)")
-            throw SyntaxErrorException()
+            die("Syntax error occurred")
         }
 
         val ctx = ASTConverter.convert(sentences)

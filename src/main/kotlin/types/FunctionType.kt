@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.interpreter.types
 
 import org.fpeterek.tilscript.interpreter.exceptions.InvalidFunctionSignature
+import org.fpeterek.tilscript.interpreter.util.die
 
 class FunctionType(
     val imageType: Type,
@@ -13,7 +14,7 @@ class FunctionType(
 
         operator fun invoke(signature: List<Type>) = when {
             signature.isEmpty() ->
-                throw InvalidFunctionSignature("Function signature must contain at least image type")
+                die("Function signature must contain at least image type")
             else -> FunctionType(
                 imageType=signature[0],
                 argTypes=signature.drop(1)

@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.interpreter.sentence.Variable
 import org.fpeterek.tilscript.interpreter.types.FunctionType
 import org.fpeterek.tilscript.interpreter.types.Type
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.die
 
 sealed class FunctionInterface constructor(
     val name: String,
@@ -20,7 +21,7 @@ sealed class FunctionInterface constructor(
 
     protected fun checkArgCount(fnArgs: List<Construction>) {
         if (fnArgs.size != args.size) {
-            throw RuntimeException("Incorrect number of arguments in application of function '$name' (expected: ${args.size}, received: ${fnArgs.size})")
+            die("Incorrect number of arguments in application of function '$name' (expected: ${args.size}, received: ${fnArgs.size})")
         }
     }
 
@@ -29,7 +30,7 @@ sealed class FunctionInterface constructor(
             if (!match) {
                 val exp = argTypes[idx]
                 val rec = fnArgs[idx]
-                throw RuntimeException("Invalid argument type in application of function '$name' (expected: $exp, received: $rec)")
+                die("Invalid argument type in application of function '$name' (expected: $exp, received: $rec)")
             }
         }
     }
@@ -43,7 +44,7 @@ sealed class FunctionInterface constructor(
         val (retvalMatch, argsMatches) = interpreter.fnSignatureMatch(signature, returned, fnArgs)
 
         if (!retvalMatch) {
-            throw RuntimeException("Returned type of function '$name' does not match expected return type (expected: $returns, received: $returned)")
+            die("Returned type of function '$name' does not match expected return type (expected: $returns, received: $returned)")
         }
 
         handleArgMatches(argsMatches, fnArgs)

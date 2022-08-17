@@ -4,6 +4,7 @@ import org.fpeterek.tilscript.interpreter.sentence.Construction
 import org.fpeterek.tilscript.interpreter.sentence.Value
 import org.fpeterek.tilscript.interpreter.sentence.TilFunction
 import org.fpeterek.tilscript.interpreter.sentence.Variable
+import org.fpeterek.tilscript.interpreter.util.die
 
 
 class SymbolRepository {
@@ -32,14 +33,14 @@ class SymbolRepository {
         is Variable    -> declare(construction)
         is TilFunction -> declare(construction)
         is Value       -> declare(construction)
-        else           -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
+        else           -> die("Only variable, function and literal types can be stored in repos")
     }
 
     fun declareAll(constructions: Iterable<Construction>) = constructions.forEach(::declare)
 
     fun define(name: String, type: Type) {
         if (name in defined) {
-            throw RuntimeException("Redefinition of symbol '$name'")
+            die("Redefinition of symbol '$name'")
         }
         defined.add(name)
         declare(name, type)
@@ -53,7 +54,7 @@ class SymbolRepository {
         is Variable    -> define(construction)
         is TilFunction -> define(construction)
         is Value       -> define(construction)
-        else           -> throw RuntimeException("Only variable, function and literal types can be stored in repos")
+        else           -> die("Only variable, function and literal types can be stored in repos")
     }
 
     fun defineAll(constructions: Iterable<Construction>) = constructions.forEach(::define)

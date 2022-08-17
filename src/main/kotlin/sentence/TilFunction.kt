@@ -1,11 +1,11 @@
 package org.fpeterek.tilscript.interpreter.sentence
 
-import org.fpeterek.tilscript.interpreter.exceptions.InvalidType
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.tilscript.interpreter.reporting.Report
 import org.fpeterek.tilscript.interpreter.sentence.isexecutable.NonExecutable
 import org.fpeterek.tilscript.interpreter.types.*
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.die
 
 
 class TilFunction(
@@ -27,7 +27,7 @@ class TilFunction(
 
     init {
         if (type !is Unknown && type !is FunctionType) {
-            throw InvalidType("Type of TilFunction must be Unknown or FunctionType")
+            die("Type of TilFunction must be Unknown or FunctionType")
         }
     }
 

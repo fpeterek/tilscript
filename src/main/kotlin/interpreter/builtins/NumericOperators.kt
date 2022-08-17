@@ -41,11 +41,11 @@ object NumericOperators {
             }
 
             if (!interpreter.typesMatch(t1, t2)) {
-                throw RuntimeException("Argument type mismatch in operator $name (first: ${t1}, second: ${t2}")
+                Nil(ctx.position, reason="Argument type mismatch in operator $name (first: ${t1}, second: ${t2}")
             }
 
             if (!interpreter.typesMatch(t1, Types.Int) && !interpreter.typesMatch(t1, Types.Real)) {
-                throw RuntimeException("Invalid argument type for operator $name, (received: $t1, expected Real or Int)")
+                Nil(ctx.position, reason="Invalid argument type for operator $name, (received: $t1, expected Real or Int)")
             }
 
             if (int.any { it !is Integral && it !is Real }) {

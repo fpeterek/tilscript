@@ -7,6 +7,7 @@ import org.fpeterek.tilscript.interpreter.types.ConstructionType
 import org.fpeterek.tilscript.interpreter.types.Type
 import org.fpeterek.tilscript.interpreter.types.Unknown
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.die
 
 class Execution(
     val construction: Construction,
@@ -26,7 +27,7 @@ class Execution(
 
     init {
         if (executionOrder < 1 || executionOrder > 2) {
-            throw InvalidExecutionOrder(executionOrder)
+            die("Execution order must be 1 or 2 (received: $executionOrder)")
         }
     }
 

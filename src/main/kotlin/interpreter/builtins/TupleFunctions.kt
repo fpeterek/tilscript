@@ -48,7 +48,7 @@ object TupleFunctions {
             val idx = args[1]
 
             if (tuple !is TilTuple) {
-                throw RuntimeException("First argument of Get must be a tuple. (${tuple.constructionType} received)")
+                return Nil(ctx.position, reason="First argument of Get must be a tuple. (${tuple.constructionType} received)")
             }
 
             if (idx is Symbol) {
@@ -58,7 +58,7 @@ object TupleFunctions {
             idx as Integral
 
             if (idx.value < 0 || idx.value >= tuple.values.size) {
-                throw RuntimeException("Index out of range")
+                return Nil(ctx.position, reason="Index out of range")
             }
 
             return tuple.values[idx.value.toInt()]

@@ -20,10 +20,15 @@ class ReportFormatter {
         }
     }
 
+    private val Report.fmtMessage get() = when {
+        message.isBlank() -> "Unknown error"
+        else -> message
+    }
+
     private fun formatReport(report: Report): String {
 
         if (report.line < 0 && report.char < 0) {
-            return report.message
+            return report.fmtMessage
         }
 
         ensureFileIsLoaded(report.file)
@@ -55,7 +60,7 @@ class ReportFormatter {
 
         return positionIndicator + trimmed + "\n" +
                 pointer + "\n" +
-                padding + report.message
+                padding + report.fmtMessage
     }
 
     fun terminalOutput(report: Report) = println(formatReport(report))

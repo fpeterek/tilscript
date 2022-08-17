@@ -43,11 +43,11 @@ object ListFunctions {
             }
 
             if (tail !is TilList) {
-                throw RuntimeException("List tail must be a list")
+                return Nil(ctx.position, reason="List tail must be a list")
             }
 
             if (!interpreter.typesMatch(head.constructionType, tail.valueType)) {
-                throw RuntimeException("Lists must be homogeneous (head type (${head.constructionType}) does not match list value type (${tail.valueType}))")
+                return Nil(ctx.position, reason="Lists must be homogeneous (head type (${head.constructionType}) does not match list value type (${tail.valueType}))")
             }
 
             return ListCell(
