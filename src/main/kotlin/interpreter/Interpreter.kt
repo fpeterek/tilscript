@@ -21,11 +21,14 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 import org.fpeterek.tilscript.interpreter.util.die
 import org.fpeterek.tilscript.parser.TILScriptLexer
 import org.fpeterek.tilscript.parser.TILScriptParser
+import java.io.File
+import java.nio.file.Paths
 
 
 class Interpreter: InterpreterInterface {
 
     private val reportFormatter = ReportFormatter()
+    private var baseDir = File(System.getProperty("user.dir"))
 
     private val symbolRepo = SymbolRepository()
     private val typeRepo = TypeRepository()
@@ -449,14 +452,17 @@ class Interpreter: InterpreterInterface {
         println("\n")
     }
 
-    fun interpretFile(file: String) {
+    private fun <T> withBaseDir(dir: File, fn: () -> T): T {
 
-        if (file in importedFiles) {
-            return
-        }
+        val prev = baseDir
+        baseDir = dir
+        val retval = fn()
+        baseDir = prev
 
-        importedFiles.add(file)
+        return retval
+    }
 
+    private fun interpretFileInt(file: String) {
         val stream = CharStreams.fromFileName(file)
 
         val errorListener = ErrorListener()
@@ -489,6 +495,34 @@ class Interpreter: InterpreterInterface {
         val ctx = ASTConverter.convert(sentences)
 
         interpret(ctx.sentences)
+    }
+
+    private fun storeAndInterpretFile(file: File) {
+
+        val absolute = file.absoluteFile.toString()
+
+        if (absolute in importedFiles) {
+            return
+        }
+
+        importedFiles.add(absolute)
+
+        withBaseDir(file.absoluteFile.parentFile) {
+            interpretFileInt(absolute)
+        }
+    }
+
+    fun interpretFile(filename: String) {
+
+        val file = File(filename)
+
+        if (file.isAbsolute) {
+            storeAndInterpretFile(file)
+        }
+
+        val relative = Paths.get(baseDir.toString(), file.toString())
+
+        storeAndInterpretFile(relative.toFile())
     }
 
 }

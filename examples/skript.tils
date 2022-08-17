@@ -1,6 +1,6 @@
-import "examples/symbols.tils".
-import "examples/vars.tils".
-import "examples/fns.tils".
+import "symbols.tils".
+import "vars/vars.tils".
+import "fns.tils".
 
 ['/ '4 '2].
 ['/ '6 '2].

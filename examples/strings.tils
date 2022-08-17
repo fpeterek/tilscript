@@ -1,4 +1,4 @@
-import "examples/fns.tils".
+import "fns.tils".
 
 ['PrintRes '['CatS '"VSB -" '" TUO"]].
 
