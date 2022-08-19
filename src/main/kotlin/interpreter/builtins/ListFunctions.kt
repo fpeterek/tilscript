@@ -111,7 +111,12 @@ object ListFunctions {
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) = when (args[0]) {
-            is EmptyList -> Bool(true, srcPos=ctx.position)
+            is TilList -> (args[0] as TilList).let { list ->
+                when (list) {
+                    is EmptyList -> Values.True
+                    is ListCell -> Values.False
+                }
+            }
 
             else -> Nil(ctx.position, reason="Cannot determine the contents of a symbolic List")
         }

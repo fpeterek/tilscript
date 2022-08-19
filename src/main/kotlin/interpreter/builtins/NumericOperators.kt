@@ -97,19 +97,27 @@ object NumericOperators {
     }
 
     object Less : NumericOperatorBase("<", Types.Bool) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) =
-            Bool(fst.value < snd.value, srcPos = ctx.position)
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
+            fst.value < snd.value -> Values.True
+            else -> Values.False
+        }
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) =
-            Bool(fst.value < snd.value, srcPos = ctx.position)
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
+            fst.value < snd.value -> Values.True
+            else -> Values.False
+        }
     }
 
     object Greater : NumericOperatorBase(">", Types.Bool) {
-        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) =
-            Bool(fst.value > snd.value, srcPos = ctx.position)
+        override fun calcIntegral(fst: Integral, snd: Integral, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
+            fst.value > snd.value -> Values.True
+            else -> Values.False
+        }
 
-        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) =
-            Bool(fst.value > snd.value, srcPos = ctx.position)
+        override fun calcReal(fst: Real, snd: Real, interpreter: InterpreterInterface, ctx: FnCallContext) = when {
+            fst.value > snd.value -> Values.True
+            else -> Values.False
+        }
     }
 
 }

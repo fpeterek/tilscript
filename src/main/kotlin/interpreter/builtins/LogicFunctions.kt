@@ -27,8 +27,11 @@ object LogicFunctions {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             when {
-                args[0] is Bool -> Bool(!(args[0] as Bool).value, srcPos = ctx.position)
-                else            -> symbolicNil(ctx)
+                args[0] is Bool -> when ((args[0] as Bool).value) {
+                    true -> Values.False
+                    else -> Values.True
+                }
+                else -> symbolicNil(ctx)
             }
     }
 
@@ -39,9 +42,9 @@ object LogicFunctions {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             when {
-                args.all { it is Bool && it.value } -> Bool(true, srcPos = ctx.position)
+                args.all { it is Bool && it.value } -> Values.True
                 args.all { it is Symbol } -> symbolicNil(ctx)
-                else -> Bool(false, srcPos = ctx.position)
+                else -> Values.False
             }
     }
 
@@ -52,9 +55,9 @@ object LogicFunctions {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             when {
-                args.any { it is Bool && it.value } -> Bool(true, srcPos = ctx.position)
+                args.any { it is Bool && it.value } -> Values.True
                 args.all { it is Symbol } -> symbolicNil(ctx)
-                else -> Bool(false, srcPos = ctx.position)
+                else -> Values.False
             }
     }
 
@@ -65,10 +68,10 @@ object LogicFunctions {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             when {
-                args[0] is Bool   && !(args[0] as Bool).value -> Bool(true, srcPos = ctx.position)
-                args[1] is Bool   &&  (args[1] as Bool).value -> Bool(true, srcPos = ctx.position)
+                args[0] is Bool   && !(args[0] as Bool).value -> Values.True
+                args[1] is Bool   &&  (args[1] as Bool).value -> Values.True
                 args[0] is Symbol ||   args[1] is Symbol      -> symbolicNil(ctx)
-                else                                          -> Bool(false, srcPos = ctx.position)
+                else                                          -> Values.False
             }
     }
 
