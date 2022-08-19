@@ -1,5 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
+import org.fpeterek.tilscript.interpreter.interpreter.LambdaFunction
 import org.fpeterek.tilscript.interpreter.interpreter.OperatorFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
@@ -97,8 +98,14 @@ object EqualityOperator : OperatorFunction(
         private infix fun Execution.eq(other: Execution) =
             executionOrder == other.executionOrder && construction eq other.construction
 
-        private infix fun TilFunction.eq(other: TilFunction) =
-            name == other.name && constructedType matches other.constructedType
+        private infix fun TilFunction.eq(other: TilFunction) = when {
+
+            this.implementation != null && this.implementation is LambdaFunction &&
+                other.implementation != null && other.implementation is LambdaFunction ->
+                    this.implementation.body eq other.implementation.body
+
+            else -> name == other.name && constructedType matches other.constructedType
+        }
 
         private infix fun Trivialization.eq(other: Trivialization) =
             construction eq other.construction

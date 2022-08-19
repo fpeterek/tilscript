@@ -34,6 +34,10 @@ class ReportFormatter {
         ensureFileIsLoaded(report.file)
         val lines = files[report.file]!!
 
+        if (report.line-1 > lines.lastIndex) {
+            return report.fmtMessage
+        }
+
         val line = lines[report.line-1]
         val rightAvailable = line.length - report.char - 1
         val rightUnused = max(19 - rightAvailable, 0)

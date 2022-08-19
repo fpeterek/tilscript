@@ -10,7 +10,7 @@ import org.fpeterek.tilscript.interpreter.reporting.Report
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
 import java.util.*
 
-class ErrorListener : BaseErrorListener() {
+class ErrorListener(private val filename: String) : BaseErrorListener() {
 
     private val mutableErrors = mutableListOf<Report>()
 
@@ -26,7 +26,7 @@ class ErrorListener : BaseErrorListener() {
         msg: String?,
         e: RecognitionException?
     ) {
-        val position = SrcPosition(line, char)
+        val position = SrcPosition(line, char, filename)
         val message = msg ?: "Invalid symbol '$offendingSymbol'"
         mutableErrors.add(Report(message, position))
     }

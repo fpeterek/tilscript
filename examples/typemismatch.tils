@@ -1,0 +1,4 @@
+
+defn Sub(a: Int, b: Int) -> Int = ['- a b].
+
+['Sub '1 '0.5].

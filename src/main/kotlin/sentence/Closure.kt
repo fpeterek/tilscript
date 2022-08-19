@@ -44,7 +44,7 @@ class Closure(
         Closure(variables, construction, position, constructedType, reports + iterable)
 
     override fun toString() =
-        "${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} $construction"
+        "[${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} $construction]"
 
     override fun hashCode(): Int {
         var result = variables.hashCode()

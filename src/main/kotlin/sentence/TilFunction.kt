@@ -26,9 +26,6 @@ class TilFunction(
         get() = constructedType is FunctionType && constructedType.fullyTyped
 
     init {
-        if (!(name.first().isLetter() && name.first().isUpperCase())) {
-            throw RuntimeException("Function names must start with an upper case character")
-        }
         if (type !is Unknown && type !is FunctionType) {
             die("Type of TilFunction must be Unknown or FunctionType")
         }

@@ -1,0 +1,53 @@
+import "fns.tils".
+
+def x: World.
+def y: World.
+def z: Time.
+
+let a: Int = '1.
+let b: Int = '1.
+let c: Int = '2.
+
+['PrintRes '['= 'x 'x]].
+['PrintRes '['= 'x 'y]].
+['PrintRes '['= 'x 'z]].
+
+['PrintRes '['= a a]].
+['PrintRes '['= a b]].
+['PrintRes '['= a c]].
+
+['PrintRes '['= 'a 'a]].
+['PrintRes '['= 'a 'b]].
+['PrintRes '['= 'a 'c]].
+
+['PrintRes '['= '['+ '1 '2] '['+ '1 '2]]].
+['PrintRes '['= '['+ '1 '2] '['- '1 '2]]].
+
+['PrintRes
+  '['=
+    '[\x: Int, y: Int ['+ x y]]
+    '[\x: Int, y: Int ['+ x y]]]].
+
+['PrintRes
+  '['=
+    '[\x: Int, y: Int ['+ x y]]
+    '[\x: Int, y: Int ['+ y x]]]].
+
+['PrintRes
+  '['=
+    [\x: Int, y: Int ['+ x y]]
+    [\x: Int, y: Int ['+ x y]]]].
+
+['PrintRes
+  '['=
+    [\x: Int, y: Int ['+ x y]]
+    [\x: Int, y: Int ['+ y x]]]].
+
+['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '1 '2 '3]]].
+['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '3 '2 '1]]].
+
+['PrintRes '['= { '1, '2, '3 } { '1, '2, '3 }]].
+['PrintRes '['= { '1, '2, '3 } { '3, '2, '1 }]].
+
+['PrintRes '['= 'PrintRes 'PrintRes]].
+['PrintRes '['= 'PrintRes 'Add]].

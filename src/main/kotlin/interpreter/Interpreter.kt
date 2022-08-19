@@ -127,7 +127,12 @@ class Interpreter: InterpreterInterface {
         symbol.reports
     )
 
-    fun getVariable(name: String): Variable = currentFrame.getVar(name)
+    private fun getVariable(name: String, frame: StackFrame?): Variable = when (frame) {
+        null -> die("No such variable '$name'")
+        else -> frame[name] ?: getVariable(name, frame.parent)
+    }
+
+    fun getVariable(name: String): Variable = getVariable(name, currentFrame)
 
     private fun interpret(triv: Trivialization) = when {
         triv.construction is TilFunction && triv.construction.name in numericOperators ->
@@ -174,8 +179,8 @@ class Interpreter: InterpreterInterface {
         )
     }
 
-    // TODO: Type-aware equality, probably built into the interpreter
-    private fun interpretEquality(args: List<Construction>, ctx: FnCallContext) = EqualityOperator.apply(this, args, ctx)
+    private fun interpretEquality(args: List<Construction>, ctx: FnCallContext) =
+        EqualityOperator.apply(this, args, ctx)
 
     private fun interpretNumericOperator(fn: TilFunction, args: List<Construction>, ctx: FnCallContext): Construction =
         (numericOperators[fn.name] ?: die("No such operator '${fn.name}'"))
@@ -417,7 +422,7 @@ class Interpreter: InterpreterInterface {
             is Construction    -> {
                 val res = interpret(sentence)
                 if (res is Nil) {
-                    ReportFormatter().terminalOutput(Report(res.reason, res.position))
+                    report(res)
                     die("Nil constructed by a top level construction. Aborting execution.")
                 }
             }
@@ -432,7 +437,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(sentences: Iterable<Sentence>) = sentences.forEachIndexed { index, sentence ->
         try {
-            println("[$index]: $sentence")
+//            println("[$index]: $sentence")
             interpret(sentence)
         } catch (e: Exception) {
             println("Runtime error: ${e.message}")
@@ -463,7 +468,7 @@ class Interpreter: InterpreterInterface {
     private fun interpretFileInt(file: String) {
         val stream = CharStreams.fromFileName(file)
 
-        val errorListener = ErrorListener()
+        val errorListener = ErrorListener(file)
 
         val lexer = TILScriptLexer(stream)
         lexer.removeErrorListeners()
