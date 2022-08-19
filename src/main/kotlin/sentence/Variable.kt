@@ -15,6 +15,12 @@ class Variable(
     val value: Construction? = null,
 ) : Construction(type, ConstructionType, srcPos, reports), Executable {
 
+    init {
+        if (!(name.first().isLetter() && name.first().isLowerCase())) {
+            throw RuntimeException("Variable names must start with a lower case character")
+        }
+    }
+
     override fun equals(other: Any?) =
         other != null && other is Variable && other.name == name
 

@@ -45,8 +45,6 @@ class Interpreter: InterpreterInterface {
 
     private val operatorFns = setOf("+", "-", "*", "/", "=", "<", ">")
 
-    private val equalityOperator = EqualityOperator
-
     init {
         BuiltinsList.types.forEach(typeRepo::process)
         BuiltinsList.values.forEach(symbolRepo::define)

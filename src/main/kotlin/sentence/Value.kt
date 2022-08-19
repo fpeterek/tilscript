@@ -24,6 +24,12 @@ class Symbol(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, type, reports) {
 
+    init {
+        if (! (value.first().isLetter() && value.first().isUpperCase())) {
+            throw RuntimeException("First character of a symbolic value must be an upper case letter")
+        }
+    }
+
     override fun equals(other: Any?) =
         other != null && other is Symbol && other.value == value
 
