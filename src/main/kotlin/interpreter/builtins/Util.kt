@@ -22,7 +22,7 @@ object Util {
                 else -> arg.toString()
             }
             print(str)
-            return Values.True
+            return Bool(value=true, srcPos=ctx.position)
         }
     }
 
@@ -36,7 +36,7 @@ object Util {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             Print.apply(interpreter, args, ctx)
             println()
-            return Values.True
+            return Bool(value=true, srcPos=ctx.position)
         }
     }
 
