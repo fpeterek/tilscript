@@ -7,20 +7,14 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object FnDeclarations {
 
-    private val realOperation
-        get() = FunctionType(Types.Real, Types.Real, Types.Real)
-
-    private val intOperation
-        get() = FunctionType(Types.Int, Types.Int, Types.Int)
-
-    private val equalityComparison
-        get() = FunctionType(Types.Bool, GenericType(1), GenericType(1))
-
     private val nonrestrictedQuantifier
         get() = FunctionType(Types.Bool, FunctionType(Types.Bool, GenericType(1)))
 
     private val restrictedQuantifier
-        get() = FunctionType(FunctionType(Types.Bool, GenericType(1)), FunctionType(Types.Bool, GenericType(1)))
+        get() = FunctionType(
+            /* Returns a class of classes */ FunctionType(Types.Bool, FunctionType(Types.Bool, GenericType(1))),
+            /* Accepts a class */ FunctionType(Types.Bool, GenericType(1))
+        )
 
     private val binaryBoolean
         get() = FunctionType(Types.Bool, Types.Bool, Types.Bool)
@@ -33,10 +27,9 @@ object FnDeclarations {
         get() = FunctionType(Types.Bool, Types.Bool.intensionalize())
 
     private val singularizer
-        get() = FunctionType(GenericType(1), FunctionType(Types.Bool, GenericType(1)))
-
-    private val listCons
-        get() = FunctionType(ListType(GenericType(1)), GenericType(1), ListType(GenericType(1)))
+        get() = FunctionType(
+            /* The only item */ GenericType(1),
+            /* Contained in this class */ FunctionType(Types.Bool, GenericType(1)))
 
     private val noPosition = SrcPosition(-1, -1)
 
@@ -46,10 +39,7 @@ object FnDeclarations {
         TilFunction("ToInt", noPosition, FunctionType(Types.Int, Types.Real)),
         TilFunction("ToReal", noPosition, FunctionType(Types.Real, Types.Int)),
 
-        TilFunction("And", noPosition, binaryBoolean),
-        TilFunction("Or", noPosition, binaryBoolean),
-        TilFunction("Implies", noPosition, binaryBoolean),
-        TilFunction("Not", noPosition, unaryBoolean),
+        TilFunction("Tr", noPosition, FunctionType(ConstructionType, ConstructionType)),
 
         // Won't receive implementation
         TilFunction("ForAll", noPosition, nonrestrictedQuantifier),
@@ -61,7 +51,6 @@ object FnDeclarations {
         TilFunction("No", noPosition, restrictedQuantifier),
 
         TilFunction("Sub", noPosition, FunctionType(ConstructionType, ConstructionType, ConstructionType, ConstructionType)),
-        TilFunction("Tr", noPosition, FunctionType(ConstructionType, ConstructionType)),
 
         TilFunction("TrueC", noPosition, constructionTruthiness),
         TilFunction("FalseC", noPosition, constructionTruthiness),
