@@ -1,0 +1,19 @@
+import "fns.tils".
+
+let t1: Time = ['ToTime '12].
+let t2: Time = ['ToTime '13].
+let t3: Time = ['ToTime '12].
+
+['PrintRes 't1].
+['PrintRes 't2].
+['PrintRes 't3].
+
+['PrintRes '['IsBefore t1 t2]].
+['PrintRes '['IsBefore t2 t1]].
+
+['PrintRes '['IsBeforeOrEq t1 t3]].
+
+['PrintRes '['IsAfter t1 t2]].
+['PrintRes '['IsAfter t2 t1]].
+
+['PrintRes '['IsAfterOrEq t1 t3]].

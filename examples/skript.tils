@@ -38,3 +38,5 @@ import "fns.tils".
 ['PrintRes '['Divisible '5 '2]].
 
 ['PrintRes '['Tr ['Divisible '19 '2]]].
+
+['PrintRes '{ 'Time, 'List<Int>, 'Tuple<World, Real> }].

@@ -5,6 +5,7 @@ import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.ConstructionType
 import org.fpeterek.tilscript.interpreter.types.GenericType
 import org.fpeterek.tilscript.interpreter.types.ListType
+import org.fpeterek.tilscript.interpreter.types.Type
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object Util {
@@ -89,6 +90,17 @@ object Util {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             Trivialization(construction = args[0], srcPos = ctx.position, constructedType = args[0].constructionType)
+    }
+
+    object TypeOf : EagerFunction(
+        "TypeOf",
+        Types.Type,
+        listOf(
+            Variable("arg", SrcPosition(-1, -1), GenericType(1))
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            TypeRef(args[0].constructionType, ctx.position)
     }
 
 }
