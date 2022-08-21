@@ -13,6 +13,7 @@ object BuiltinsList {
         Util.Println,
         Util.If,
         Util.Progn,
+        Util.Tr,
 
         LogicFunctions.Not,
         LogicFunctions.And,

@@ -15,7 +15,7 @@ import "fns.tils".
 ]
 .
 
-['/ '2 '0].
+-- ['/ '2 '0].
 
 
 ['* '3 '4].
@@ -36,3 +36,5 @@ import "fns.tils".
 
 ['PrintRes '['Divisible '4 '2]].
 ['PrintRes '['Divisible '5 '2]].
+
+['PrintRes '['Tr ['Divisible '19 '2]]].

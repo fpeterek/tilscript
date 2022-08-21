@@ -80,4 +80,15 @@ object Util {
         }
     }
 
+    object Tr : EagerFunction(
+        "Tr",
+        ConstructionType,
+        listOf(
+            Variable("tr", SrcPosition(-1, -1), GenericType(1))
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Trivialization(construction = args[0], srcPos = ctx.position, constructedType = args[0].constructionType)
+    }
+
 }
