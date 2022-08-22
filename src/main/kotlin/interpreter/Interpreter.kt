@@ -305,15 +305,6 @@ class Interpreter: InterpreterInterface {
             die("Invalid function type")
         }
 
-        if (it.constructedType.imageType is GenericType) {
-            val genTypes = it.constructedType.argTypes.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
-
-            if (it.constructedType.imageType.argNumber !in genTypes) {
-                die("Image type of function ${it.name} could not be deduced from type arguments")
-            }
-        }
-
-
         if (it.name !in functions) {
             functions[it.name] = it
         } else {
@@ -326,14 +317,6 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun interpret(def: FunctionDefinition) {
-
-        if (def.signature.imageType is GenericType) {
-            val genTypes = def.args.filterIsInstance<GenericType>().map { it.argNumber }.toSet()
-
-            if (def.signature.imageType.argNumber !in genTypes) {
-                die("Image type of function ${def.name} could not be deduced from type arguments")
-            }
-        }
 
         if (def.name in functions) {
             val declared = functions[def.name]!!

@@ -1,6 +1,5 @@
 package org.fpeterek.tilscript.interpreter.sentence
 
-import org.fpeterek.tilscript.interpreter.exceptions.InvalidExecutionOrder
 import org.fpeterek.tilscript.interpreter.reporting.Report
 import org.fpeterek.tilscript.interpreter.sentence.isexecutable.Executable
 import org.fpeterek.tilscript.interpreter.types.ConstructionType

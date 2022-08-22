@@ -44,3 +44,5 @@ import "fns.tils".
 ['PrintRes '['NullaryFn]].
 
 ['Println callsite].
+
+['PrintRes '['TypeOf ['CreateEmptyList 'Time]]].

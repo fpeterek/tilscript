@@ -17,3 +17,5 @@ defn DruhaMocnina(x: Int) -> Int = ['* x x].
 defn Add(x: Int, y: Int) -> Int = ['+ x y].
 
 defn NullaryFn() -> Time = ['Now].
+
+defn CreateEmptyList(type: Type) -> List<Any<1>> = ['EmptyListOf type].
