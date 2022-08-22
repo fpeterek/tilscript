@@ -22,7 +22,7 @@ terminator : TERMINATOR;
 
 typeDefinition : TYPEDEF typeName EQUAL dataType;
 
-funDefinition : DEFN entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType EQUAL construction;
+funDefinition : DEFN entityName OPEN_PAR typedVariables? CLOSE_PAR ARROW dataType EQUAL construction;
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 

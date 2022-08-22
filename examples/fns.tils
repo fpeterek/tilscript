@@ -15,3 +15,5 @@ defn PrintRes(cons: Construction) -> Bool =
 defn DruhaMocnina(x: Int) -> Int = ['* x x].
 
 defn Add(x: Int, y: Int) -> Int = ['+ x y].
+
+defn NullaryFn() -> Time = ['Now].

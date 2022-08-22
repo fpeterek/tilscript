@@ -183,8 +183,10 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         return TypedVar(variable, type, ctx.position())
     }
 
-    override fun visitTypedVariables(ctx: TILScriptParser.TypedVariablesContext) =
-        TypedVars(ctx.typedVariable().map(::visitTypedVariable), ctx.position())
+    override fun visitTypedVariables(ctx: TILScriptParser.TypedVariablesContext?) = when (ctx) {
+        null -> TypedVars(listOf(), SrcPosition(-1, -1))
+        else -> TypedVars(ctx.typedVariable().map(::visitTypedVariable), ctx.position())
+    }
 
     override fun visitTypedVariable(ctx: TILScriptParser.TypedVariableContext) = TypedVar(
         visitVariableName(ctx.variableName()).name,

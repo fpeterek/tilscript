@@ -40,3 +40,7 @@ import "fns.tils".
 ['PrintRes '['Tr ['Divisible '19 '2]]].
 
 ['PrintRes '{ 'Time, 'List<Int>, 'Tuple<World, Real> }].
+
+['PrintRes '['NullaryFn]].
+
+['Println callsite].

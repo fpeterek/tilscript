@@ -200,11 +200,27 @@ class Interpreter: InterpreterInterface {
         }
     }
 
+    private fun createCallsiteVar(ctx: FnCallContext) = Variable(
+        "callsite",
+        ctx.position,
+        type=TupleType(Types.Text, Types.Int, Types.Int),
+        value = TilTuple(
+            listOf(
+                Text(ctx.position.file, ctx.position),
+                Integral(ctx.position.line.toLong(), ctx.position),
+                Integral(ctx.position.char.toLong(), ctx.position),
+            ),
+            srcPos = ctx.position
+        )
+    )
+
     private fun interpretFn(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext) = withFrame {
+        createLocal(createCallsiteVar(ctx))
         fn(this, args, ctx)
     }
 
     private fun interpretLambda(fn: LambdaFunction, args: List<Construction>, ctx: FnCallContext) = withFrame(fn.context.frame) {
+        createLocal(createCallsiteVar(ctx))
         fn(this, args, ctx)
     }
 
@@ -272,6 +288,15 @@ class Interpreter: InterpreterInterface {
         )
 
         currentFrame.putVar(varWithValue)
+    }
+
+    private fun createLocal(variable: Variable) {
+
+        if (variable.name in currentFrame) {
+            die("Redefinition of variable '${variable.name}'")
+        }
+
+        currentFrame.putVar(variable)
     }
 
     private fun interpret(decl: FunctionDeclaration) = decl.functions.forEach {

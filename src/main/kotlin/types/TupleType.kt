@@ -2,7 +2,7 @@ package org.fpeterek.tilscript.interpreter.types
 
 class TupleType(val types: List<Type>) : Type() {
 
-    constructor(type: Type) : this(listOf(type))
+    constructor(vararg types: Type) : this(types.toList())
 
     override val name
         get() = "Tuple<${types.joinToString(separator = ", ")}>"
