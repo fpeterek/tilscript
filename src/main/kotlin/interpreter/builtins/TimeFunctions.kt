@@ -8,6 +8,16 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object TimeFunctions {
 
+    object Now : EagerFunction(
+        "Now",
+        Types.Time,
+        listOf(
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Timestamp(time=System.currentTimeMillis(), srcPos = ctx.position)
+    }
+
     abstract class TimeCmp(name: String) : EagerFunction(
         name,
         Types.Bool,

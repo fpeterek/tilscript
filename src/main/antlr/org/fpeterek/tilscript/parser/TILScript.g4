@@ -50,7 +50,7 @@ variable : variableName;
 
 trivialization : TRIVIALIZE (construction | entity | dataType);
 
-composition : OPEN_BRA construction (construction | (construction))+ CLOSE_BRA;
+composition : OPEN_BRA construction (construction | (construction))* CLOSE_BRA;
 
 closure : OPEN_BRA lambdaVariables (construction | (construction)) CLOSE_BRA;
 

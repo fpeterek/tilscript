@@ -34,6 +34,7 @@ object BuiltinsList {
         TimeFunctions.IsBeforeOrEq,
         TimeFunctions.IsAfter,
         TimeFunctions.IsAfterOrEq,
+        TimeFunctions.Now,
 
         Conversions.IntToText,
         Conversions.RealToText,

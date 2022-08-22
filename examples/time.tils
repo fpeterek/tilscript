@@ -4,6 +4,9 @@ let t1: Time = ['ToTime '12].
 let t2: Time = ['ToTime '13].
 let t3: Time = ['ToTime '12].
 
+['PrintRes '['Now]].
+['PrintRes '['TypeOf ['Now]]].
+
 ['PrintRes 't1].
 ['PrintRes 't2].
 ['PrintRes 't3].
