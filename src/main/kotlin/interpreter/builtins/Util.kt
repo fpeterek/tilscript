@@ -12,33 +12,33 @@ object Util {
 
     object Print : LazyFunction(
         "Print",
-        Types.Bool,
+        GenericType(1),
         listOf(
             Variable("arg", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            val str = when (val arg = interpreter.interpret(args.first())) {
-                is Text -> arg.value
-                else -> arg.toString()
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            interpreter.interpret(args.first()).apply {
+
+            val str = when (this) {
+                is Text -> value
+                else -> toString()
             }
             print(str)
-            return Values.True
         }
     }
 
     object Println : LazyFunction(
         "Println",
-        Types.Bool,
+        GenericType(1),
         listOf(
             Variable("arg", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            Print.apply(interpreter, args, ctx)
-            println()
-            return Values.True
-        }
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Print.apply(interpreter, args, ctx).apply {
+                println()
+            }
     }
 
     object If : LazyFunction(

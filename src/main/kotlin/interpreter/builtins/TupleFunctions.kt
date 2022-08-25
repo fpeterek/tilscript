@@ -66,4 +66,24 @@ object TupleFunctions {
 
     }
 
+    object TupleLen : EagerFunction(
+        "TupleLen",
+        Types.Int,
+        listOf(
+            Variable("tuple", SrcPosition(-1, -1), GenericType(1)),
+        ),
+    ) {
+
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+            val tuple = args[0]
+
+            if (tuple !is TilTuple) {
+                return Nil(ctx.position, reason = "First argument of Get must be a tuple. (${tuple.constructionType} received)")
+            }
+
+            return Integral(value = tuple.values.size.toLong(), SrcPosition(-1, -1))
+        }
+
+    }
+
 }
