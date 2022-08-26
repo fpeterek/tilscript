@@ -6,8 +6,6 @@ import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
 import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
 import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
-import org.fpeterek.tilscript.interpreter.exceptions.NilException
-import org.fpeterek.tilscript.interpreter.exceptions.SyntaxErrorException
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FunctionInterface
@@ -132,7 +130,7 @@ class Interpreter: InterpreterInterface {
         else -> frame[name] ?: getVariable(name, frame.parent)
     }
 
-    fun getVariable(name: String): Variable = getVariable(name, currentFrame)
+    override fun getVariable(name: String): Variable = getVariable(name, currentFrame)
 
     private fun interpret(triv: Trivialization) = when {
         triv.construction is TilFunction && triv.construction.name in numericOperators ->
@@ -175,7 +173,7 @@ class Interpreter: InterpreterInterface {
             closure.position,
             closure.constructedType,
             closure.reports,
-            LambdaFunction(closure.variables, closure.construction, createLambdaCapture()),
+            LambdaFunction(closure.variables, closure.construction, createLambdaCapture(), returnType=closure.returnType),
         )
     }
 

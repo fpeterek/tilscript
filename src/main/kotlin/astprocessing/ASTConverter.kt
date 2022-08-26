@@ -84,8 +84,14 @@ class ASTConverter private constructor() {
 
     private fun convertImportStatement(imp: ImportStatement) = TilImport(imp.file, imp.position)
 
-    private fun convertListInitializer(init: ListInitializer): TilConstruction =
-        init.values.foldRight(TilTrivialization(Values.Nil, init.position) as TilConstruction) { cons, acc ->
+    private fun listEnd(init: ListInitializer) = TilComposition(
+        TilTrivialization(ListFunctions.ListOfOne.tilFunction, init.position, constructedType = ListFunctions.ListOfOne.signature),
+        args = listOf(convertConstruction(init.values.last())),
+        srcPos = init.position,
+    ) as TilConstruction
+
+    private fun convertListInitializer(init: ListInitializer): TilConstruction = init.values.asReversed().asSequence().drop(1)
+        .fold(listEnd(init)) { acc, cons ->
             TilComposition(
                 TilTrivialization(ListFunctions.Cons.tilFunction, init.position, constructedType = ListFunctions.Cons.signature),
                 args = listOf(convertConstruction(cons), acc),
@@ -125,6 +131,10 @@ class ASTConverter private constructor() {
     private fun convertClosure(closure: Closure): TilClosure = TilClosure(
         variables=closure.vars.map(::convertTypedVar),
         construction=convertConstruction(closure.construction),
+        returnType = when (closure.returnType) {
+            null -> GenericType(Int.MAX_VALUE)
+            else -> convertDataType(closure.returnType)
+        },
         srcPos=closure.position,
     )
 

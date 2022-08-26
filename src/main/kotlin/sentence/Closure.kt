@@ -12,10 +12,15 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 class Closure(
     val variables: List<Variable>,
     val construction: Construction,
+    val returnType: Type,
     srcPos: SrcPosition,
-    constructedType: Type = Unknown,
     reports: List<Report> = listOf(),
-) : Construction(constructedType, ConstructionType, srcPos, reports), Executable {
+) : Construction(createFnType(returnType, variables), ConstructionType, srcPos, reports), Executable {
+
+    companion object {
+        private fun createFnType(returns: Type, vars: List<Variable>) =
+            FunctionType(returns, vars.map { it.constructedType })
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is Closure) {
@@ -30,21 +35,15 @@ class Closure(
                 && construction == other.construction
     }
 
-    val functionType = when {
-        construction !is Composition                    -> Unknown
-        construction.constructedType == Unknown         -> Unknown
-        variables.any { it.constructedType == Unknown } -> Unknown
-
-        else -> FunctionType(construction.constructedType, variables.map { it.constructedType })
-    }
+    val functionType get() = constructedType
 
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun withReports(iterable: Iterable<Report>) =
-        Closure(variables, construction, position, constructedType, reports + iterable)
+        Closure(variables, construction, returnType, position, reports + iterable)
 
     override fun toString() =
-        "[${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} $construction]"
+        "[${variables.joinToString(", ", prefix = "\\") { "${it.name}: ${it.constructedType.name}" }} -> $returnType: $construction]"
 
     override fun hashCode(): Int {
         var result = variables.hashCode()

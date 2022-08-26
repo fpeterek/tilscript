@@ -8,6 +8,7 @@ object BuiltinsList {
         ListFunctions.Head,
         ListFunctions.Tail,
         ListFunctions.IsEmpty,
+        ListFunctions.ListOfOne,
 
         Util.Print,
         Util.Println,
@@ -15,6 +16,7 @@ object BuiltinsList {
         Util.Progn,
         Util.Tr,
         Util.TypeOf,
+        Util.IsNil,
 
         LogicFunctions.Not,
         LogicFunctions.And,

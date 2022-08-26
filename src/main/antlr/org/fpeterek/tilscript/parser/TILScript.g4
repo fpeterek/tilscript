@@ -52,13 +52,11 @@ trivialization : TRIVIALIZE (construction | entity | dataType);
 
 composition : OPEN_BRA construction (construction | (construction))* CLOSE_BRA;
 
-closure : OPEN_BRA lambdaVariables (construction | (construction)) CLOSE_BRA;
+closure : OPEN_BRA lambdaVariables (ARROW dataType)? COLON (construction | (construction)) CLOSE_BRA;
 
-lambdaVariables : LAMBDA optTypedVariables;
+lambdaVariables : LAMBDA typedVariables;
 
 nExecution : EXEC (construction | entity);
-
-optTypedVariables : optTypedVariable (COMMA optTypedVariable)*;
 
 typedVariables : typedVariable (COMMA typedVariable)*;
 

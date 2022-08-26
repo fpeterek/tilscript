@@ -16,7 +16,17 @@ object Util {
         FunctionType(FunctionType(this, Types.Time), Types.World)
 
     fun Closure.intensionalize() =
-        Closure(listOf(w), Closure(listOf(t), this, srcPos=position), srcPos=position)
+        Closure(
+            listOf(w),
+            Closure(
+                listOf(t),
+                this,
+                srcPos=position,
+                returnType = FunctionType(this.functionType, Types.Time)
+            ),
+            srcPos=position,
+            returnType = FunctionType(FunctionType(this.functionType, Types.Time), Types.World)
+        )
 
     fun <T : Construction> T.trivialize() =
         Trivialization(

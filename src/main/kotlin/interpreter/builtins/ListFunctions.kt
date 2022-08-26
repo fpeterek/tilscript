@@ -12,7 +12,23 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object ListFunctions {
 
-    object Cons : LazyFunction(
+    object ListOfOne : EagerFunction(
+        "ListOfOne",
+        ListType(GenericType(1)),
+        listOf(
+            Variable("head", SrcPosition(-1, -1), GenericType(1)),
+        ),
+    ) {
+
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) = ListCell(
+            args[0],
+            EmptyList(args[0].constructedType, ctx.position),
+            args[0].constructedType,
+            srcPos = ctx.position
+        )
+    }
+
+    object Cons : EagerFunction(
         "Cons",
         ListType(GenericType(1)),
         listOf(
@@ -22,21 +38,8 @@ object ListFunctions {
     ) {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            val head = interpreter.interpret(args[0])
-            val tail = interpreter.interpret(args[1])
-
-            if (head is Nil) {
-                return Nil(
-                    ctx.position,
-                    reason="List head cannot be nil"
-                )
-            }
-
-            if (tail is Nil) {
-                return ListCell(
-                    head, EmptyList(head.constructionType, head.position), head.constructionType, head.position
-                )
-            }
+            val head = args[0]
+            val tail = args[1]
 
             if (tail is Symbol) {
                 return Nil(ctx.position, reason="Cannot construct a new list from a symbolic list")

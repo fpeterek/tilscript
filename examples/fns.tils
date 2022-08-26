@@ -10,7 +10,8 @@ defn PrintRes(cons: Construction) -> Bool =
     ['Progn
         ['Print cons]
         ['Print '": "]
-        ['Println ^2 cons]].
+        ['Println ^2 cons]
+        'True].
 
 defn DruhaMocnina(x: Int) -> Int = ['* x x].
 

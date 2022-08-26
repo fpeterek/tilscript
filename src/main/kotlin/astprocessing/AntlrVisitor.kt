@@ -152,11 +152,15 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
     override fun visitClosure(ctx: TILScriptParser.ClosureContext) = Construction.Closure(
         visitLambdaVariables(ctx.lambdaVariables()),
         visitConstruction(ctx.construction()),
+        when (ctx.dataType()) {
+            null -> null
+            else -> visitDataType(ctx.dataType())
+        },
         ctx.position(),
     )
 
     override fun visitLambdaVariables(ctx: TILScriptParser.LambdaVariablesContext) =
-        visitOptTypedVariables(ctx.optTypedVariables())
+        visitTypedVariables(ctx.typedVariables())
 
     override fun visitNExecution(ctx: TILScriptParser.NExecutionContext) = Construction.Execution(
         order=ctx.EXEC().text.drop(1).takeWhile { it.isDigit() }.toInt(),
@@ -167,9 +171,6 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         },
         srcPos=ctx.position(),
     )
-
-    override fun visitOptTypedVariables(ctx: TILScriptParser.OptTypedVariablesContext) =
-        TypedVars(ctx.optTypedVariable().map(::visitOptTypedVariable), ctx.position())
 
     override fun visitOptTypedVariable(ctx: TILScriptParser.OptTypedVariableContext): TypedVar {
 
