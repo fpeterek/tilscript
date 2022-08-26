@@ -1,17 +1,16 @@
-package org.fpeterek.tilscript.interpreter.interpreter.builtins
+package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.ConstructionType
-import org.fpeterek.tilscript.interpreter.types.ListType
-import org.fpeterek.tilscript.interpreter.types.TupleType
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
-object ConstructionFunctions {
+object VariableFunctions {
 
-    private val noPos = SrcPosition(-1, -1)
+    private val noPos get() = SrcPosition(-1, -1)
 
     object ConsVariable : EagerFunction(
         "ConsVariable",
@@ -58,49 +57,41 @@ object ConstructionFunctions {
         }
     }
 
-    object ConsClosure : EagerFunction(
-        "ConsClosure",
-        ConstructionType,
+    object VariableType : EagerFunction(
+        "VariableType",
+        Types.Type,
         listOf(
-            Variable("vars", noPos, ListType(ConstructionType)),
-            Variable("construction", noPos, ConstructionType),
+            Variable("name", noPos, ConstructionType),
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            TODO("Not yet implemented")
+
+            val variable = args[0]
+
+            if (variable !is Variable) {
+                return Nil(ctx.position, reason="VariableType function expects a Variable as it's argument")
+            }
+
+            return TypeRef(variable.constructedType, srcPos = ctx.position)
         }
     }
 
+    object VariableName : EagerFunction(
+        "VariableName",
+        Types.Type,
+        listOf(
+            Variable("name", noPos, ConstructionType),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            val variable = args[0]
+
+            if (variable !is Variable) {
+                return Nil(ctx.position, reason="VariableName function expects a Variable as it's argument")
+            }
+
+            return Text(variable.name, srcPos = ctx.position)
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

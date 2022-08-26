@@ -1,5 +1,6 @@
-package org.fpeterek.tilscript.interpreter.interpreter.builtins
+package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface

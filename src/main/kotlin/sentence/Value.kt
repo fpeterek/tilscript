@@ -205,6 +205,7 @@ sealed class TilList(
     val valueType get() = listType.type
 
     abstract fun contentsStr(): String
+    abstract fun toKotlinList(): List<Construction>
 
 }
 
@@ -238,6 +239,8 @@ class ListCell(
     override fun contentsStr(): String = "$head${tailStr()}"
 
     override fun toString() = "{ ${contentsStr()} }"
+
+    override fun toKotlinList() = listOf(head) + tail.toKotlinList()
 }
 
 class EmptyList(
@@ -253,6 +256,8 @@ class EmptyList(
     override fun toString() = "{}"
 
     override fun hashCode() = valueType.hashCode()
+
+    override fun toKotlinList() = emptyList<Construction>()
 
     override fun equals(other: Any?) = other != null && other is EmptyList && other.valueType == valueType
 }

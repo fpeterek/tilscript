@@ -125,12 +125,19 @@ class Interpreter: InterpreterInterface {
         symbol.reports
     )
 
-    private fun getVariable(name: String, frame: StackFrame?): Variable = when (frame) {
+    private fun getVariableInternal(name: String, frame: StackFrame?): Variable = when (frame) {
         null -> die("No such variable '$name'")
-        else -> frame[name] ?: getVariable(name, frame.parent)
+        else -> frame[name] ?: getVariableInternal(name, frame.parent)
     }
 
-    override fun getVariable(name: String): Variable = getVariable(name, currentFrame)
+    private fun getVariableInternal(name: String): Variable = getVariableInternal(name, currentFrame)
+
+    private fun getVariable(name: String, frame: StackFrame?): Variable? = when (frame) {
+        null -> null
+        else -> frame[name] ?: getVariableInternal(name, frame.parent)
+    }
+
+    override fun getVariable(name: String): Variable? = getVariable(name, currentFrame)
 
     private fun interpret(triv: Trivialization) = when {
         triv.construction is TilFunction && triv.construction.name in numericOperators ->
@@ -147,7 +154,7 @@ class Interpreter: InterpreterInterface {
         triv.construction is Symbol && triv.construction.constructionType is Unknown ->
             getSymbol(triv.construction)
 
-        triv.construction is Variable -> getVariable(triv.construction.name)
+        triv.construction is Variable -> getVariableInternal(triv.construction.name)
 
         else -> triv.construction
     }
