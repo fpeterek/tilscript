@@ -2,6 +2,7 @@ package org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface
 
 import org.fpeterek.tilscript.interpreter.sentence.Construction
 import org.fpeterek.tilscript.interpreter.sentence.Nil
+import org.fpeterek.tilscript.interpreter.sentence.TilFunction
 import org.fpeterek.tilscript.interpreter.sentence.Variable
 import org.fpeterek.tilscript.interpreter.types.FunctionType
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
@@ -24,4 +25,6 @@ interface InterpreterInterface {
     fun createLocal(variable: Variable, value: Construction)
 
     fun getVariable(name: String): Variable?
+
+    fun getFunction(name: String): TilFunction?
 }

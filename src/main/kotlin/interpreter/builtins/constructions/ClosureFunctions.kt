@@ -1,9 +1,11 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
+import org.fpeterek.tilscript.interpreter.sentence.EmptyList
 import org.fpeterek.tilscript.interpreter.types.ConstructionType
 import org.fpeterek.tilscript.interpreter.types.ListType
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
@@ -18,6 +20,7 @@ object ClosureFunctions {
         listOf(
             Variable("vars", noPos, ListType(ConstructionType)),
             Variable("construction", noPos, ConstructionType),
+            Variable("returns", noPos, Types.Type),
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
@@ -39,6 +42,65 @@ object ClosureFunctions {
             }
 
             return Closure(varList.map { it as Variable }, cons, returns.type, ctx.position)
+        }
+    }
+
+    object ClosureArgs : EagerFunction(
+        "ClosureArgs",
+        ListType(ConstructionType),
+        listOf(
+            Variable("closure", noPos, ConstructionType),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            val cons = args[0]
+
+            if (cons !is Closure) {
+                return Nil(ctx.position, reason = "ClosureArgs expects a closure")
+            }
+
+            return cons.variables.foldRight(EmptyList(ConstructionType, ctx.position) as TilList) { variable, acc ->
+                ListCell(variable, acc, ConstructionType, ctx.position)
+            }
+        }
+    }
+
+    object ClosureBody : EagerFunction(
+        "ClosureBody",
+        ConstructionType,
+        listOf(
+            Variable("closure", noPos, ConstructionType),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            val cons = args[0]
+
+            if (cons !is Closure) {
+                return Nil(ctx.position, reason = "ClosureBody expects a closure")
+            }
+
+            return cons.construction
+        }
+    }
+
+    object ClosureReturnType : EagerFunction(
+        "ClosureReturnType",
+        Types.Type,
+        listOf(
+            Variable("closure", noPos, ConstructionType),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            val cons = args[0]
+
+            if (cons !is Closure) {
+                return Nil(ctx.position, reason = "ClosureReturnType expects a closure")
+            }
+
+            return TypeRef(cons.returnType, ctx.position)
         }
     }
 }

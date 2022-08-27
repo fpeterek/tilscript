@@ -1,5 +1,8 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions.*
+import java.time.Clock
+
 
 object BuiltinsList {
     val functions = listOf(
@@ -47,6 +50,42 @@ object BuiltinsList {
         Conversions.WorldToInt,
         Conversions.TimeToInt,
 
+        ClosureFunctions.ConsClosure,
+        ClosureFunctions.ClosureBody,
+        ClosureFunctions.ClosureArgs,
+        ClosureFunctions.ClosureReturnType,
+
+        IsConstruction.IsVariable,
+        IsConstruction.IsComposition,
+        IsConstruction.IsClosure,
+        IsConstruction.IsExecution,
+        IsConstruction.IsFunction,
+        IsConstruction.IsTrivialization,
+        IsConstruction.IsSymbol,
+        IsConstruction.IsList,
+        IsConstruction.IsValue,
+        IsConstruction.IsTuple,
+
+        VariableFunctions.ConsVariable,
+        VariableFunctions.GetVariable,
+        VariableFunctions.VariableType,
+        VariableFunctions.VariableName,
+
+        TrivializationFunctions.Trivialize,
+        TrivializationFunctions.TrivializationBody,
+
+        ExecutionFunctions.Execute,
+        ExecutionFunctions.ExecutionBody,
+        ExecutionFunctions.ExecutionOrder,
+
+        FunctionFunctions.CreateFunctionRef,
+        FunctionFunctions.GetFunction,
+        FunctionFunctions.FunctionName,
+        FunctionFunctions.FunctionType,
+
+        CompositionFunctions.Compose,
+        CompositionFunctions.CompositionConstructions,
+        CompositionFunctions.CompositionConstructionAt,
     )
 
     val types get() = Types.all

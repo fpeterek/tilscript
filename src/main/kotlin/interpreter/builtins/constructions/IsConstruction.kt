@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCal
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.ConstructionType
+import org.fpeterek.tilscript.interpreter.types.GenericType
 import org.fpeterek.tilscript.interpreter.types.ListType
 import org.fpeterek.tilscript.interpreter.types.TupleType
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
@@ -62,7 +63,7 @@ object IsConstruction {
         "IsFunction",
         Types.Bool,
         listOf(
-            Variable("name", noPos, ConstructionType)
+            Variable("name", noPos, GenericType(1))
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
@@ -84,7 +85,7 @@ object IsConstruction {
         "IsSymbol",
         Types.Bool,
         listOf(
-            Variable("name", noPos, ConstructionType)
+            Variable("name", noPos, GenericType(1))
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
@@ -95,29 +96,18 @@ object IsConstruction {
         "IsValue",
         Types.Bool,
         listOf(
-            Variable("name", noPos, ConstructionType)
+            Variable("name", noPos, GenericType(1))
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             Bool(value = args[0] is Value, noPos)
     }
 
-    object NonSymbolValue : EagerFunction(
-        "NonSymbolValue",
-        Types.Bool,
-        listOf(
-            Variable("name", noPos, ConstructionType)
-        ),
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            Bool(value = args[0] is Value && args[0] !is Symbol, noPos)
-    }
-
     object IsList : EagerFunction(
         "IsList",
         Types.Bool,
         listOf(
-            Variable("name", noPos, ConstructionType)
+            Variable("name", noPos, GenericType(1))
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
@@ -128,7 +118,7 @@ object IsConstruction {
         "IsTuple",
         Types.Bool,
         listOf(
-            Variable("name", noPos, ConstructionType)
+            Variable("name", noPos, GenericType(1))
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =

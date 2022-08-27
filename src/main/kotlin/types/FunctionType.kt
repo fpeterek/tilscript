@@ -1,6 +1,5 @@
 package org.fpeterek.tilscript.interpreter.types
 
-import org.fpeterek.tilscript.interpreter.exceptions.InvalidFunctionSignature
 import org.fpeterek.tilscript.interpreter.util.die
 
 class FunctionType(

@@ -108,7 +108,13 @@ class Interpreter: InterpreterInterface {
         return frameVar.value
     }
 
-    fun getFunction(fn: String): TilFunction =
+    override fun getFunction(name: String) = when (name) {
+        in numericOperators -> numericOperators[name]!!.tilFunction
+        "="                 -> EqualityOperator.tilFunction
+        else                -> functions[name]
+    }
+
+    private fun getFunctionInt(fn: String): TilFunction =
         functions[fn] ?: die("Function '$fn' is not declared")
 
     fun getSymbol(symbol: String): Symbol = Symbol(
@@ -145,11 +151,11 @@ class Interpreter: InterpreterInterface {
 
         triv.construction is TilFunction && triv.construction.name == "=" -> EqualityOperator.tilFunction
 
-        triv.construction is TilFunction -> getFunction(triv.construction.name)
+        triv.construction is TilFunction -> getFunctionInt(triv.construction.name)
 
         // If the function was not known at parse-time, it could have been incorrectly detected as a Symbol instead
         triv.construction is Symbol && triv.construction.constructionType is Unknown &&
-                triv.construction.value in functions -> getFunction(triv.construction.value)
+                triv.construction.value in functions -> getFunctionInt(triv.construction.value)
 
         triv.construction is Symbol && triv.construction.constructionType is Unknown ->
             getSymbol(triv.construction)
