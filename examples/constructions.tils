@@ -1,0 +1,13 @@
+
+import "fns.tils".
+
+['PrintRes '['IsComposition '['Divisible '3 '5]]].
+
+['PrintRes '['CompositionConstructionAt '['Divisible '3 '5] '1]].
+
+['PrintRes '['Compose { ''Divisible, ''3, ''5 }]].
+
+['PrintRes '['ExecutionOrder '^1 '1]].
+['PrintRes '['ExecutionOrder '^2 '1]].
+
+['PrintRes '['ClosureArgs '[\x: Int, y: Int -> Int: ['+ x y]]]].

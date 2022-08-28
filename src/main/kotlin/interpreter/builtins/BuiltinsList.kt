@@ -86,6 +86,17 @@ object BuiltinsList {
         CompositionFunctions.Compose,
         CompositionFunctions.CompositionConstructions,
         CompositionFunctions.CompositionConstructionAt,
+
+        TypeFunctions.GetType,
+        TypeFunctions.ConsFunctionType,
+        TypeFunctions.FunctionTypeAsList,
+        TypeFunctions.FunctionTypeAt,
+        TypeFunctions.TupleTypeAt,
+        TypeFunctions.ConsTupleType,
+        TypeFunctions.ConsListType,
+        TypeFunctions.ListValueType,
+        TypeFunctions.ConsGenericType,
+        TypeFunctions.GenericTypeNumber,
     )
 
     val types get() = Types.all

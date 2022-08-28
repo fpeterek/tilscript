@@ -108,6 +108,8 @@ class Interpreter: InterpreterInterface {
         return frameVar.value
     }
 
+    override fun getType(name: String) = typeRepo[name]
+
     override fun getFunction(name: String) = when (name) {
         in numericOperators -> numericOperators[name]!!.tilFunction
         "="                 -> EqualityOperator.tilFunction

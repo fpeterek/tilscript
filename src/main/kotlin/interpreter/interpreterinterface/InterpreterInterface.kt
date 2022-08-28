@@ -27,4 +27,6 @@ interface InterpreterInterface {
     fun getVariable(name: String): Variable?
 
     fun getFunction(name: String): TilFunction?
+
+    fun getType(name: String): Type?
 }
