@@ -44,7 +44,7 @@ sealed class FunctionInterface constructor(
         val (retvalMatch, argsMatches) = interpreter.fnSignatureMatch(signature, returned, fnArgs)
 
         if (!retvalMatch) {
-            die("Returned type of function '$name' does not match expected return type (expected: $returns, received: $returned)")
+            die("Type returned by function '$name' does not match expected return type (expected: $returns, received: $returned)")
         }
 
         handleArgMatches(argsMatches, fnArgs)

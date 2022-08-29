@@ -49,6 +49,8 @@ object BuiltinsList {
         Conversions.TextToReal,
         Conversions.WorldToInt,
         Conversions.TimeToInt,
+        Conversions.ToReal,
+        Conversions.ToInt,
 
         ClosureFunctions.ConsClosure,
         ClosureFunctions.ClosureBody,

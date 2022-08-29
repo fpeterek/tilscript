@@ -38,10 +38,26 @@ class ASTConverter private constructor() {
         lits.addAll(Values.all.asSequence().map { it.toString() })
     }
 
-    private fun convert(sentences: Sentences) = ScriptContext(
-        sentences=sentences.sentences.map(::convertSentence),
-        types=repo,
-    )
+    private fun convert(sentences: Sentences): ScriptContext {
+
+        // We run definitions/declarations first to ensure they are processed first and the symbols get into
+        // the repos before analyzing any constructions
+        // We discard the results because we do not need them and because the analysis will likely be wrong
+        sentences.sentences
+            .asSequence()
+            .filter { it is TypeAlias }
+            .forEach(::convertSentence)
+
+        sentences.sentences
+            .asSequence()
+            .filter { it is FunDefinition || it is GlobalVarDef || it is GlobalVarDecl || it is EntityDef || it is TypeAlias }
+            .forEach(::convertSentence)
+
+        return ScriptContext(
+            sentences=sentences.sentences.map(::convertSentence),
+            types=repo,
+        )
+    }
 
     private fun convertDefn(def: FunDefinition): FunctionDefinition {
         fns.add(def.name.name)
@@ -192,7 +208,7 @@ class ASTConverter private constructor() {
         is Entity.Number -> convertNumLiteral(entity)
         is Entity.FnOrEntity -> when (entity.value) {
             in fns -> TilFunction(entity.value, entity.position)
-            else -> convertNonNumLiteral(entity)
+            else   -> convertNonNumLiteral(entity)
         }
         is Entity.StringLit -> convertStringLiteral(entity)
     }

@@ -24,10 +24,6 @@ class TypeRepository(withBuiltins: Boolean = false) {
         types[alias.name] = alias
     }
 
-    private fun storeAtomic(type: AtomicType) = type.apply(::addType)
-
-    private fun storeAlias(alias: TypeAlias) = alias.apply(::addAlias)
-
     fun process(type: AtomicType) = when (type.name) {
         !in types -> type.apply(::addType)
         else -> type

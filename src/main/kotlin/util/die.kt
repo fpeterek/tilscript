@@ -10,3 +10,12 @@ fun die(msg: String): Nothing {
     }
     exitProcess(-1)
 }
+
+fun die(ex: Exception): Nothing {
+    println("** Error **")
+    println(ex)
+    ex.printStackTrace()
+    println()
+    println("Interpreter exited upon encountering exception ${ex.javaClass}")
+    exitProcess(-2)
+}

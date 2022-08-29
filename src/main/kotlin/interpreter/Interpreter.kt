@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
 import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
 import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
+import org.fpeterek.tilscript.interpreter.astprocessing.result.FunDefinition
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
@@ -456,14 +457,57 @@ class Interpreter: InterpreterInterface {
 
     private fun report(nil: Nil) = report(Report(nil.reason, nil.position))
 
-    private fun interpret(sentences: Iterable<Sentence>) = sentences.forEachIndexed { index, sentence ->
-        try {
-//            println("[$index]: $sentence")
-            interpret(sentence)
-        } catch (e: Exception) {
-            println("Runtime error: ${e.message}")
-            return@interpret
+    private fun varDefToDecl(def: VariableDefinition) = VariableDeclaration(
+        listOf(def.variable),
+        def.position,
+        def.reports,
+    )
+
+    private fun tryInterpret(sentence: Sentence) = try {
+        interpret(sentence)
+    } catch (e: Exception) {
+        die(e)
+    }
+
+    private fun interpretTypeAliases(sentences: List<Sentence>) = sentences
+        .asSequence()
+        .filter {
+            it is TypeDefinition
         }
+        .forEach(::tryInterpret)
+
+    private fun interpretDefinitions(sentences: List<Sentence>) = sentences
+        .asSequence()
+        .filter {
+            it is FunctionDeclaration ||
+            it is FunctionDefinition  ||
+            it is VariableDefinition  ||
+            it is VariableDeclaration ||
+            it is LiteralDeclaration
+        }
+        .map {
+            when (it) {
+                is VariableDefinition -> varDefToDecl(it)
+                else                  -> it
+            }
+        }
+        .forEach(::tryInterpret)
+
+    private fun interpretRest(sentences: List<Sentence>) = sentences
+        .asSequence()
+        .filterNot {
+            it is FunctionDeclaration ||
+            it is FunctionDefinition  ||
+            it is VariableDeclaration ||
+            it is TypeDefinition      ||
+            it is LiteralDeclaration
+        }
+        .forEach(::tryInterpret)
+
+    private fun interpret(sentences: List<Sentence>) {
+        interpretTypeAliases(sentences)
+        interpretDefinitions(sentences)
+        interpretRest(sentences)
     }
 
     private fun printErrors(errors: Iterable<Report>, errorType: String) {

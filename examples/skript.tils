@@ -35,6 +35,13 @@ import "fns.tils".
 ['Println ['+ pi '1.5]].
 -- ['Println ['+ 'Pi '1.5]].
 
+['PrintRes '['TypeOf 'Float]].
+['PrintRes '['= 'Float 'Real]].
+['PrintRes '['TestFn '5]].
+
+defn TestFn(a: Int) -> Float = ['+ ['ToReal a] '0.5].
+
+typedef Float = Real.
 
 ['PrintRes '['Divisible '4 '2]].
 ['PrintRes '['Divisible '5 '2]].

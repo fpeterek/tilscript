@@ -114,7 +114,6 @@ object EqualityOperator : OperatorFunction(
             name == other.name && constructedType matches other.constructedType
 
         private infix fun Construction.eq(other: Construction): Boolean = when {
-            javaClass != other.javaClass -> false
 
             this is Closure        && other is Closure        -> this eq other
             this is Composition    && other is Composition    -> this eq other
