@@ -14,7 +14,7 @@ class TilFunction(
     type: Type = Unknown,
     reports: List<Report> = listOf(),
     val implementation: FunctionInterface? = null,
-) : Construction(constructedType=type, constructionType=ConstructionType, srcPosition, reports),
+) : Construction(constructedType=type, constructionType=type, srcPosition, reports),
     NonExecutable {
 
     override fun equals(other: Any?) =

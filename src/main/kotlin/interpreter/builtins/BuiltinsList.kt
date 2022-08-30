@@ -12,6 +12,7 @@ object BuiltinsList {
         ListFunctions.Tail,
         ListFunctions.IsEmpty,
         ListFunctions.ListOfOne,
+        ListFunctions.EmptyList,
 
         Util.Print,
         Util.Println,
@@ -20,6 +21,7 @@ object BuiltinsList {
         Util.Tr,
         Util.TypeOf,
         Util.IsNil,
+        Util.Cond,
 
         LogicFunctions.Not,
         LogicFunctions.And,

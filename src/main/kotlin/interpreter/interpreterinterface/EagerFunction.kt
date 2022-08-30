@@ -19,6 +19,7 @@ abstract class EagerFunction(name: String, returns: Type, args: List<Variable>):
         checkArgCount(cons)
         checkArgTypes(interpreter, cons.map { it.constructionType })
         cons.zip(this.args).map { (value, variable) ->
+            println("Creating variable $variable = $value")
             interpreter.createLocal(variable, value)
         }
 

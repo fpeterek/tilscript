@@ -15,14 +15,20 @@ class TypeMatcher private constructor(val types: TypeRepository) {
             TypeMatcher(types).matchFn(fn, returned, args)
     }
 
-    private val generics = mutableMapOf<String, Type>()
+    private val generics = mutableMapOf<Int, Type>()
 
     private fun matchTuples(l: TupleType, r: TupleType) = l.types.size == r.types.size &&
             l.types.asSequence().zip(r.types.asSequence()).all { (fst, snd) -> match(fst, snd) }
 
-    private fun matchLists(l: ListType, r: ListType) = match(l.type, r.type)
+    private fun matchLists(l: ListType, r: ListType) = run {
+//        println("Matching list type (${l.type} - ${r.type})")
+//        if (l.type is GenericType) {
+//            println(generics[l.type.argNumber])
+//        }
+        match(l.type, r.type)
+    }
 
-    private fun matchGenerics(l: GenericType, r: Type) = match(r, generics.getOrPut(l.name) { r })
+    private fun matchGenerics(l: GenericType, r: Type) = match(r, generics.getOrPut(l.argNumber) { r })
 
     private fun matchFunctions(l: FunctionType, r: FunctionType) =
         l.arity == r.arity &&
@@ -46,14 +52,16 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     }
 
     fun matchFn(fn: FunctionType, returned: Type, args: List<Type>): Pair<Boolean, List<Boolean>> =
-        match(fn.imageType, returned) to
-                fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
+        match(fn.imageType, returned) to matchFnArgs(fn, args)
 
     fun matchFnArgs(fn: FunctionType, args: List<Type>): List<Boolean> =
         fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
 
     fun match(l: Type, r: Type): Boolean = when {
         l is Unknown || r is Unknown -> true
+
+        l is GenericType && r is GenericType && l.argNumber !in generics && r.argNumber !in generics -> true
+        l is GenericType && r is GenericType -> l.argNumber == r.argNumber
 
         l is GenericType -> matchGenerics(l, r)
         r is GenericType -> matchGenerics(r, l)

@@ -1,0 +1,26 @@
+import "fns.tils".
+
+['PrintRes '{ 'Time, 'List<Int>, 'Tuple<World, Real> }].
+
+['PrintRes '['EmptyListOf 'World]].
+['PrintRes '['EmptyList]].
+
+['PrintRes '['TypeOf ['EmptyListOf 'World]]].
+['PrintRes '['TypeOf ['EmptyList]]].
+
+['PrintRes '['Cons '1 ['EmptyList]]].
+
+['PrintRes '['IsEmpty ['EmptyList]]].
+
+-- TODO: Fix
+defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
+    ['Progn ['Print '"Mapping "] ['Println list]
+    ['Cond
+        ['IsEmpty list] ['EmptyList]
+        else ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]]].
+
+['Println ['TypeOf [\x: Int -> Int: ['* x x]]]].
+
+['Println ['Map { '1, '2, '3 } [\x: Int -> Int: ['Progn ['Println x] ['* x x]] ] ]].
+
+

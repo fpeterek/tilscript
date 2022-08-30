@@ -5,6 +5,7 @@ import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.ConstructionType
 import org.fpeterek.tilscript.interpreter.types.GenericType
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.die
 
 object Util {
 
@@ -56,6 +57,50 @@ object Util {
                 }
                 else -> Nil(ctx.position, reason="If condition cannot be a symbolic value")
             }
+    }
+
+    object Cond : BuiltinBareFunction(
+        "Cond",
+        GenericType(1),
+        listOf(
+            Variable("placeholder", SrcPosition(-1, -1), GenericType(1)),
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            interpreter.createLocal(Variable("else", ctx.position), Bool(true, ctx.position))
+
+            if (args.size % 2 != 0) {
+                return Nil(ctx.position, reason="Cond expects an even number of arguments")
+            }
+
+            var i = 0
+
+            while (i < args.size) {
+
+                val cond = interpreter.interpret(args[i])
+
+                if (cond is Nil) {
+                    return cond
+                }
+
+                if (!interpreter.typesMatch(cond.constructionType, Types.Bool)) {
+                    die("Condition must be a Bool (received: ${cond.constructionType})")
+                }
+
+                if (cond !is Bool) {
+                    return Nil(ctx.position, reason="Condition must not be symbolic")
+                }
+
+                if (cond.value) {
+                    return interpreter.interpret(args[i+1])
+                }
+
+                i += 2
+            }
+
+            return Nil(ctx.position, reason="No condition matched")
+        }
     }
 
     object Progn : BuiltinBareFunction(

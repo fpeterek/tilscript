@@ -80,14 +80,6 @@ class Interpreter: InterpreterInterface {
 
     private infix fun Type.matches(other: Type) = TypeMatcher.match(this, other, typeRepo)
 
-    private fun findVar(frame: StackFrame?, name: String): Variable = when {
-        frame == null -> die("Variable not found '$name'")
-        name in frame -> frame[name]!!
-        else          -> findVar(frame.parent, name)
-    }
-
-    private fun findVar(name: String) = findVar(currentFrame, name)
-
     override fun fnArgsMatch(fn: FunctionType, types: List<Type>): List<Boolean> =
         TypeMatcher.matchFnArgs(fn, types, typeRepo)
 
@@ -96,15 +88,15 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(variable: Variable): Construction {
 
-        val frameVar = findVar(variable.name)
+        val frameVar = getVariableInternal(variable.name)
 
         if (frameVar.value == null) {
             die("Variable '${variable.name}' is declared but undefined")
         }
 
-        if (!(frameVar.constructedType matches variable.constructedType)) {
-            die("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${frameVar.constructedType})")
-        }
+//        if (!(frameVar.constructedType matches variable.constructedType)) {
+//            die("Mismatch between expected type (${variable.constructedType}) and actual type of variable (${frameVar.constructedType})")
+//        }
 
         return frameVar.value
     }
@@ -182,14 +174,16 @@ class Interpreter: InterpreterInterface {
         // We want to put variables introduced by the closure on the stack even if we aren't calling the
         // resulting function as of now to avoid capturing variables with the same name from a higher scope
         // This is necessary because we use the call stack to create captures
-        closure.variables.forEach(currentFrame::putVar)
+//        closure.variables.forEach(currentFrame::putVar)
+
+        val lambda = LambdaFunction(closure.variables, closure.construction, createLambdaCapture(), returnType=closure.returnType)
 
         TilFunction(
             "<Lambda>",
             closure.position,
-            closure.constructedType,
+            lambda.signature,
             closure.reports,
-            LambdaFunction(closure.variables, closure.construction, createLambdaCapture(), returnType=closure.returnType),
+            lambda,
         )
     }
 
@@ -233,10 +227,11 @@ class Interpreter: InterpreterInterface {
         fn(this, args, ctx)
     }
 
-    private fun interpretLambda(fn: LambdaFunction, args: List<Construction>, ctx: FnCallContext) = withFrame(fn.context.frame) {
-        createLocal(createCallsiteVar(ctx))
-        fn(this, args, ctx)
-    }
+    private fun interpretLambda(fn: LambdaFunction, args: List<Construction>, ctx: FnCallContext) =
+        withFrame(StackFrame(parent = fn.context.frame)) {
+            createLocal(createCallsiteVar(ctx))
+            fn(this, args, ctx)
+        }
 
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
         val fnImpl = when (fn.implementation) {
