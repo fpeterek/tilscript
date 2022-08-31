@@ -63,7 +63,7 @@ class Interpreter: InterpreterInterface {
         "<" to NumericOperators.Less,
     )
 
-    private fun defaultFrame() = StackFrame(parent = currentFrame)
+    private fun defaultFrame() = StackFrame(parent = topLevelFrame)
 
     private fun pushFrame(frame: StackFrame) = stack.add(frame)
     private fun pushFrame() = pushFrame(defaultFrame())
@@ -135,7 +135,7 @@ class Interpreter: InterpreterInterface {
 
     private fun getVariable(name: String, frame: StackFrame?): Variable? = when (frame) {
         null -> null
-        else -> frame[name] ?: getVariableInternal(name, frame.parent)
+        else -> frame[name] ?: getVariable(name, frame.parent)
     }
 
     override fun getVariable(name: String): Variable? = getVariable(name, currentFrame)

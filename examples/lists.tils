@@ -14,7 +14,7 @@ import "fns.tils".
 
 -- TODO: Fix
 defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
-    ['Progn ['Print '"Mapping "] ['Println list]
+    ['Progn ['Print '"Mapping "] ['Println list] ['If ['IsEmpty list] ['Println '""] ['Println ['Head list]]]
     ['Cond
         ['IsEmpty list] ['EmptyList]
         else ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]]].
@@ -23,4 +23,6 @@ defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
 
 ['Println ['Map { '1, '2, '3 } [\x: Int -> Int: ['Progn ['Println x] ['* x x]] ] ]].
 
+defn Square(x: Int) -> Int = ['Progn ['Println x] ['* x x]].
 
+['Println ['Map { '1, '2, '3 } 'Square]].

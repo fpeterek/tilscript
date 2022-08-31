@@ -49,14 +49,22 @@ object Util {
             Variable("returned", SrcPosition(-1, -1), GenericType(1)),
         )
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction =
-            when (val cond = interpreter.interpret(args.first())) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+            val cond = interpreter.interpret(args.first())
+
+            if (!interpreter.typesMatch(cond.constructionType, Types.Bool)) {
+                die("If condition must be a Bool")
+            }
+
+            return when (cond) {
                 is Bool -> when (cond.value) {
                     true -> interpreter.interpret(args[1])
                     else -> interpreter.interpret(args[2])
                 }
-                else -> Nil(ctx.position, reason="If condition cannot be a symbolic value")
+
+                else -> Nil(ctx.position, reason = "If condition cannot be a symbolic value")
             }
+        }
     }
 
     object Cond : BuiltinBareFunction(

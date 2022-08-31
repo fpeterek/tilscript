@@ -19,7 +19,12 @@ abstract class EagerFunction(name: String, returns: Type, args: List<Variable>):
         checkArgCount(cons)
         checkArgTypes(interpreter, cons.map { it.constructionType })
         cons.zip(this.args).map { (value, variable) ->
-            println("Creating variable $variable = $value")
+//            println("Creating variable $variable = $value")
+//            if (interpreter.getVariable(variable.name) != null) {
+//                val v = interpreter.getVariable(variable.name)!!
+//                println("Variable ${v.name} already exists")
+//                println(interpreter.getVariable(v.value.toString()))
+//            }
             interpreter.createLocal(variable, value)
         }
 
