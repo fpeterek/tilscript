@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -8,7 +8,7 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object Conversions {
 
-    object TextToInt : EagerFunction (
+    object TextToInt : DefaultFunction (
         "TextToInt",
         Types.Int,
         listOf(
@@ -30,7 +30,7 @@ object Conversions {
             }
     }
 
-    object TextToReal : EagerFunction (
+    object TextToReal : DefaultFunction (
         "TextToReal",
         Types.Real,
         listOf(
@@ -52,7 +52,7 @@ object Conversions {
             }
     }
 
-    object IntToText : EagerFunction (
+    object IntToText : DefaultFunction (
         "IntToText",
         Types.Text,
         listOf(
@@ -67,7 +67,7 @@ object Conversions {
             }
     }
 
-    object RealToText : EagerFunction (
+    object RealToText : DefaultFunction (
         "RealToText",
         Types.Text,
         listOf(
@@ -82,7 +82,7 @@ object Conversions {
             }
     }
 
-    object ToWorld : EagerFunction (
+    object ToWorld : DefaultFunction (
         "ToWorld",
         Types.World,
         listOf(
@@ -97,7 +97,7 @@ object Conversions {
             }
     }
 
-    object ToTime : EagerFunction (
+    object ToTime : DefaultFunction (
         "ToTime",
         Types.Time,
         listOf(
@@ -112,7 +112,7 @@ object Conversions {
             }
     }
 
-    object WorldToInt : EagerFunction (
+    object WorldToInt : DefaultFunction (
         "WorldToInt",
         Types.Int,
         listOf(
@@ -127,7 +127,7 @@ object Conversions {
             }
     }
 
-    object TimeToInt : EagerFunction (
+    object TimeToInt : DefaultFunction (
         "TimeToInt",
         Types.Int,
         listOf(
@@ -142,7 +142,7 @@ object Conversions {
             }
     }
 
-    object ToInt : EagerFunction (
+    object ToInt : DefaultFunction (
         "ToInt",
         Types.Int,
         listOf(
@@ -157,7 +157,7 @@ object Conversions {
             }
     }
 
-    object ToReal : EagerFunction (
+    object ToReal : DefaultFunction (
         "ToReal",
         Types.Real,
         listOf(

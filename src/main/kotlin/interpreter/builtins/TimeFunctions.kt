@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -8,7 +8,7 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object TimeFunctions {
 
-    object Now : EagerFunction(
+    object Now : DefaultFunction(
         "Now",
         Types.Time,
         listOf(
@@ -18,7 +18,7 @@ object TimeFunctions {
             Timestamp(time=System.currentTimeMillis(), srcPos = ctx.position)
     }
 
-    abstract class TimeCmp(name: String) : EagerFunction(
+    abstract class TimeCmp(name: String) : DefaultFunction(
         name,
         Types.Bool,
         listOf(

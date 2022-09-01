@@ -8,6 +8,7 @@ import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
 import org.fpeterek.tilscript.interpreter.astprocessing.result.FunDefinition
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.*
+import org.fpeterek.tilscript.interpreter.interpreter.builtins.Util
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FunctionInterface
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
@@ -66,7 +67,7 @@ class Interpreter: InterpreterInterface {
     private fun defaultFrame() = StackFrame(parent = topLevelFrame)
 
     private fun pushFrame(frame: StackFrame) = stack.add(frame)
-    private fun pushFrame() = pushFrame(defaultFrame())
+
     private fun popFrame() = stack.removeLast()
 
     private fun <T> withFrame(frame: StackFrame, fn: () -> T): T {
@@ -202,9 +203,11 @@ class Interpreter: InterpreterInterface {
 
         val ctx = FnCallContext(comp.function.position)
 
+        val intArgs = comp.args.map(::interpret)
+
         return when (fn.name) {
-            "="  -> interpretEquality(comp.args.map { interpret(it) }, ctx)
-            else -> interpretNumericOperator(fn, comp.args, ctx)
+            "="  -> interpretEquality(intArgs, ctx)
+            else -> interpretNumericOperator(fn, intArgs, ctx)
         }
     }
 
@@ -222,16 +225,91 @@ class Interpreter: InterpreterInterface {
         )
     )
 
-    private fun interpretFn(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext) = withFrame {
-        createLocal(createCallsiteVar(ctx))
-        fn(this, args, ctx)
+    private fun interpretFnUsingFrame(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext, frame: StackFrame) =
+        withFrame(frame) {
+            fn.args.asSequence().zip(args.asSequence()).forEach { (variable, value) ->
+                createLocal(variable, value)
+            }
+            fn(this, args, ctx)
+        }
+
+    private fun interpretNilAccepting(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+        val intArgs = withFrame(StackFrame(parent = currentFrame)) {
+            createLocal(createCallsiteVar(ctx))
+            args.map(::interpret)
+        }
+
+        return interpretFnUsingFrame(fn, intArgs, ctx, defaultFrame())
+    }
+
+    private fun interpretNilRefusing(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+        val intArgs = mutableListOf<Construction>()
+
+        val frame = StackFrame(parent = currentFrame)
+        withFrame(frame) {
+            createLocal(createCallsiteVar(ctx))
+        }
+
+        for (arg in args) {
+
+            val int = withFrame(frame) {
+                interpret(arg)
+            }
+
+            if (int is Nil) {
+                return int
+            }
+
+            intArgs.add(int)
+        }
+
+        return interpretFnUsingFrame(fn, intArgs, ctx, defaultFrame())
+    }
+
+    private fun interpretIf(args: List<Construction>, ctx: FnCallContext): Construction {
+
+        if (args.size % 2 != 0) {
+            die("If expects an even number of arguments")
+        }
+
+        var i = 0
+
+        while (i < args.size) {
+
+            val cond = interpret(args[i])
+
+            if (cond is Nil) {
+                return cond
+            }
+
+            if (!(cond.constructionType matches Types.Bool)) {
+                die("Condition must be a Bool (received: ${cond.constructionType})")
+            }
+
+            if (cond !is Bool) {
+                return Nil(ctx.position, reason="Condition must not be symbolic")
+            }
+
+            if (cond.value) {
+                return interpret(args[i+1])
+            }
+
+            i += 2
+        }
+
+        return Nil(ctx.position, reason="No condition matched")
+    }
+
+    private fun interpretFn(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext) = when {
+        fn is Util.If -> interpretIf(args, ctx)
+        fn.acceptsNil -> interpretNilAccepting(fn, args, ctx)
+        else          -> interpretNilRefusing(fn, args, ctx)
     }
 
     private fun interpretLambda(fn: LambdaFunction, args: List<Construction>, ctx: FnCallContext) =
-        withFrame(StackFrame(parent = fn.context.frame)) {
-            createLocal(createCallsiteVar(ctx))
-            fn(this, args, ctx)
-        }
+        interpretFnUsingFrame(fn, args.map(::interpret), ctx, StackFrame(parent = fn.context.frame))
 
     private fun interpretFn(fn: TilFunction, comp: Composition): Construction {
         val fnImpl = when (fn.implementation) {

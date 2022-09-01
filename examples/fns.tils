@@ -1,10 +1,9 @@
 
 defn Divisible(num: Int, divisor: Int) -> Bool =
-    ['If ['= num '0]
-        'True
-        ['If ['< num '0]
-            'False
-            ['Divisible ['- num divisor] divisor]]].
+    ['If
+        ['= num '0] 'True
+        ['< num '0] 'False
+        'True       ['Divisible ['- num divisor] divisor]].
 
 defn PrintRes(cons: Construction) -> Bool =
     ['Progn

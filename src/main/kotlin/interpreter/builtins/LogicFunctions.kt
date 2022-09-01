@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -20,7 +20,7 @@ object LogicFunctions {
     private fun symbolicNil(ctx: FnCallContext) =
         Nil(ctx.position, reason="Cannot perform logic operations on symbolic values")
 
-    object Not : EagerFunction(
+    object Not : DefaultFunction(
         "Not",
         Types.Bool,
         unary
@@ -35,7 +35,7 @@ object LogicFunctions {
             }
     }
 
-    object And : EagerFunction(
+    object And : DefaultFunction(
         "And",
         Types.Bool,
         binary
@@ -48,7 +48,7 @@ object LogicFunctions {
             }
     }
 
-    object Or : EagerFunction(
+    object Or : DefaultFunction(
         "Or",
         Types.Bool,
         binary
@@ -61,7 +61,7 @@ object LogicFunctions {
             }
     }
 
-    object Implies : EagerFunction(
+    object Implies : DefaultFunction(
         "Implies",
         Types.Bool,
         binary

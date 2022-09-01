@@ -9,7 +9,7 @@ import org.fpeterek.tilscript.interpreter.util.die
 
 object Util {
 
-    object Print : LazyFunction(
+    object Print : NilAcceptingFunction(
         "Print",
         GenericType(1),
         listOf(
@@ -17,17 +17,17 @@ object Util {
         )
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            interpreter.interpret(args.first()).apply {
+            args.first().apply {
 
-            val str = when (this) {
-                is Text -> value
-                else -> toString()
+                val str = when (this) {
+                    is Text -> value
+                    else -> toString()
+                }
+                print(str)
             }
-            print(str)
-        }
     }
 
-    object Println : LazyFunction(
+    object Println : NilAcceptingFunction(
         "Println",
         GenericType(1),
         listOf(
@@ -40,99 +40,36 @@ object Util {
             }
     }
 
-    object If : LazyFunction(
+    object If : BuiltinVariadicFunction(
         "If",
         GenericType(1),
         listOf(
             Variable("cond", SrcPosition(-1, -1), Types.Bool),
-            Variable("ignored", SrcPosition(-1, -1), GenericType(1)),
-            Variable("returned", SrcPosition(-1, -1), GenericType(1)),
-        )
+            Variable("value", SrcPosition(-1, -1), GenericType(1)),
+        ),
+        acceptsNil = true
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            val cond = interpreter.interpret(args.first())
-
-            if (!interpreter.typesMatch(cond.constructionType, Types.Bool)) {
-                die("If condition must be a Bool")
-            }
-
-            return when (cond) {
-                is Bool -> when (cond.value) {
-                    true -> interpreter.interpret(args[1])
-                    else -> interpreter.interpret(args[2])
-                }
-
-                else -> Nil(ctx.position, reason = "If condition cannot be a symbolic value")
-            }
+            die("If should never be invoked directly, instead, handling of If should be done by the interpreter")
         }
     }
 
-    object Cond : BuiltinBareFunction(
-        "Cond",
-        GenericType(1),
-        listOf(
-            Variable("placeholder", SrcPosition(-1, -1), GenericType(1)),
-        )
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-
-            interpreter.createLocal(Variable("else", ctx.position), Bool(true, ctx.position))
-
-            if (args.size % 2 != 0) {
-                return Nil(ctx.position, reason="Cond expects an even number of arguments")
-            }
-
-            var i = 0
-
-            while (i < args.size) {
-
-                val cond = interpreter.interpret(args[i])
-
-                if (cond is Nil) {
-                    return cond
-                }
-
-                if (!interpreter.typesMatch(cond.constructionType, Types.Bool)) {
-                    die("Condition must be a Bool (received: ${cond.constructionType})")
-                }
-
-                if (cond !is Bool) {
-                    return Nil(ctx.position, reason="Condition must not be symbolic")
-                }
-
-                if (cond.value) {
-                    return interpreter.interpret(args[i+1])
-                }
-
-                i += 2
-            }
-
-            return Nil(ctx.position, reason="No condition matched")
-        }
-    }
-
-    object Progn : BuiltinBareFunction(
+    object Progn : BuiltinVariadicFunction(
         "Progn",
         GenericType(1),
         listOf(
             Variable("placeholder", SrcPosition(-1, -1), GenericType(1)),
-        )
+        ),
+        acceptsNil = false
     ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-
-            for ((idx, arg) in args.withIndex()) {
-                val int = interpreter.interpret(arg)
-
-                if (int is Nil || idx == args.lastIndex) {
-                    return int
-                }
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            when (args.isNotEmpty()) {
+                true -> args.last()
+                else -> Nil(ctx.position, reason="No arguments were passed to Progn")
             }
-
-            return Nil(ctx.position, reason="No arguments were passed to Progn")
-        }
     }
 
-    object Tr : EagerFunction(
+    object Tr : DefaultFunction(
         "Tr",
         ConstructionType,
         listOf(
@@ -143,7 +80,7 @@ object Util {
             Trivialization(construction = args[0], srcPos = ctx.position, constructedType = args[0].constructionType)
     }
 
-    object TypeOf : EagerFunction(
+    object TypeOf : DefaultFunction(
         "TypeOf",
         Types.Type,
         listOf(
@@ -154,7 +91,7 @@ object Util {
             TypeRef(args[0].constructionType, ctx.position)
     }
 
-    object IsNil : LazyFunction(
+    object IsNil : NilAcceptingFunction(
         "IsNil",
         Types.Bool,
         listOf(
@@ -162,6 +99,6 @@ object Util {
         )
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            Bool(value = interpreter.interpret(args[0]) is Nil, srcPos = ctx.position)
+            Bool(value = args[0] is Nil, srcPos = ctx.position)
     }
 }

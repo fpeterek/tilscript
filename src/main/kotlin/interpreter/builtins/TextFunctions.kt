@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -11,7 +11,7 @@ object TextFunctions {
     private val text2Var = Variable("str2", SrcPosition(-1, -1), Types.Text)
     private val idxVar = Variable("idx", SrcPosition(-1, -1), Types.Int)
 
-    object Char : EagerFunction(
+    object Char : DefaultFunction(
         "Char",
         Types.Text,
         listOf(
@@ -38,7 +38,7 @@ object TextFunctions {
 
     }
 
-    object CatS : EagerFunction(
+    object CatS : DefaultFunction(
         "CatS",
         Types.Text,
         listOf(
@@ -59,7 +59,7 @@ object TextFunctions {
 
     }
 
-    object HeadS : EagerFunction(
+    object HeadS : DefaultFunction(
         "HeadS",
         Types.Text,
         listOf(
@@ -81,7 +81,7 @@ object TextFunctions {
         }
     }
 
-    object TailS : EagerFunction(
+    object TailS : DefaultFunction(
         "TailS",
         Types.Text,
         listOf(
@@ -99,7 +99,7 @@ object TextFunctions {
         }
     }
 
-    object LenS : EagerFunction(
+    object LenS : DefaultFunction(
         "LenS",
         Types.Int,
         listOf(

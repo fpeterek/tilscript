@@ -1,7 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -14,7 +14,7 @@ object ClosureFunctions {
 
     private val noPos get() = SrcPosition(-1, -1)
 
-    object ConsClosure : EagerFunction(
+    object ConsClosure : DefaultFunction(
         "ConsClosure",
         ConstructionType,
         listOf(
@@ -45,7 +45,7 @@ object ClosureFunctions {
         }
     }
 
-    object ClosureArgs : EagerFunction(
+    object ClosureArgs : DefaultFunction(
         "ClosureArgs",
         ListType(ConstructionType),
         listOf(
@@ -66,7 +66,7 @@ object ClosureFunctions {
         }
     }
 
-    object ClosureBody : EagerFunction(
+    object ClosureBody : DefaultFunction(
         "ClosureBody",
         ConstructionType,
         listOf(
@@ -85,7 +85,7 @@ object ClosureFunctions {
         }
     }
 
-    object ClosureReturnType : EagerFunction(
+    object ClosureReturnType : DefaultFunction(
         "ClosureReturnType",
         Types.Type,
         listOf(

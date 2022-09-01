@@ -1,7 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -12,7 +12,7 @@ object VariableFunctions {
 
     private val noPos get() = SrcPosition(-1, -1)
 
-    object ConsVariable : EagerFunction(
+    object ConsVariable : DefaultFunction(
         "ConsVariable",
         ConstructionType,
         listOf(
@@ -38,7 +38,7 @@ object VariableFunctions {
         }
     }
 
-    object GetVariable : EagerFunction(
+    object GetVariable : DefaultFunction(
         "GetVariable",
         ConstructionType,
         listOf(
@@ -57,7 +57,7 @@ object VariableFunctions {
         }
     }
 
-    object VariableType : EagerFunction(
+    object VariableType : DefaultFunction(
         "VariableType",
         Types.Type,
         listOf(
@@ -76,7 +76,7 @@ object VariableFunctions {
         }
     }
 
-    object VariableName : EagerFunction(
+    object VariableName : DefaultFunction(
         "VariableName",
         Types.Type,
         listOf(

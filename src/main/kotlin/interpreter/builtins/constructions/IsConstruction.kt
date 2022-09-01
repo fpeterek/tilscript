@@ -1,7 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -15,7 +15,7 @@ object IsConstruction {
 
     private val noPos get() = SrcPosition(-1, -1)
 
-    object IsVariable : EagerFunction(
+    object IsVariable : DefaultFunction(
         "IsVariable",
         Types.Bool,
         listOf(
@@ -26,7 +26,7 @@ object IsConstruction {
             Bool(value = args[0] is Variable, noPos)
     }
 
-    object IsComposition : EagerFunction(
+    object IsComposition : DefaultFunction(
         "IsComposition",
         Types.Bool,
         listOf(
@@ -37,7 +37,7 @@ object IsConstruction {
             Bool(value = args[0] is Composition, noPos)
     }
 
-    object IsClosure : EagerFunction(
+    object IsClosure : DefaultFunction(
         "IsClosure",
         Types.Bool,
         listOf(
@@ -48,7 +48,7 @@ object IsConstruction {
             Bool(value = args[0] is Closure, noPos)
     }
 
-    object IsExecution : EagerFunction(
+    object IsExecution : DefaultFunction(
         "IsExecution",
         Types.Bool,
         listOf(
@@ -59,7 +59,7 @@ object IsConstruction {
             Bool(value = args[0] is Execution, noPos)
     }
 
-    object IsFunction : EagerFunction(
+    object IsFunction : DefaultFunction(
         "IsFunction",
         Types.Bool,
         listOf(
@@ -70,7 +70,7 @@ object IsConstruction {
             Bool(value = args[0] is TilFunction, noPos)
     }
 
-    object IsTrivialization : EagerFunction(
+    object IsTrivialization : DefaultFunction(
         "IsTrivialization",
         Types.Bool,
         listOf(
@@ -81,7 +81,7 @@ object IsConstruction {
             Bool(value = args[0] is Trivialization, noPos)
     }
 
-    object IsSymbol : EagerFunction(
+    object IsSymbol : DefaultFunction(
         "IsSymbol",
         Types.Bool,
         listOf(
@@ -92,7 +92,7 @@ object IsConstruction {
             Bool(value = args[0] is Symbol, noPos)
     }
 
-    object IsValue : EagerFunction(
+    object IsValue : DefaultFunction(
         "IsValue",
         Types.Bool,
         listOf(
@@ -103,7 +103,7 @@ object IsConstruction {
             Bool(value = args[0] is Value, noPos)
     }
 
-    object IsList : EagerFunction(
+    object IsList : DefaultFunction(
         "IsList",
         Types.Bool,
         listOf(
@@ -114,7 +114,7 @@ object IsConstruction {
             Bool(value = args[0].constructedType is ListType, noPos)
     }
 
-    object IsTuple : EagerFunction(
+    object IsTuple : DefaultFunction(
         "IsTuple",
         Types.Bool,
         listOf(

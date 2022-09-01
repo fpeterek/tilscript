@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.sentence
 
-import org.fpeterek.tilscript.interpreter.interpreter.DefaultFunction
+import org.fpeterek.tilscript.interpreter.interpreter.TilConstructionFunction
 import org.fpeterek.tilscript.interpreter.reporting.Report
 import org.fpeterek.tilscript.interpreter.types.FunctionType
 import org.fpeterek.tilscript.interpreter.types.Type
@@ -105,7 +105,7 @@ class FunctionDefinition(
 
     val signature = FunctionType(listOf(constructsType) + args.map { it.constructedType })
 
-    val function = DefaultFunction(
+    val function = TilConstructionFunction(
         name,
         constructsType,
         args,

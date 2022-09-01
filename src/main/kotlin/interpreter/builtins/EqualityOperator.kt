@@ -130,9 +130,6 @@ object EqualityOperator : OperatorFunction(
 
     }
 
-    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) = when {
-        args[0] is Nil -> args[0]
-        args[1] is Nil -> args[1]
-        else -> Bool(value=ConstructionComparator(args[0], args[1], interpreter), srcPos = ctx.position)
-    }
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+        Bool(value=ConstructionComparator(args[0], args[1], interpreter), srcPos = ctx.position)
 }

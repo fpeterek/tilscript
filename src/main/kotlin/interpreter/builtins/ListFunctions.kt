@@ -1,9 +1,8 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.LazyFunction
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.sentence.EmptyList as NilList
 import org.fpeterek.tilscript.interpreter.types.GenericType
@@ -13,7 +12,7 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object ListFunctions {
 
-    object ListOfOne : EagerFunction(
+    object ListOfOne : DefaultFunction(
         "ListOfOne",
         ListType(GenericType(1)),
         listOf(
@@ -29,7 +28,7 @@ object ListFunctions {
         )
     }
 
-    object Cons : EagerFunction(
+    object Cons : DefaultFunction(
         "Cons",
         ListType(GenericType(1)),
         listOf(
@@ -66,7 +65,7 @@ object ListFunctions {
 
     }
 
-    object Head : EagerFunction(
+    object Head : DefaultFunction(
         "Head",
         GenericType(1),
         listOf(
@@ -89,7 +88,7 @@ object ListFunctions {
         }
     }
 
-    object Tail : EagerFunction(
+    object Tail : DefaultFunction(
         "Tail",
         ListType(GenericType(1)),
         listOf(
@@ -108,7 +107,7 @@ object ListFunctions {
         }
     }
 
-    object IsEmpty : EagerFunction(
+    object IsEmpty : DefaultFunction(
         "IsEmpty",
         Types.Bool,
         listOf(
@@ -121,7 +120,7 @@ object ListFunctions {
         }
     }
 
-    object EmptyListOf : EagerFunction(
+    object EmptyListOf : DefaultFunction(
         "EmptyListOf",
         ListType(GenericType(1)),
         listOf(
@@ -137,7 +136,7 @@ object ListFunctions {
         }
     }
 
-    object EmptyList : EagerFunction(
+    object EmptyList : DefaultFunction(
         "EmptyList",
         ListType(GenericType(1)),
         emptyList(),

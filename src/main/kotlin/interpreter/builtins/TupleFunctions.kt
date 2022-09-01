@@ -1,7 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.BuiltinBareFunction
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.BuiltinVariadicFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -10,32 +10,21 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 
 object TupleFunctions {
 
-    object MkTuple : BuiltinBareFunction(
+    object MkTuple : BuiltinVariadicFunction(
         "MkTuple",
         GenericType(1),
         listOf(
             Variable("placeholder", SrcPosition(-1, -1), GenericType(2))
-        )
+        ),
+        acceptsNil = false
     ) {
 
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            val int = args.map(interpreter::interpret)
-
-            val nil = int.firstOrNull { it is Nil }
-
-            if (nil != null) {
-                return nil
-            }
-
-            return TilTuple(
-                int,
-                int.firstOrNull()?.position ?: SrcPosition(-1, -1),
-            )
-        }
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            TilTuple(args, ctx.position)
 
     }
 
-    object Get : EagerFunction(
+    object Get : DefaultFunction(
         "Get",
         GenericType(1),
         listOf(
@@ -66,7 +55,7 @@ object TupleFunctions {
 
     }
 
-    object TupleLen : EagerFunction(
+    object TupleLen : DefaultFunction(
         "TupleLen",
         Types.Int,
         listOf(

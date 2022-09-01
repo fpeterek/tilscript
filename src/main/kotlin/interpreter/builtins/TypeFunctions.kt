@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -13,7 +13,7 @@ object TypeFunctions {
 
     private val noPos get() = SrcPosition(-1, -1)
 
-    object GetType : EagerFunction(
+    object GetType : DefaultFunction(
         "GetType",
         Types.Type,
         listOf(
@@ -37,7 +37,7 @@ object TypeFunctions {
 
     }
 
-    object ConsFunctionType : EagerFunction(
+    object ConsFunctionType : DefaultFunction(
         "ConsFunctionType",
         Types.Type,
         listOf(
@@ -64,7 +64,7 @@ object TypeFunctions {
         }
     }
 
-    object FunctionTypeAsList : EagerFunction(
+    object FunctionTypeAsList : DefaultFunction(
         "FunctionTypeAsList",
         ListType(Types.Type),
         listOf(
@@ -86,7 +86,7 @@ object TypeFunctions {
         }
     }
 
-    object FunctionTypeAt : EagerFunction(
+    object FunctionTypeAt : DefaultFunction(
         "FunctionTypeAt",
         Types.Type,
         listOf(
@@ -120,7 +120,7 @@ object TypeFunctions {
         }
     }
 
-    object TupleTypeAt : EagerFunction(
+    object TupleTypeAt : DefaultFunction(
         "TupleTypeAt",
         Types.Type,
         listOf(
@@ -149,7 +149,7 @@ object TypeFunctions {
         }
     }
 
-    object ConsTupleType : EagerFunction(
+    object ConsTupleType : DefaultFunction(
         "ConsTupleType",
         Types.Type,
         listOf(
@@ -174,7 +174,7 @@ object TypeFunctions {
         }
     }
 
-    object ConsListType : EagerFunction(
+    object ConsListType : DefaultFunction(
         "ConsListType",
         Types.Type,
         listOf(
@@ -193,7 +193,7 @@ object TypeFunctions {
         }
     }
 
-    object ListValueType : EagerFunction(
+    object ListValueType : DefaultFunction(
         "ListValueType",
         Types.Type,
         listOf(
@@ -212,7 +212,7 @@ object TypeFunctions {
         }
     }
 
-    object ConsGenericType : EagerFunction(
+    object ConsGenericType : DefaultFunction(
         "ConsGenericType",
         Types.Type,
         listOf(
@@ -235,7 +235,7 @@ object TypeFunctions {
         }
     }
 
-    object GenericTypeNumber : EagerFunction(
+    object GenericTypeNumber : DefaultFunction(
         "GenericTypeNumber",
         Types.Int,
         listOf(

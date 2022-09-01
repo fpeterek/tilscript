@@ -9,4 +9,4 @@ class LambdaFunction(
     body: Construction,
     val context: LambdaContext,
     returnType: Type
-) : DefaultFunction("<Lambda>", returnType, args, body)
+) : TilConstructionFunction("<Lambda>", returnType, args, body)

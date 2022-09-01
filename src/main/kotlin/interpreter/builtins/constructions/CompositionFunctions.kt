@@ -1,7 +1,7 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.Types
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.*
@@ -14,7 +14,7 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 object CompositionFunctions {
     private val noPos get() = SrcPosition(-1, -1)
 
-    object Compose : EagerFunction(
+    object Compose : DefaultFunction(
         "Compose",
         ConstructionType,
         listOf(
@@ -48,7 +48,7 @@ object CompositionFunctions {
 
     }
 
-    object CompositionConstructions : EagerFunction(
+    object CompositionConstructions : DefaultFunction(
         "CompositionConstructions",
         ListType(ConstructionType),
         listOf(
@@ -71,7 +71,7 @@ object CompositionFunctions {
         }
     }
 
-    object CompositionConstructionAt : EagerFunction(
+    object CompositionConstructionAt : DefaultFunction(
         "CompositionConstructionAt",
         ConstructionType,
         listOf(

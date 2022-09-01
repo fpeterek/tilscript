@@ -1,6 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions
 
-import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.EagerFunction
+import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.interpreter.sentence.Construction
@@ -14,7 +14,7 @@ import org.fpeterek.tilscript.interpreter.util.SrcPosition
 object TrivializationFunctions {
     private val noPos get() = SrcPosition(-1, -1)
 
-    object Trivialize : EagerFunction(
+    object Trivialize : DefaultFunction(
         "Trivialize",
         ConstructionType,
         listOf(
@@ -26,7 +26,7 @@ object TrivializationFunctions {
 
     }
 
-    object TrivializationBody : EagerFunction(
+    object TrivializationBody : DefaultFunction(
         "TrivializationBody",
         ConstructionType,
         listOf(

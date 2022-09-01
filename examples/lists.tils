@@ -12,17 +12,15 @@ import "fns.tils".
 
 ['PrintRes '['IsEmpty ['EmptyList]]].
 
--- TODO: Fix
 defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
-    ['Progn ['Print '"Mapping "] ['Println list] ['If ['IsEmpty list] ['Println '""] ['Println ['Head list]]]
-    ['Cond
+    ['If
         ['IsEmpty list] ['EmptyList]
-        else ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]]].
+        'True ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]].
 
 ['Println ['TypeOf [\x: Int -> Int: ['* x x]]]].
 
-['Println ['Map { '1, '2, '3 } [\x: Int -> Int: ['Progn ['Println x] ['* x x]] ] ]].
+['Println ['Map { '1, '2, '3 } [\x: Int -> Int: ['* x x]] ]].
 
-defn Square(x: Int) -> Int = ['Progn ['Println x] ['* x x]].
+defn Square(x: Int) -> Int = ['* x x].
 
 ['Println ['Map { '1, '2, '3 } 'Square]].

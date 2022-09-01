@@ -1,11 +1,11 @@
 import "fns.tils".
 
 ['PrintRes '['TextToInt '"123"]].
-['PrintRes '['TextToInt '"123a"]].
+-- ['PrintRes '['TextToInt '"123a"]].
 ['PrintRes '['TypeOf ['TextToInt '"123"]]].
 
 ['PrintRes '['TextToReal '"12.3"]].
-['PrintRes '['TextToReal '"12.3a"]].
+-- ['PrintRes '['TextToReal '"12.3a"]].
 ['PrintRes '['TypeOf ['TextToReal '"12.3"]]].
 
 ['PrintRes '['IntToText '12]].

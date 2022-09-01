@@ -25,23 +25,23 @@ let c: Int = '2.
 
 ['PrintRes
   '['=
-    '[\x: Int, y: Int ['+ x y]]
-    '[\x: Int, y: Int ['+ x y]]]].
+    '[\x: Int, y: Int -> Int: ['+ x y]]
+    '[\x: Int, y: Int -> Int: ['+ x y]]]].
 
 ['PrintRes
   '['=
-    '[\x: Int, y: Int ['+ x y]]
-    '[\x: Int, y: Int ['+ y x]]]].
+    '[\x: Int, y: Int -> Int: ['+ x y]]
+    '[\x: Int, y: Int -> Int: ['+ y x]]]].
 
 ['PrintRes
   '['=
-    [\x: Int, y: Int ['+ x y]]
-    [\x: Int, y: Int ['+ x y]]]].
+    [\x: Int, y: Int -> Int: ['+ x y]]
+    [\x: Int, y: Int -> Int: ['+ x y]]]].
 
 ['PrintRes
   '['=
-    [\x: Int, y: Int ['+ x y]]
-    [\x: Int, y: Int ['+ y x]]]].
+    [\x: Int, y: Int -> Int: ['+ x y]]
+    [\x: Int, y: Int -> Int: ['+ y x]]]].
 
 ['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '1 '2 '3]]].
 ['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '3 '2 '1]]].

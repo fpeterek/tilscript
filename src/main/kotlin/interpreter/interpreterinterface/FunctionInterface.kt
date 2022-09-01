@@ -14,6 +14,8 @@ sealed class FunctionInterface constructor(
     val args: List<Variable>,
 ) {
 
+    abstract val acceptsNil: Boolean
+
     val argTypes = args.map { it.constructedType }
 
     val signature = FunctionType(returns, argTypes)
@@ -48,6 +50,17 @@ sealed class FunctionInterface constructor(
         }
 
         handleArgMatches(argsMatches, fnArgs)
+    }
+
+    protected fun runWithTypechecks(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+        checkArgCount(args)
+        checkArgTypes(interpreter, args.map { it.constructionType })
+
+        val retval = apply(interpreter, args, ctx)
+
+        checkSignature(interpreter, retval.constructionType, args.map { it.constructionType })
+
+        return retval
     }
 
     abstract fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction

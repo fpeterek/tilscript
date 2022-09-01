@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.interpreter.interpreter.interpreterinterface.Inter
 import org.fpeterek.tilscript.interpreter.sentence.*
 import org.fpeterek.tilscript.interpreter.types.Type
 import org.fpeterek.tilscript.interpreter.util.SrcPosition
+import org.fpeterek.tilscript.interpreter.util.die
 
 object NumericOperators {
 
@@ -27,34 +28,24 @@ object NumericOperators {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
 
-            val int = args.map(interpreter::interpret)
-
-            val t1 = int[0].constructionType
-            val t2 = int[1].constructionType
-
-            if (int[0] is Nil) {
-                return int[0]
-            }
-
-            if (int[1] is Nil) {
-                return int[1]
-            }
+            val t1 = args[0].constructionType
+            val t2 = args[1].constructionType
 
             if (!interpreter.typesMatch(t1, t2)) {
-                Nil(ctx.position, reason="Argument type mismatch in operator $name (first: ${t1}, second: ${t2}")
+                die("Argument type mismatch in operator $name (first: ${t1}, second: ${t2}")
             }
 
             if (!interpreter.typesMatch(t1, Types.Int) && !interpreter.typesMatch(t1, Types.Real)) {
-                Nil(ctx.position, reason="Invalid argument type for operator $name, (received: $t1, expected Real or Int)")
+                die("Invalid argument type for operator $name, (received: $t1, expected Real or Int)")
             }
 
-            if (int.any { it !is Integral && it !is Real }) {
+            if (args.any { it !is Integral && it !is Real }) {
                 return Nil(ctx.position, reason="Cannot perform arithmetic operations on symbolic values")
             }
 
-            return when (int[0]) {
-                is Integral -> calcIntegral(int[0] as Integral, int[1] as Integral, interpreter, ctx)
-                else        -> calcReal(int[0] as Real, int[1] as Real, interpreter, ctx)
+            return when (args[0]) {
+                is Integral -> calcIntegral(args[0] as Integral, args[1] as Integral, interpreter, ctx)
+                else        -> calcReal(args[0] as Real, args[1] as Real, interpreter, ctx)
             }
         }
 

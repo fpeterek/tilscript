@@ -1,7 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter.builtins
 
 import org.fpeterek.tilscript.interpreter.interpreter.builtins.constructions.*
-import java.time.Clock
 
 
 object BuiltinsList {
@@ -21,7 +20,6 @@ object BuiltinsList {
         Util.Tr,
         Util.TypeOf,
         Util.IsNil,
-        Util.Cond,
 
         LogicFunctions.Not,
         LogicFunctions.And,
