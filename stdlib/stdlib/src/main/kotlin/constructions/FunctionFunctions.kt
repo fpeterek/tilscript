@@ -1,6 +1,6 @@
-package org.fpeterek.tilscript.common.stdlib.constructions
+package org.fpeterek.tilscript.stdlib.constructions
 
-import org.fpeterek.tilscript.common.stdlib.Types
+import org.fpeterek.tilscript.stdlib.Types
 import org.fpeterek.tilscript.common.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.common.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.common.interpreterinterface.InterpreterInterface

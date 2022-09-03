@@ -1,19 +1,18 @@
 package org.fpeterek.tilscript.common.types
 
 import org.fpeterek.tilscript.common.sentence.*
-import org.fpeterek.tilscript.common.stdlib.Types
 import org.fpeterek.tilscript.common.SrcPosition
 
 object Util {
 
-    val w = Variable("w", SrcPosition(-1, -1), Types.World)
-    val t = Variable("t", SrcPosition(-1, -1), Types.Time)
+    val w = Variable("w", SrcPosition(-1, -1), Primitives.World)
+    val t = Variable("t", SrcPosition(-1, -1), Primitives.Time)
 
     fun FunctionType.intensionalize() =
-        FunctionType(FunctionType(this, Types.Time), Types.World)
+        FunctionType(FunctionType(this, Primitives.Time), Primitives.World)
 
     fun AtomicType.intensionalize() =
-        FunctionType(FunctionType(this, Types.Time), Types.World)
+        FunctionType(FunctionType(this, Primitives.Time), Primitives.World)
 
     fun Closure.intensionalize() =
         Closure(
@@ -22,10 +21,10 @@ object Util {
                 listOf(t),
                 this,
                 srcPos=position,
-                returnType = FunctionType(this.functionType, Types.Time)
+                returnType = FunctionType(this.functionType, Primitives.Time)
             ),
             srcPos=position,
-            returnType = FunctionType(FunctionType(this.functionType, Types.Time), Types.World)
+            returnType = FunctionType(FunctionType(this.functionType, Primitives.Time), Primitives.World)
         )
 
     fun <T : Construction> T.trivialize() =

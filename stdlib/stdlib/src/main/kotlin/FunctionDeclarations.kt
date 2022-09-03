@@ -1,11 +1,11 @@
-package org.fpeterek.tilscript.common.stdlib
+package org.fpeterek.tilscript.stdlib
 
 import org.fpeterek.tilscript.common.sentence.TilFunction
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.types.Util.intensionalize
 import org.fpeterek.tilscript.common.SrcPosition
 
-object FnDeclarations {
+object FunctionDeclarations {
 
     private val nonrestrictedQuantifier
         get() = FunctionType(Types.Bool, FunctionType(Types.Bool, GenericType(1)))
@@ -34,12 +34,6 @@ object FnDeclarations {
     private val noPosition = SrcPosition(-1, -1)
 
     val builtinFunctions = listOf(
-
-        // TODO: Implement
-        TilFunction("ToInt", noPosition, FunctionType(Types.Int, Types.Real)),
-        TilFunction("ToReal", noPosition, FunctionType(Types.Real, Types.Int)),
-
-        TilFunction("Tr", noPosition, FunctionType(ConstructionType, ConstructionType)),
 
         // Won't receive implementation
         TilFunction("ForAll", noPosition, nonrestrictedQuantifier),

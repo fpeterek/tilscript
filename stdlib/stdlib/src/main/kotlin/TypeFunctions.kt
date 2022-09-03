@@ -1,10 +1,9 @@
-package org.fpeterek.tilscript.common.stdlib
+package org.fpeterek.tilscript.stdlib
 
 import org.fpeterek.tilscript.common.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.common.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.common.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.common.sentence.*
-import org.fpeterek.tilscript.common.sentence.EmptyList
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.SrcPosition
 
@@ -79,7 +78,7 @@ object TypeFunctions {
                 return Nil(ctx.position, reason = "FunctionTypeAsList expects a function type")
             }
 
-            return (listOf(fn.type.imageType) + fn.type.argTypes)
+            return (listOf((fn.type as FunctionType).imageType) + (fn.type as FunctionType).argTypes)
                 .foldRight(EmptyList(Types.Type, ctx.position) as TilList) { type, acc ->
                     ListCell(TypeRef(type, ctx.position), acc, Types.Type, ctx.position)
                 }
@@ -107,13 +106,13 @@ object TypeFunctions {
                 return Nil(ctx.position, reason = "Index must not be symbolic")
             }
 
-            if (idx.value < 0 || idx.value > fn.type.argTypes.size) {
+            if (idx.value < 0 || idx.value > (fn.type as FunctionType).argTypes.size) {
                 return Nil(ctx.position, reason = "Index out of range")
             }
 
             val type = when (val i = idx.value.toInt()) {
-                0    -> fn.type.imageType
-                else -> fn.type.argTypes[i - 1]
+                0    -> (fn.type as FunctionType).imageType
+                else -> (fn.type as FunctionType).argTypes[i - 1]
             }
 
             return TypeRef(type, ctx.position)
@@ -141,11 +140,11 @@ object TypeFunctions {
                 return Nil(ctx.position, reason = "Index must not be symbolic")
             }
 
-            if (idx.value < 0 || idx.value >= tupleType.type.types.size) {
+            if (idx.value < 0 || idx.value >= (tupleType.type as TupleType).types.size) {
                 return Nil(ctx.position, reason = "Index out of range")
             }
 
-            return TypeRef(tupleType.type.types[idx.value.toInt()], ctx.position)
+            return TypeRef((tupleType.type as TupleType).types[idx.value.toInt()], ctx.position)
         }
     }
 
@@ -208,7 +207,7 @@ object TypeFunctions {
                 return Nil(ctx.position, reason = "ListValueType expects a list type")
             }
 
-            return TypeRef(type.type.type, ctx.position)
+            return TypeRef((type.type as ListType).type, ctx.position)
         }
     }
 
@@ -250,7 +249,7 @@ object TypeFunctions {
                 return Nil(ctx.position, reason="GenericTypeNumber expects a generic type")
             }
 
-            return Integral(type.type.argNumber.toLong(), ctx.position)
+            return Integral((type.type as GenericType).argNumber.toLong(), ctx.position)
         }
     }
 }

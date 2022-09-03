@@ -5,7 +5,7 @@ import org.fpeterek.tilscript.interpreter.astprocessing.result.Construction.*
 import org.fpeterek.tilscript.interpreter.astprocessing.result.ImportStatement
 import org.fpeterek.tilscript.interpreter.interpreter.TypeRepository
 import org.fpeterek.tilscript.interpreter.interpreter.ScriptContext
-import org.fpeterek.tilscript.common.stdlib.*
+import org.fpeterek.tilscript.stdlib.*
 import org.fpeterek.tilscript.common.sentence.*
 import org.fpeterek.tilscript.common.sentence.Symbol
 import org.fpeterek.tilscript.common.types.*
@@ -32,14 +32,14 @@ class ASTConverter private constructor() {
 
     init {
 
-        Types.all.forEach(repo::process)
+        StdlibRegistrar.types.forEach(repo::process)
 
-        fns.addAll(FnDeclarations.builtinFunctions.asSequence().map { it.name })
+        fns.addAll(StdlibRegistrar.functionDeclarations.asSequence().map { it.name })
         fns.addAll(StdlibRegistrar.functions.asSequence().map { it.name })
         fns.addAll(listOf("<", ">", "=", "*", "/", "+", "-"))
         // Since we know built-ins will only ever be Symbols, Nil, or Booleans,
         // we can store their values as a String
-        lits.addAll(Values.all.asSequence().map { it.toString() })
+        lits.addAll(StdlibRegistrar.values.asSequence().map { it.toString() })
     }
 
     private fun convert(sentences: Sentences): ScriptContext {

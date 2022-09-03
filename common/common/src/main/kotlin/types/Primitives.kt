@@ -1,8 +1,6 @@
-package org.fpeterek.tilscript.common.stdlib
+package org.fpeterek.tilscript.common.types
 
-import org.fpeterek.tilscript.common.types.AtomicType
-
-object Types {
+object Primitives {
     val Bool  = AtomicType("Bool")
     val Indiv = AtomicType("Indiv")
     val Time  = AtomicType("Time")
@@ -11,8 +9,4 @@ object Types {
     val Int   = AtomicType("Int")
     val Type  = AtomicType("Type")
     val Text  = AtomicType("Text")
-
-    val all = listOf(
-        Bool, Indiv, Time, World, Real, Int, Type
-    )
 }

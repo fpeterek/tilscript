@@ -1,4 +1,4 @@
-package org.fpeterek.tilscript.common.stdlib
+package org.fpeterek.tilscript.stdlib
 
 import org.fpeterek.tilscript.common.interpreterinterface.LambdaFunction
 import org.fpeterek.tilscript.common.interpreterinterface.OperatorFunction
@@ -102,7 +102,7 @@ object EqualityOperator : OperatorFunction(
 
             this.implementation != null && this.implementation is LambdaFunction &&
                 other.implementation != null && other.implementation is LambdaFunction ->
-                    this.implementation.body eq other.implementation.body
+                (this.implementation as LambdaFunction).body eq (other.implementation as LambdaFunction).body
 
             else -> name == other.name && constructedType matches other.constructedType
         }
@@ -131,5 +131,5 @@ object EqualityOperator : OperatorFunction(
     }
 
     override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-        Bool(value=ConstructionComparator(args[0], args[1], interpreter), srcPos = ctx.position)
+        Bool(value= ConstructionComparator(args[0], args[1], interpreter), srcPos = ctx.position)
 }

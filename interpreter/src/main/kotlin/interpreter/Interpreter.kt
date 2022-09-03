@@ -6,8 +6,8 @@ import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
 import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
 import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
-import org.fpeterek.tilscript.common.stdlib.*
-import org.fpeterek.tilscript.common.stdlib.Util
+import org.fpeterek.tilscript.stdlib.*
+import org.fpeterek.tilscript.stdlib.Util
 import org.fpeterek.tilscript.common.interpreterinterface.*
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.common.reporting.ReportFormatter

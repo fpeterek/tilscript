@@ -2,7 +2,7 @@ package org.fpeterek.tilscript.common.sentence
 
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.common.sentence.isexecutable.NonExecutable
-import org.fpeterek.tilscript.common.stdlib.Types
+import org.fpeterek.tilscript.common.types.Primitives
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.SrcPosition
 
@@ -45,7 +45,7 @@ class TypeRef(
     val type: Type,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.Type, reports) {
+) : Value(srcPos, Primitives.Type, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is TypeRef && other.type.name == type.name
@@ -63,7 +63,7 @@ class World(
     val world: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.World, reports) {
+) : Value(srcPos, Primitives.World, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is World && other.world == world
@@ -80,7 +80,7 @@ class Timestamp(
     val time: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.Time, reports) {
+) : Value(srcPos, Primitives.Time, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Timestamp && other.time == time
@@ -97,7 +97,7 @@ class Integral(
     val value: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.Int, reports) {
+) : Value(srcPos, Primitives.Int, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Integral && other.value == value
@@ -114,7 +114,7 @@ class Real(
     val value: Double,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.Real, reports) {
+) : Value(srcPos, Primitives.Real, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Real && other.value == value
@@ -131,7 +131,7 @@ class Text(
     val value: String,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.Text, reports) {
+) : Value(srcPos, Primitives.Text, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Text && other.value == value
@@ -148,7 +148,7 @@ class Bool(
     val value: Boolean,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
-) : Value(srcPos, Types.Bool, reports) {
+) : Value(srcPos, Primitives.Bool, reports) {
 
     override fun equals(other: Any?) =
         other != null && other is Bool && other.value == value

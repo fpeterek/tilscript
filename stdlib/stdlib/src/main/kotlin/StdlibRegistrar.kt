@@ -1,7 +1,8 @@
-package org.fpeterek.tilscript.common.stdlib
+package org.fpeterek.tilscript.stdlib
 
 import org.fpeterek.tilscript.common.interpreterinterface.SymbolRegistrar
-import org.fpeterek.tilscript.common.stdlib.constructions.*
+import org.fpeterek.tilscript.common.sentence.TilFunction
+import org.fpeterek.tilscript.stdlib.constructions.*
 
 
 object StdlibRegistrar : SymbolRegistrar {
@@ -105,5 +106,5 @@ object StdlibRegistrar : SymbolRegistrar {
 
     override val types get()  = Types.all
     override val values get() = Values.all
-
+    override val functionDeclarations get() = FunctionDeclarations.builtinFunctions
 }

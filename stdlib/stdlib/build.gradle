@@ -1,0 +1,49 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'org.fpeterek.tilscript'
+version = '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation 'org.fpeterek.tilscript:common:1.0'
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+jar {
+    archiveName 'stdlib.jar'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.fpeterek.tilscript'
+            artifactId = 'stdlib'
+            version = '1.0'
+
+            from components.java
+        }
+    }
+}

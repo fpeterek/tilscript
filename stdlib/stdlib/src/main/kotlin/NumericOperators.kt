@@ -1,4 +1,4 @@
-package org.fpeterek.tilscript.common.stdlib
+package org.fpeterek.tilscript.stdlib
 
 import org.fpeterek.tilscript.common.interpreterinterface.OperatorFunction
 import org.fpeterek.tilscript.common.interpreterinterface.FnCallContext

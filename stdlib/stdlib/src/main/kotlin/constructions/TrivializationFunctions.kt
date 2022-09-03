@@ -1,4 +1,4 @@
-package org.fpeterek.tilscript.common.stdlib.constructions
+package org.fpeterek.tilscript.stdlib.constructions
 
 import org.fpeterek.tilscript.common.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.common.interpreterinterface.FnCallContext
