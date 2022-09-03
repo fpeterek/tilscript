@@ -1,0 +1,64 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'antlr'
+    id 'java'
+}
+
+group 'org.fpeterek.tilscript'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.10'
+
+    implementation 'org.json:json:20220320'
+    implementation 'org.apache.commons:commons-text:1.9'
+
+    implementation 'org.fpeterek.tilscript:common:1.0'
+
+    antlr 'org.antlr:antlr4:4.9.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+generateGrammarSource {
+    arguments += ['-visitor']
+}
+
+compileKotlin {
+    dependsOn(generateGrammarSource)
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir generateGrammarSource.outputDirectory
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    archiveName 'tilscript.jar'
+    manifest {
+        attributes 'Main-Class': 'org.fpeterek.tilscript.interpreter.MainKt'
+    }
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    } {
+        exclude 'META-INF', 'META-INF/**'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
