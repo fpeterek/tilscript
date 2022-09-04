@@ -1,0 +1,10 @@
+import "class://org.fpeterek.tilscript.math.Registrar".
+
+import "fns.tils".
+
+['PrintRes '['Sin 'Pi]].
+
+['PrintRes '['Sin '3.14159]].
+
+['PrintRes '['Log '1024.0 '2.0]].
+

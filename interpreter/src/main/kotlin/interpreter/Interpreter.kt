@@ -400,19 +400,22 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    private fun interpret(def: FunctionDefinition) {
+    private fun defineFn(name: String, fn: TilFunction) {
 
-        if (def.name in functions) {
-            val declared = functions[def.name]!!
+        if (name in functions) {
+            val declared = functions[name]!!
             if (declared.implementation != null) {
-                die("Redefinition of function '${def.name}' with a conflicting implementation")
+                die("Redefinition of function '${name}' with a conflicting implementation")
             }
-            if (!(declared.constructedType matches def.signature)) {
-                die("Redeclaration of function '${def.name}' with a different type")
+            if (!(declared.constructionType matches fn.constructionType)) {
+                die("Redeclaration of function '${name}' with a different type")
             }
         }
-        functions[def.name] = def.tilFunction
+        functions[name] = fn
     }
+
+    private fun interpret(def: FunctionDefinition) = defineFn(def.name, def.tilFunction)
+
 
     private fun interpret(lit: LiteralDeclaration) {
         lit.literals.forEach {
@@ -509,6 +512,11 @@ class Interpreter: InterpreterInterface {
         }
     }
 
+    private fun interpret(import: ImportStatement) = when (import.file.startsWith("class://")) {
+        true -> loadFromJar(import.file.removePrefix("class://"))
+        else -> interpretFile(import.file)
+    }
+
     private fun interpret(sentence: Sentence) {
         when (sentence) {
             is Construction    -> {
@@ -519,7 +527,7 @@ class Interpreter: InterpreterInterface {
                 }
             }
             is Declaration     -> interpret(sentence)
-            is ImportStatement -> interpretFile(sentence.file)
+            is ImportStatement -> interpret(sentence)
         }
     }
 
@@ -578,6 +586,24 @@ class Interpreter: InterpreterInterface {
         interpretTypeAliases(sentences)
         interpretDefinitions(sentences)
         interpretRest(sentences)
+    }
+
+    private fun loadFromJar(registrar: String) {
+
+        val reg = Class.forName(registrar).constructors.first().newInstance() as SymbolRegistrar
+
+        reg.functions.asSequence().forEach {
+            if (it !is DefaultFunction) {
+                die("Only instances of DefaultFunction can be registered")
+            }
+            defineFn(it.name, it.tilFunction)
+        }
+
+        reg.aliases.forEach { interpret(it.toDefinition()) }
+
+        reg.symbols.forEach { interpret(it.toDeclaration()) }
+
+        reg.functionDeclarations.forEach { interpret(it.toDeclaration()) }
     }
 
     private fun printErrors(errors: Iterable<Report>, errorType: String) {

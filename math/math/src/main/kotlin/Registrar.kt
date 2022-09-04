@@ -2,7 +2,7 @@ package org.fpeterek.tilscript.math
 
 import org.fpeterek.tilscript.common.interpreterinterface.SymbolRegistrar
 import org.fpeterek.tilscript.common.sentence.TilFunction
-import org.fpeterek.tilscript.common.types.Type
+import org.fpeterek.tilscript.common.types.TypeAlias
 
 
 class Registrar : SymbolRegistrar {
@@ -16,7 +16,7 @@ class Registrar : SymbolRegistrar {
         Round
     )
 
-    override val types get()  = emptyList<Type>()
-    override val values get() = listOf(Pi, E)
+    override val aliases get()  = emptyList<TypeAlias>()
+    override val symbols get() = listOf(Pi, E)
     override val functionDeclarations get() = listOf<TilFunction>()
 }

@@ -132,7 +132,7 @@ object Log : DefaultFunction(
     override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
 
         val x = args[0]
-        val base = args[0]
+        val base = args[1]
 
         if (x !is Real) {
             return Nil(ctx.position, reason="Cannot compute the logarithm of a symbolic value")
