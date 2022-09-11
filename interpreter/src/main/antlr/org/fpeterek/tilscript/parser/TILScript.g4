@@ -30,9 +30,9 @@ construction : (trivialization | variable | closure | nExecution | composition |
 
 listInitializer : OPEN_CUR construction (COMMA construction)* CLOSE_CUR;
 
-globalVarDef : LET variableName COLON dataType EQUAL construction;
+globalVarDecl : LET variableName (COMMA variableName)* COLON dataType;
 
-globalVarDecl : DEF variableName (COMMA variableName)* COLON dataType;
+globalVarDef : LET variableName COLON dataType EQUAL construction;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 

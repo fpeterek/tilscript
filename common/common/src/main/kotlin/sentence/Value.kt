@@ -60,20 +60,18 @@ class TypeRef(
 }
 
 class World(
-    val world: Long,
     srcPos: SrcPosition,
     reports: List<Report> = listOf(),
 ) : Value(srcPos, Primitives.World, reports) {
 
-    override fun equals(other: Any?) =
-        other != null && other is World && other.world == world
+    override fun equals(other: Any?) = other != null && other is World
 
     override fun withReports(iterable: Iterable<Report>) =
-        World(world, position, reports + iterable)
+        World(position, reports + iterable)
 
-    override fun toString() = world.toString()
+    override fun toString() = "World"
 
-    override fun hashCode() = world.hashCode()
+    override fun hashCode() = toString().hashCode()
 }
 
 class Timestamp(

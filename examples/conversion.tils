@@ -14,14 +14,11 @@ import "fns.tils".
 ['PrintRes '['TypeOf ['IntToText '12]]].
 ['PrintRes '['TypeOf ['RealToText '12.3]]].
 
-['PrintRes '['ToWorld '12]].
 ['PrintRes '['ToTime '12]].
 
-['PrintRes '['TypeOf ['ToWorld '12]]].
 ['PrintRes '['TypeOf ['ToTime '12]]].
 
-['PrintRes '['WorldToInt ['ToWorld '12]]].
 ['PrintRes '['TimeToInt ['ToTime '12]]].
 
-['PrintRes '['TypeOf ['WorldToInt ['ToWorld '12]]]].
 ['PrintRes '['TypeOf ['TimeToInt ['ToTime '12]]]].
+

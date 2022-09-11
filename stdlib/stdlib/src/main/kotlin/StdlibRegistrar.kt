@@ -24,6 +24,7 @@ object StdlibRegistrar : SymbolRegistrar {
         Util.Progn,
         Util.Tr,
         Util.TypeOf,
+        Util.GetWorld,
         Util.IsNil,
 
         LogicFunctions.Not,
@@ -49,10 +50,8 @@ object StdlibRegistrar : SymbolRegistrar {
         Conversions.IntToText,
         Conversions.RealToText,
         Conversions.ToTime,
-        Conversions.ToWorld,
         Conversions.TextToInt,
         Conversions.TextToReal,
-        Conversions.WorldToInt,
         Conversions.TimeToInt,
         Conversions.ToReal,
         Conversions.ToInt,

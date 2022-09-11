@@ -68,9 +68,6 @@ object EqualityOperator : OperatorFunction(
         private infix fun TypeRef.eq(other: TypeRef) =
             type matches other.type
 
-        private infix fun World.eq(other: World) =
-            world == other.world
-
         private infix fun Value.eq(other: Value): Boolean = when (this) {
             is Bool      -> this eq (other as Bool)
             is Integral  -> this eq (other as Integral)
@@ -83,7 +80,7 @@ object EqualityOperator : OperatorFunction(
             is TilTuple  -> this eq (other as TilTuple)
             is Timestamp -> this eq (other as Timestamp)
             is TypeRef   -> this eq (other as TypeRef)
-            is World     -> this eq (other as World)
+            is World     -> true
         }
 
         private infix fun Closure.eq(other: Closure) =
@@ -114,6 +111,7 @@ object EqualityOperator : OperatorFunction(
             name == other.name && constructedType matches other.constructedType
 
         private infix fun Construction.eq(other: Construction): Boolean = when {
+            this.javaClass != other.javaClass                 -> false
 
             this is Closure        && other is Closure        -> this eq other
             this is Composition    && other is Composition    -> this eq other

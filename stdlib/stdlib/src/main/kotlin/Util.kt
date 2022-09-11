@@ -50,7 +50,7 @@ object Util {
         acceptsNil = true
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
-            die("If should never be invoked directly, instead, handling of If should be done by the interpreter")
+            die("If should never be invoked directly, instead, handling of If should be done by the interpreter", ctx.position)
         }
     }
 
@@ -89,6 +89,15 @@ object Util {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             TypeRef(args[0].constructionType, ctx.position)
+    }
+
+    object GetWorld : DefaultFunction(
+        "GetWorld",
+        Types.World,
+        listOf()
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            World(ctx.position)
     }
 
     object IsNil : NilAcceptingFunction(

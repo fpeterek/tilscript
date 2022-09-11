@@ -32,11 +32,11 @@ object NumericOperators {
             val t2 = args[1].constructionType
 
             if (!interpreter.typesMatch(t1, t2)) {
-                die("Argument type mismatch in operator $name (first: ${t1}, second: ${t2}")
+                die("Argument type mismatch in operator $name (first: ${t1}, second: ${t2}", ctx.position)
             }
 
             if (!interpreter.typesMatch(t1, Types.Int) && !interpreter.typesMatch(t1, Types.Real)) {
-                die("Invalid argument type for operator $name, (received: $t1, expected Real or Int)")
+                die("Invalid argument type for operator $name, (received: $t1, expected Real or Int)", args[0].position)
             }
 
             if (args.any { it !is Integral && it !is Real }) {

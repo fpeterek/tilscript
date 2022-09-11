@@ -22,8 +22,12 @@ fun die(ex: Exception): Nothing {
     exitProcess(-2)
 }
 
-fun die(report: Report) {
+fun die(report: Report): Nothing {
     println("** Error **")
     ReportFormatter().terminalOutput(report)
     exitProcess(-1)
 }
+
+fun die(msg: String, pos: SrcPosition): Nothing =
+    die(Report(msg, pos))
+

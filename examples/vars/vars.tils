@@ -1,5 +1,7 @@
 -- Variable declaration
-def variable: Int.
+let variable: Int.
+
+let real1, real2, real3: Real.
 
 -- Variable definition with value assignment
 let pi: Real = '3.14159.

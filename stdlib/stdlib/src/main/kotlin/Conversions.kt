@@ -82,21 +82,6 @@ object Conversions {
             }
     }
 
-    object ToWorld : DefaultFunction (
-        "ToWorld",
-        Types.World,
-        listOf(
-            Variable("int", SrcPosition(-1, -1), Types.Int)
-        )
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            when (args[0]) {
-                is Integral -> World(world = (args[0] as Integral).value, srcPos = ctx.position)
-
-                else -> Nil(reason = "Cannot convert a symbolic value", srcPos = ctx.position)
-            }
-    }
-
     object ToTime : DefaultFunction (
         "ToTime",
         Types.Time,
@@ -107,21 +92,6 @@ object Conversions {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             when (args[0]) {
                 is Integral -> Timestamp(time = (args[0] as Integral).value, srcPos = ctx.position)
-
-                else -> Nil(reason = "Cannot convert a symbolic value", srcPos = ctx.position)
-            }
-    }
-
-    object WorldToInt : DefaultFunction (
-        "WorldToInt",
-        Types.Int,
-        listOf(
-            Variable("arg", SrcPosition(-1, -1), Types.World)
-        )
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            when (args[0]) {
-                is World -> Integral(value = (args[0] as World).world, srcPos = ctx.position)
 
                 else -> Nil(reason = "Cannot convert a symbolic value", srcPos = ctx.position)
             }
