@@ -27,18 +27,33 @@ class Interpreter: InterpreterInterface {
     private val reportFormatter = ReportFormatter()
     private var baseDir = File(System.getProperty("user.dir"))
 
-    private val symbolRepo = SymbolRepository()
-    private val typeRepo = TypeRepository()
+    private val globalRun = run {
+        val topLevelFrame = StackFrame(parent = null)
 
-    private val topLevelFrame = StackFrame(parent = null)
+        CurrentRun(
+            topLevelFrame = topLevelFrame,
+            stack         = mutableListOf(topLevelFrame),
+            imports       = mutableMapOf(),
+            functions     = mutableMapOf(),
+            symbolRepo    = SymbolRepository(),
+            typeRepo      = TypeRepository(),
+        )
+    }
 
-    private val stack: MutableList<StackFrame> = mutableListOf(topLevelFrame)
+    private var currentRun = globalRun
 
-    private val importedFiles = mutableSetOf<String>()
+    private val defineHooks = mutableListOf<(Declaration) -> Unit>(
+        {  }
+    )
+
+    private val symbolRepo    get() = currentRun.symbolRepo
+    private val typeRepo      get() = currentRun.typeRepo
+    private val topLevelFrame get() = currentRun.topLevelFrame
+    private val stack         get() = currentRun.stack
+    private val importedFiles get() = currentRun.imports
+    private val functions     get() = currentRun.functions
 
     private val currentFrame get() = stack.last()
-
-    private val functions = mutableMapOf<String, TilFunction>()
 
     private val operatorFns = setOf("+", "-", "*", "/", "=", "<", ">")
 
