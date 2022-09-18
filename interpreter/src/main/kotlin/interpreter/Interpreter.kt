@@ -42,9 +42,7 @@ class Interpreter: InterpreterInterface {
 
     private var currentRun = globalRun
 
-    private val defineHooks = mutableListOf<(Declaration) -> Unit>(
-        {  }
-    )
+    private val declareHooks = mutableListOf(createDeclareHook())
 
     private val symbolRepo    get() = currentRun.symbolRepo
     private val typeRepo      get() = currentRun.typeRepo
@@ -75,6 +73,27 @@ class Interpreter: InterpreterInterface {
         ">" to NumericOperators.Greater,
         "<" to NumericOperators.Less,
     )
+
+    class DeclareHook(
+        private val interpreter: Interpreter,
+        private val run: CurrentRun,
+    ) {
+
+        operator fun invoke(name: String, fn: TilFunction) = interpreter.defineFn(name, fn, run.functions)
+
+        operator fun invoke(decl: Declaration) = when (decl) {
+            is FunctionDeclaration -> interpreter.declare(decl, run.functions)
+            is LiteralDeclaration  -> interpreter.declare(decl, run.symbolRepo)
+            is VariableDeclaration -> interpreter.declare(decl, run.topLevelFrame)
+
+            is FunctionDefinition  -> interpreter.define(decl, run.functions)
+            is TypeDefinition      -> interpreter.define(decl, run.typeRepo)
+            is VariableDefinition  -> interpreter.define(decl, run.topLevelFrame)
+        }
+
+    }
+
+    private fun createDeclareHook() = DeclareHook(this, currentRun)
 
     private fun defaultFrame() = StackFrame(parent = topLevelFrame)
 
@@ -391,16 +410,16 @@ class Interpreter: InterpreterInterface {
         currentFrame.putVar(variable)
     }
 
-    private fun interpret(decl: FunctionDeclaration) = decl.functions.forEach {
+    private fun declare(decl: FunctionDeclaration, fns: MutableMap<String, TilFunction>) = decl.functions.forEach {
 
         if (it.constructedType !is FunctionType) {
             die("Invalid function type", it.position)
         }
 
-        if (it.name !in functions) {
-            functions[it.name] = it
+        if (it.name !in fns) {
+            fns[it.name] = it
         } else {
-            val fn = functions[it.name]!!
+            val fn = fns[it.name]!!
 
             if (!(fn.constructedType matches it.constructedType)) {
                 die("Redeclaration of function '${fn.name}' with a different type", it.position)
@@ -408,10 +427,10 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    private fun defineFn(name: String, fn: TilFunction) {
+    private fun defineFn(name: String, fn: TilFunction, fns: MutableMap<String, TilFunction>) {
 
-        if (name in functions) {
-            val declared = functions[name]!!
+        if (name in fns) {
+            val declared = fns[name]!!
             if (declared.implementation != null) {
                 die("Redefinition of function '${name}' with a conflicting implementation", fn.position)
             }
@@ -419,76 +438,77 @@ class Interpreter: InterpreterInterface {
                 die("Redeclaration of function '${name}' with a different type", fn.position)
             }
         }
-        functions[name] = fn
+        fns[name] = fn
     }
 
-    private fun interpret(def: FunctionDefinition) = defineFn(def.name, def.tilFunction)
+    private fun define(def: FunctionDefinition, fns: MutableMap<String, TilFunction>) =
+        defineFn(def.name, def.tilFunction, fns)
 
 
-    private fun interpret(lit: LiteralDeclaration) {
+    private fun declare(lit: LiteralDeclaration, repo: SymbolRepository) {
         lit.literals.forEach {
 
             if (it.constructedType.isGeneric) {
                 invalidUseOfGenerics(it.position)
             }
 
-            if (it.value in symbolRepo) {
-                val declaredType = symbolRepo[it.value]!!
+            if (it.value in repo) {
+                val declaredType = repo[it.value]!!
                 if (!(declaredType matches lit.type)) {
                     die("Redeclaration of symbol '${it.value}' with a different type", it.position)
                 }
             } else {
-                symbolRepo.declare(it)
+                repo.declare(it)
             }
         }
     }
 
-    private fun interpret(typedef: TypeDefinition) {
+    private fun define(typedef: TypeDefinition, repo: TypeRepository) {
         val alias = typedef.alias
 
         if (alias.type.isGeneric) {
             invalidUseOfGenerics(typedef.position)
         }
 
-        if (alias.name in typeRepo) {
-            val declaredType = typeRepo[alias.name]!!
+        if (alias.name in repo) {
+            val declaredType = repo[alias.name]!!
             if (!(declaredType matches alias.type)) {
                 die("Redeclaration of symbol '${alias.name}' with a different type", typedef.position)
             }
         } else {
-            typeRepo.process(alias)
+            repo.process(alias)
         }
     }
 
     private fun invalidUseOfGenerics(pos: SrcPosition): Nothing =
         die("Generic types are only allowed in function definitions", pos)
 
-    private fun interpret(varDecl: VariableDeclaration) {
+    private fun declare(varDecl: VariableDeclaration, frame: StackFrame) {
         varDecl.variables.forEach {
 
             if (it.constructedType.isGeneric) {
                 invalidUseOfGenerics(it.position)
             }
 
-            if (it.name in topLevelFrame) {
-                val declared = topLevelFrame[it.name]!!
+            if (it.name in frame) {
+                val declared = frame[it.name]!!
                 if (!(declared.constructedType matches it.constructedType)) {
                     die("Redeclaration of variable '${it.name}' with a different type", it.position)
                 }
             } else {
-                topLevelFrame.putVar(it)
+                frame.putVar(it)
             }
         }
     }
 
-    private fun interpret(varDef: VariableDefinition) {
+    private fun define(varDef: VariableDefinition, frame: StackFrame) {
 
         if (varDef.constructsType.isGeneric) {
             invalidUseOfGenerics(varDef.position)
         }
 
-        if (varDef.name in topLevelFrame) {
-            val declared = topLevelFrame[varDef.name]!!
+        if (varDef.name in frame) {
+            val declared = frame[varDef.name]!!
 
             if (declared.value != null) {
                 die("Redefinition of variable '${varDef.name}' with a new value", varDef.position)
@@ -506,7 +526,7 @@ class Interpreter: InterpreterInterface {
                     "(expected: ${varDef.constructsType}, received: ${value.constructedType})", varDef.position)
         }
 
-        topLevelFrame.putVar(varDef.variable.withValue(value))
+        frame.putVar(varDef.variable.withValue(value))
     }
 
     private fun interpret(declaration: Declaration) {
@@ -555,15 +575,23 @@ class Interpreter: InterpreterInterface {
         die(e)
     }
 
+    private fun declare(declaration: Declaration) =
+        declareHooks.forEach { fn -> fn(declaration) }
+
+    private fun tryDeclare(declaration: Declaration) = try {
+        declare(declaration)
+    } catch (e: Exception) {
+        die(e)
+    }
+
     private fun interpretTypeAliases(sentences: List<Sentence>) = sentences
         .asSequence()
-        .filter {
-            it is TypeDefinition
-        }
-        .forEach(::tryInterpret)
+        .filterIsInstance<TypeDefinition>()
+        .forEach(::tryDeclare)
 
     private fun interpretDefinitions(sentences: List<Sentence>) = sentences
         .asSequence()
+        .filterIsInstance<Declaration>()
         .filter {
             it is FunctionDeclaration ||
             it is FunctionDefinition  ||
@@ -577,7 +605,7 @@ class Interpreter: InterpreterInterface {
                 else                  -> it
             }
         }
-        .forEach(::tryInterpret)
+        .forEach(::tryDeclare)
 
     private fun interpretRest(sentences: List<Sentence>) = sentences
         .asSequence()
@@ -604,7 +632,7 @@ class Interpreter: InterpreterInterface {
             if (it !is DefaultFunction) {
                 die("Only instances of DefaultFunction can be registered")
             }
-            defineFn(it.name, it.tilFunction)
+            declareHooks.forEach { hook -> hook(it.name, it.tilFunction) }
         }
 
         reg.aliases.forEach { interpret(it.toDefinition()) }
