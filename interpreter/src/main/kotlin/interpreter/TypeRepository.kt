@@ -6,9 +6,11 @@ import org.fpeterek.tilscript.common.types.Type
 import org.fpeterek.tilscript.common.types.TypeAlias
 
 
-class TypeRepository {
+class TypeRepository(
+    private val types: MutableMap<String, Type> = mutableMapOf()
+) {
 
-    private val types = mutableMapOf<String, Type>()
+    fun copy() = TypeRepository(types.toMutableMap())
 
     private fun addType(type: AtomicType) {
         types[type.name] = type
