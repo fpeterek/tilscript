@@ -33,7 +33,7 @@ class Interpreter: InterpreterInterface {
         CurrentRun(
             topLevelFrame = topLevelFrame,
             stack         = mutableListOf(topLevelFrame),
-            imports       = mutableMapOf(),
+            imports       = mutableSetOf(),
             functions     = mutableMapOf(),
             symbolRepo    = SymbolRepository(),
             typeRepo      = TypeRepository(),
@@ -83,16 +83,31 @@ class Interpreter: InterpreterInterface {
         private val run: CurrentRun,
     ) {
 
-        operator fun invoke(name: String, fn: TilFunction) = interpreter.defineFn(name, fn, run.functions)
+        operator fun invoke(name: String, fn: TilFunction, srcFile: String) {
+            if (srcFile !in run.imports) {
+                interpreter.defineFn(name, fn, run.functions)
+            }
+        }
 
-        operator fun invoke(decl: Declaration) = when (decl) {
-            is FunctionDeclaration -> interpreter.declare(decl, run.functions)
-            is LiteralDeclaration  -> interpreter.declare(decl, run.symbolRepo)
-            is VariableDeclaration -> interpreter.declare(decl, run.topLevelFrame)
+        operator fun invoke(decl: Declaration, srcFile: String) {
 
-            is FunctionDefinition  -> interpreter.define(decl, run.functions)
-            is TypeDefinition      -> interpreter.define(decl, run.typeRepo)
-            is VariableDefinition  -> interpreter.define(decl, run.topLevelFrame)
+            if (srcFile in run.imports) {
+                return
+            }
+
+            when (decl) {
+                is FunctionDeclaration -> interpreter.declare(decl, run)
+                is LiteralDeclaration  -> interpreter.declare(decl, run)
+                is VariableDeclaration -> interpreter.declare(decl, run)
+
+                is FunctionDefinition  -> interpreter.define(decl, run)
+                is TypeDefinition      -> interpreter.define(decl, run)
+                is VariableDefinition  -> interpreter.define(decl, srcFile, run)
+            }
+        }
+
+        fun importFile(absFile: String) {
+            run.imports.add(absFile)
         }
 
     }
@@ -414,16 +429,16 @@ class Interpreter: InterpreterInterface {
         currentFrame.putVar(variable)
     }
 
-    private fun declare(decl: FunctionDeclaration, fns: MutableMap<String, TilFunction>) = decl.functions.forEach {
+    private fun declare(decl: FunctionDeclaration, run: CurrentRun) = decl.functions.forEach {
 
         if (it.constructedType !is FunctionType) {
             die("Invalid function type", it.position)
         }
 
-        if (it.name !in fns) {
-            fns[it.name] = it
+        if (it.name !in run.functions) {
+            run.functions[it.name] = it
         } else {
-            val fn = fns[it.name]!!
+            val fn = run.functions[it.name]!!
 
             if (!(fn.constructedType matches it.constructedType)) {
                 die("Redeclaration of function '${fn.name}' with a different type", it.position)
@@ -445,62 +460,63 @@ class Interpreter: InterpreterInterface {
         fns[name] = fn
     }
 
-    private fun define(def: FunctionDefinition, fns: MutableMap<String, TilFunction>) =
-        defineFn(def.name, def.tilFunction, fns)
+    private fun define(def: FunctionDefinition, run: CurrentRun) =
+        defineFn(def.name, def.tilFunction, run.functions)
 
-
-    private fun declare(lit: LiteralDeclaration, repo: SymbolRepository) {
+    private fun declare(lit: LiteralDeclaration, run: CurrentRun) {
         lit.literals.forEach {
 
             if (it.constructedType.isGeneric) {
                 invalidUseOfGenerics(it.position)
             }
 
-            if (it.value in repo) {
-                val declaredType = repo[it.value]!!
+            if (it.value in run.symbolRepo) {
+                val declaredType = run.symbolRepo[it.value]!!
                 if (!(declaredType matches lit.type)) {
                     die("Redeclaration of symbol '${it.value}' with a different type", it.position)
                 }
             } else {
-                repo.declare(it)
+                run.symbolRepo.declare(it)
             }
         }
     }
 
-    private fun define(typedef: TypeDefinition, repo: TypeRepository) {
+    private fun define(typedef: TypeDefinition, run: CurrentRun) {
+
         val alias = typedef.alias
 
         if (alias.type.isGeneric) {
             invalidUseOfGenerics(typedef.position)
         }
 
-        if (alias.name in repo) {
-            val declaredType = repo[alias.name]!!
+        if (alias.name in run.typeRepo) {
+            val declaredType = run.typeRepo[alias.name]!!
             if (!(declaredType matches alias.type)) {
                 die("Redeclaration of symbol '${alias.name}' with a different type", typedef.position)
             }
         } else {
-            repo.process(alias)
+            run.typeRepo.process(alias)
         }
     }
 
     private fun invalidUseOfGenerics(pos: SrcPosition): Nothing =
         die("Generic types are only allowed in function definitions", pos)
 
-    private fun declare(varDecl: VariableDeclaration, frame: StackFrame) {
+    private fun declare(varDecl: VariableDeclaration, run: CurrentRun) {
+
         varDecl.variables.forEach {
 
             if (it.constructedType.isGeneric) {
                 invalidUseOfGenerics(it.position)
             }
 
-            if (it.name in frame) {
-                val declared = frame[it.name]!!
+            if (it.name in run.topLevelFrame) {
+                val declared = run.topLevelFrame[it.name]!!
                 if (!(declared.constructedType matches it.constructedType)) {
                     die("Redeclaration of variable '${it.name}' with a different type", it.position)
                 }
             } else {
-                frame.putVar(it)
+                run.topLevelFrame.putVar(it)
             }
         }
     }
@@ -537,17 +553,6 @@ class Interpreter: InterpreterInterface {
         run.topLevelFrame.putVar(varDef.variable.withValue(value))
     }
 
-    private fun interpret(declaration: Declaration, srcFile: String, run: CurrentRun) {
-        when (declaration) {
-            is FunctionDeclaration -> declare(declaration, srcFile, run)
-            is FunctionDefinition  -> define(declaration, srcFile, run)
-            is LiteralDeclaration  -> declare(declaration, srcFile, run)
-            is TypeDefinition      -> define(declaration, srcFile, run)
-            is VariableDeclaration -> declare(declaration, srcFile, run)
-            is VariableDefinition  -> define(declaration, srcFile, run)
-        }
-    }
-
     private fun interpret(import: ImportStatement) = when (import.file.startsWith("class://")) {
         true -> loadFromJar(import.file.removePrefix("class://"))
         else -> interpretFile(import.file)
@@ -562,7 +567,7 @@ class Interpreter: InterpreterInterface {
                     die("Nil constructed by a top level construction. Aborting execution.")
                 }
             }
-            is Declaration     -> interpret(sentence)
+            is Declaration     -> throw RuntimeException("Interpreter Error: Declarations cannot be using method interpret()")
             is ImportStatement -> interpret(sentence)
         }
     }
@@ -583,11 +588,11 @@ class Interpreter: InterpreterInterface {
         die(e)
     }
 
-    private fun declare(declaration: Declaration) =
-        declareHooks.forEach { fn -> fn(declaration) }
+    private fun declare(declaration: Declaration, srcFile: String) =
+        declareHooks.forEach { fn -> fn(declaration, srcFile) }
 
-    private fun tryDeclare(declaration: Declaration) = try {
-        declare(declaration)
+    private fun tryDeclare(declaration: Declaration, srcFile: String) = try {
+        declare(declaration, srcFile)
     } catch (e: Exception) {
         die(e)
     }
@@ -597,12 +602,12 @@ class Interpreter: InterpreterInterface {
         .filterIsInstance<ImportStatement>()
         .forEach { tryInterpret(it) }
 
-    private fun interpretTypeAliases(sentences: List<Sentence>) = sentences
+    private fun interpretTypeAliases(sentences: List<Sentence>, srcFile: String) = sentences
         .asSequence()
         .filterIsInstance<TypeDefinition>()
-        .forEach(::tryDeclare)
+        .forEach { tryDeclare(it, srcFile) }
 
-    private fun interpretDefinitions(sentences: List<Sentence>) = sentences
+    private fun interpretDefinitions(sentences: List<Sentence>, srcFile: String) = sentences
         .asSequence()
         .filterIsInstance<Declaration>()
         .filter {
@@ -618,7 +623,7 @@ class Interpreter: InterpreterInterface {
                 else                  -> it
             }
         }
-        .forEach(::tryDeclare)
+        .forEach { tryDeclare(it, srcFile) }
 
     private fun interpretRest(sentences: List<Sentence>) = sentences
         .asSequence()
@@ -632,10 +637,10 @@ class Interpreter: InterpreterInterface {
         }
         .forEach(::tryInterpret)
 
-    private fun interpret(sentences: List<Sentence>) {
+    private fun interpret(sentences: List<Sentence>, srcFile: String) {
         interpretImports(sentences)
-        interpretTypeAliases(sentences)
-        interpretDefinitions(sentences)
+        interpretTypeAliases(sentences, srcFile)
+        interpretDefinitions(sentences, srcFile)
         interpretRest(sentences)
     }
 
@@ -643,18 +648,32 @@ class Interpreter: InterpreterInterface {
 
         val reg = Class.forName(registrar).constructors.first().newInstance() as SymbolRegistrar
 
-        reg.functions.asSequence().forEach {
+        reg.functions.forEach {
             if (it !is DefaultFunction) {
                 die("Only instances of DefaultFunction can be registered")
             }
-            declareHooks.forEach { hook -> hook(it.name, it.tilFunction) }
+            declareHooks.forEach { hook ->
+                hook(it.name, it.tilFunction, registrar)
+            }
         }
 
-        reg.aliases.forEach { interpret(it.toDefinition()) }
+        reg.aliases.forEach {
+            declareHooks.forEach { hook ->
+                hook(it.toDefinition(), registrar)
+            }
+        }
 
-        reg.symbols.forEach { interpret(it.toDeclaration()) }
+        reg.symbols.forEach {
+            declareHooks.forEach { hook ->
+                hook(it.toDeclaration(), registrar)
+            }
+        }
 
-        reg.functionDeclarations.forEach { interpret(it.toDeclaration()) }
+        reg.functionDeclarations.forEach {
+            declareHooks.forEach { hook ->
+                hook(it.toDeclaration(), registrar)
+            }
+        }
     }
 
     private fun printErrors(errors: Iterable<Report>, errorType: String) {
@@ -709,22 +728,27 @@ class Interpreter: InterpreterInterface {
 
         val ctx = ASTConverter.convert(sentences)
 
-        interpret(ctx.sentences)
+        interpret(ctx.sentences, file)
     }
 
     private fun storeAndInterpretFile(file: File) {
 
         val absolute = file.absoluteFile.toString()
 
+        // TODO: Do not reinterpret the same file multiple times
+        //       Only reimport declarations/definitions
         if (absolute in importedFiles) {
             return
         }
 
         importedFiles.add(absolute)
 
+        // TODO: Setup context and hooks
         withBaseDir(file.absoluteFile.parentFile) {
             interpretFileInt(absolute)
         }
+
+        declareHooks.forEach { it.importFile(absolute) }
     }
 
     fun interpretFile(filename: String) {
