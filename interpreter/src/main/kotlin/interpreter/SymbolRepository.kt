@@ -9,19 +9,14 @@ import org.fpeterek.tilscript.common.types.Unknown
 import org.fpeterek.tilscript.common.die
 
 
-class SymbolRepository(
-    private val types: MutableMap<String, Type> = mutableMapOf(),
-    private val declared: MutableSet<String> = mutableSetOf(),
-    private val defined: MutableSet<String> = mutableSetOf()
-) {
+class SymbolRepository {
+
+    private val types = mutableMapOf<String, Type>()
+
+    private val declared = mutableSetOf<String>()
+    private val defined = mutableSetOf<String>()
 
     val symbols get() = types.asSequence().map { it.key }
-
-    fun copy() = SymbolRepository(
-        types=types.toMutableMap(),
-        declared=declared.toMutableSet(),
-        defined=defined.toMutableSet()
-    )
 
     fun declare(name: String, type: Type) {
         declared.add(name)

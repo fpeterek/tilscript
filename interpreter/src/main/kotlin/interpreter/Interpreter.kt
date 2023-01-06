@@ -51,10 +51,6 @@ class Interpreter: InterpreterInterface {
     private val importedFiles get() = currentRun.imports
     private val functions     get() = currentRun.functions
 
-    private val defaultFunctions = currentRun.functions.toMap()
-    private val defaultSymbolRepo = symbolRepo.copy()
-    private val defaultType = typeRepo.copy()
-
     private val currentFrame get() = stack.last()
 
     private val operatorFns = setOf("+", "-", "*", "/", "=", "<", ">")
@@ -505,18 +501,14 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    private fun define(varDef: VariableDefinition, srcFile: String, run: CurrentRun) {
-
-        if (srcFile in run.imports) {
-            return
-        }
+    private fun define(varDef: VariableDefinition, frame: StackFrame) {
 
         if (varDef.constructsType.isGeneric) {
             invalidUseOfGenerics(varDef.position)
         }
 
-        if (varDef.name in run.topLevelFrame) {
-            val declared = run.topLevelFrame[varDef.name]!!
+        if (varDef.name in frame) {
+            val declared = frame[varDef.name]!!
 
             if (declared.value != null) {
                 die("Redefinition of variable '${varDef.name}' with a new value", varDef.position)
@@ -534,17 +526,17 @@ class Interpreter: InterpreterInterface {
                     "(expected: ${varDef.constructsType}, received: ${value.constructedType})", varDef.position)
         }
 
-        run.topLevelFrame.putVar(varDef.variable.withValue(value))
+        frame.putVar(varDef.variable.withValue(value))
     }
 
-    private fun interpret(declaration: Declaration, srcFile: String, run: CurrentRun) {
+    private fun interpret(declaration: Declaration) {
         when (declaration) {
-            is FunctionDeclaration -> declare(declaration, srcFile, run)
-            is FunctionDefinition  -> define(declaration, srcFile, run)
-            is LiteralDeclaration  -> declare(declaration, srcFile, run)
-            is TypeDefinition      -> define(declaration, srcFile, run)
-            is VariableDeclaration -> declare(declaration, srcFile, run)
-            is VariableDefinition  -> define(declaration, srcFile, run)
+            is FunctionDeclaration -> interpret(declaration)
+            is FunctionDefinition  -> interpret(declaration)
+            is LiteralDeclaration  -> interpret(declaration)
+            is TypeDefinition      -> interpret(declaration)
+            is VariableDeclaration -> interpret(declaration)
+            is VariableDefinition  -> interpret(declaration)
         }
     }
 
@@ -592,11 +584,6 @@ class Interpreter: InterpreterInterface {
         die(e)
     }
 
-    private fun interpretImports(sentences: List<Sentence>) = sentences
-        .asSequence()
-        .filterIsInstance<ImportStatement>()
-        .forEach { tryInterpret(it) }
-
     private fun interpretTypeAliases(sentences: List<Sentence>) = sentences
         .asSequence()
         .filterIsInstance<TypeDefinition>()
@@ -627,13 +614,11 @@ class Interpreter: InterpreterInterface {
             it is FunctionDefinition  ||
             it is VariableDeclaration ||
             it is TypeDefinition      ||
-            it is LiteralDeclaration  ||
-            it is ImportStatement
+            it is LiteralDeclaration
         }
         .forEach(::tryInterpret)
 
     private fun interpret(sentences: List<Sentence>) {
-        interpretImports(sentences)
         interpretTypeAliases(sentences)
         interpretDefinitions(sentences)
         interpretRest(sentences)
