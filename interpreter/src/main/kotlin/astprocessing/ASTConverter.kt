@@ -59,6 +59,7 @@ class ASTConverter private constructor() {
 
         return ScriptContext(
             sentences=sentences.sentences.map(::convertSentence),
+            types=repo,
         )
     }
 

@@ -2,6 +2,7 @@ package org.fpeterek.tilscript.interpreter.interpreter
 
 import org.fpeterek.tilscript.common.sentence.Sentence
 
-data class ScriptContext(
+class ScriptContext(
     val sentences: List<Sentence>,
+    val types: TypeRepository,
 )
