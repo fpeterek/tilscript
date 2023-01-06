@@ -25,32 +25,30 @@ import java.nio.file.Paths
 class Interpreter: InterpreterInterface {
 
     private val reportFormatter = ReportFormatter()
+    private val interpretedFiles = mutableMapOf<String, ScriptContext>()
+
+    private val defaultRunContext get() = RunContext(
+        stack = mutableListOf(StackFrame(parent = null)),
+        typeRepo = TypeRepository(),
+        symbolRepo = SymbolRepository(),
+        functions = mutableMapOf(),
+        imports = mutableSetOf()
+    )
+
     private var baseDir = File(System.getProperty("user.dir"))
+    private var context = defaultRunContext
 
-    private val symbolRepo = SymbolRepository()
-    private val typeRepo = TypeRepository()
+    private var scriptContext = ScriptContext("", listOf(), mapOf())
 
-    private val topLevelFrame = StackFrame(parent = null)
-
-    private val stack: MutableList<StackFrame> = mutableListOf(topLevelFrame)
-
-    private val importedFiles = mutableSetOf<String>()
-
-    private val currentFrame get() = stack.last()
-
-    private val functions = mutableMapOf<String, TilFunction>()
+    private val stack         get() = context.stack
+    private val typeRepo      get() = context.typeRepo
+    private val symbolRepo    get() = context.symbolRepo
+    private val functions     get() = context.functions
+    private val importedFiles get() = context.imports
+    private val currentFrame  get() = context.currentFrame
+    private val topLevelFrame get() = context.topLevelFrame
 
     private val operatorFns = setOf("+", "-", "*", "/", "=", "<", ">")
-
-    init {
-        StdlibRegistrar.types.forEach(typeRepo::process)
-        StdlibRegistrar.values.forEach(symbolRepo::define)
-
-        StdlibRegistrar.functions.forEach { fn ->
-            symbolRepo.define(fn.tilFunction)
-            functions[fn.name] = fn.tilFunction
-        }
-    }
 
     private val numericOperators = mutableMapOf(
         "+" to NumericOperators.Plus,
@@ -60,6 +58,20 @@ class Interpreter: InterpreterInterface {
         ">" to NumericOperators.Greater,
         "<" to NumericOperators.Less,
     )
+
+    init {
+        importStdlib()
+    }
+
+    private fun importStdlib() {
+        StdlibRegistrar.types.forEach(typeRepo::process)
+        StdlibRegistrar.values.forEach(symbolRepo::define)
+
+        StdlibRegistrar.functions.forEach { fn ->
+            symbolRepo.define(fn.tilFunction)
+            functions[fn.name] = fn.tilFunction
+        }
+    }
 
     private fun defaultFrame() = StackFrame(parent = topLevelFrame)
 
@@ -165,6 +177,7 @@ class Interpreter: InterpreterInterface {
         // We want to put variables introduced by the closure on the stack even if we aren't calling the
         // resulting function as of now to avoid capturing variables with the same name from a higher scope
         // This is necessary because we use the call stack to create captures
+        // Addendum: Not anymore, as we no longer create captures
 //        closure.variables.forEach(currentFrame::putVar)
 
         val lambda = LambdaFunction(closure.variables, closure.construction, createLambdaCapture(), returnType=closure.returnType)
@@ -669,17 +682,26 @@ class Interpreter: InterpreterInterface {
         }
     }
 
-    fun interpretFile(filename: String) {
-
+    private fun absoluteFile(filename: String): File {
         val file = File(filename)
 
-        if (file.isAbsolute) {
-            storeAndInterpretFile(file)
+        return when (file.isAbsolute) {
+            true -> file
+            else -> Paths.get(baseDir.toString(), file.toString()).toFile()
         }
+    }
 
-        val relative = Paths.get(baseDir.toString(), file.toString())
+    private fun interpretImportedFile(filename: String) {
+        val oldCtx = context
+        context = defaultRunContext
+        importStdlib()
+        storeAndInterpretFile(absoluteFile(filename))
+        context = oldCtx
+        // TODO: Import symbols from newly interpreted file
+    }
 
-        storeAndInterpretFile(relative.toFile())
+    fun interpretFile(filename: String) {
+        storeAndInterpretFile(absoluteFile(filename))
     }
 
 }
