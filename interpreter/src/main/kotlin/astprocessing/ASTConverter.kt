@@ -22,7 +22,7 @@ import org.fpeterek.tilscript.common.sentence.ImportStatement as TilImport
 class ASTConverter private constructor() {
 
     companion object {
-        fun convert(sentences: Sentences) = ASTConverter().convert(sentences)
+        fun convert(file: String, sentences: Sentences) = ASTConverter().convert(file, sentences)
     }
 
     private val lits = mutableSetOf<String>()
@@ -42,7 +42,7 @@ class ASTConverter private constructor() {
         lits.addAll(StdlibRegistrar.values.asSequence().map { it.toString() })
     }
 
-    private fun convert(sentences: Sentences): ScriptContext {
+    private fun convert(file: String, sentences: Sentences): ScriptContext {
 
         // We run definitions/declarations first to ensure they are processed first and the symbols get into
         // the repos before analyzing any constructions
@@ -58,8 +58,8 @@ class ASTConverter private constructor() {
             .forEach(::convertSentence)
 
         return ScriptContext(
+            filename=file,
             sentences=sentences.sentences.map(::convertSentence),
-            types=repo,
         )
     }
 

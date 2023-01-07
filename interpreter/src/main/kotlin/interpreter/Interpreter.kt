@@ -1,23 +1,17 @@
 package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
-import org.fpeterek.tilscript.interpreter.astprocessing.ASTConverter
-import org.fpeterek.tilscript.interpreter.astprocessing.AntlrVisitor
-import org.fpeterek.tilscript.interpreter.astprocessing.ErrorListener
-import org.fpeterek.tilscript.interpreter.astprocessing.result.Sentences
-import org.fpeterek.tilscript.stdlib.*
-import org.fpeterek.tilscript.stdlib.Util
+import org.fpeterek.tilscript.common.SrcPosition
+import org.fpeterek.tilscript.common.die
 import org.fpeterek.tilscript.common.interpreterinterface.*
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.common.reporting.ReportFormatter
 import org.fpeterek.tilscript.common.sentence.*
-import org.fpeterek.tilscript.common.types.*
+import org.fpeterek.tilscript.common.types.FunctionType
+import org.fpeterek.tilscript.common.types.TupleType
+import org.fpeterek.tilscript.common.types.Type
+import org.fpeterek.tilscript.common.types.Unknown
 import org.fpeterek.tilscript.common.types.Util.isGeneric
-import org.fpeterek.tilscript.common.SrcPosition
-import org.fpeterek.tilscript.common.die
-import org.fpeterek.tilscript.parser.TILScriptLexer
-import org.fpeterek.tilscript.parser.TILScriptParser
+import org.fpeterek.tilscript.stdlib.*
 import java.io.File
 import java.nio.file.Paths
 
@@ -36,17 +30,17 @@ class Interpreter: InterpreterInterface {
     )
 
     private var baseDir = File(System.getProperty("user.dir"))
-    private var context = defaultRunContext
+    private var runContext = defaultRunContext
 
-    private var scriptContext = ScriptContext("", listOf(), mapOf())
+    private var scriptContext = ScriptContext("", listOf(), mutableMapOf())
 
-    private val stack         get() = context.stack
-    private val typeRepo      get() = context.typeRepo
-    private val symbolRepo    get() = context.symbolRepo
-    private val functions     get() = context.functions
-    private val importedFiles get() = context.imports
-    private val currentFrame  get() = context.currentFrame
-    private val topLevelFrame get() = context.topLevelFrame
+    private val stack         get() = runContext.stack
+    private val typeRepo      get() = runContext.typeRepo
+    private val symbolRepo    get() = runContext.symbolRepo
+    private val functions     get() = runContext.functions
+    private val importedFiles get() = runContext.imports
+    private val currentFrame  get() = runContext.currentFrame
+    private val topLevelFrame get() = runContext.topLevelFrame
 
     private val operatorFns = setOf("+", "-", "*", "/", "=", "<", ">")
 
@@ -504,6 +498,7 @@ class Interpreter: InterpreterInterface {
                     "(expected: ${varDef.constructsType}, received: ${value.constructedType})", varDef.position)
         }
 
+        scriptContext.putVar(varDef.name, value)
         topLevelFrame.putVar(varDef.variable.withValue(value))
     }
 
@@ -520,7 +515,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpret(import: ImportStatement) = when (import.file.startsWith("class://")) {
         true -> loadFromJar(import.file.removePrefix("class://"))
-        else -> interpretFile(import.file)
+        else -> interpretImportedFile(import.file)
     }
 
     private fun interpret(sentence: Sentence) {
@@ -596,6 +591,11 @@ class Interpreter: InterpreterInterface {
 
     private fun loadFromJar(registrar: String) {
 
+        if (registrar in importedFiles) {
+            return
+        }
+        importedFiles.add(registrar)
+
         val reg = Class.forName(registrar).constructors.first().newInstance() as SymbolRegistrar
 
         reg.functions.asSequence().forEach {
@@ -612,16 +612,6 @@ class Interpreter: InterpreterInterface {
         reg.functionDeclarations.forEach { interpret(it.toDeclaration()) }
     }
 
-    private fun printErrors(errors: Iterable<Report>, errorType: String) {
-        println("-".repeat(80))
-        println("$errorType errors")
-
-        reportFormatter.terminalOutput(errors)
-
-        println("-".repeat(80))
-        println("\n")
-    }
-
     private fun <T> withBaseDir(dir: File, fn: () -> T): T {
 
         val prev = baseDir
@@ -632,53 +622,31 @@ class Interpreter: InterpreterInterface {
         return retval
     }
 
-    private fun interpretFileInt(file: String) {
-        val stream = CharStreams.fromFileName(file)
+    private fun interpretFileInt(file: String) =
+        setupContextAndInterpret(Parser.parse(file))
 
-        val errorListener = ErrorListener(file)
-
-        val lexer = TILScriptLexer(stream)
-        lexer.removeErrorListeners()
-        lexer.addErrorListener(errorListener)
-
-        val parser = TILScriptParser(CommonTokenStream(lexer))
-        parser.removeErrorListeners()
-        parser.addErrorListener(errorListener)
-
-        val start = parser.start()
-
-        val sentences = try {
-            AntlrVisitor(file).visit(start)
-        } catch (ignored: Exception) {
-            Sentences(listOf(), SrcPosition(0, 0, file))
-        }
-
-        if (errorListener.hasErrors) {
-            printErrors(errorListener.errors, "Syntax")
-            die("Syntax error occurred")
-        }
-        if (parser.numberOfSyntaxErrors > 0) {
-            println("Parsing failed (likely due to a syntax error which couldn't be properly detected)")
-            die("Syntax error occurred")
-        }
-
-        val ctx = ASTConverter.convert(sentences)
+    private fun setupContextAndInterpret(ctx: ScriptContext): ScriptContext {
+        val oldCtx = scriptContext
+        scriptContext = ctx
 
         interpret(ctx.sentences)
+
+        scriptContext = oldCtx
+        return ctx
     }
 
-    private fun storeAndInterpretFile(file: File) {
+    private fun interpretAndStoreFile(file: File) {
 
-        val absolute = file.absoluteFile.toString()
-
-        if (absolute in importedFiles) {
-            return
-        }
+        val absolute = file.absolutePath
 
         importedFiles.add(absolute)
 
+        if (absolute in interpretedFiles) {
+            return
+        }
+
         withBaseDir(file.absoluteFile.parentFile) {
-            interpretFileInt(absolute)
+            interpretedFiles[file.absolutePath] = interpretFileInt(absolute)
         }
     }
 
@@ -691,17 +659,37 @@ class Interpreter: InterpreterInterface {
         }
     }
 
+    private fun importSymbolsFromInterpretedFile(file: String) {
+        val ctx = interpretedFiles[file] ?: die("Interpreter error: file '$file' has not been interpreted")
+
+        ctx.declarations.forEach {
+            if (it is VariableDefinition) {
+                val value = ctx.getVar(it.name) ?: die("Interpreter error: definition of variable ${it.name} has not been evaluated")
+
+                val def = VariableDefinition(it.name, value.constructedType, value, it.position, listOf())
+
+                interpret(def)
+            } else {
+                interpret(it)
+            }
+        }
+    }
+
     private fun interpretImportedFile(filename: String) {
-        val oldCtx = context
-        context = defaultRunContext
+        if (filename in importedFiles) {
+            return
+        }
+
+        val oldCtx = runContext
+        runContext = defaultRunContext
         importStdlib()
-        storeAndInterpretFile(absoluteFile(filename))
-        context = oldCtx
-        // TODO: Import symbols from newly interpreted file
+        interpretAndStoreFile(absoluteFile(filename))
+        runContext = oldCtx
+        importSymbolsFromInterpretedFile(filename)
     }
 
     fun interpretFile(filename: String) {
-        storeAndInterpretFile(absoluteFile(filename))
+        interpretAndStoreFile(absoluteFile(filename))
     }
 
 }
