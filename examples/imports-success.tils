@@ -1,0 +1,6 @@
+import "imports.tils".
+import "fns.tils".
+
+
+['PrintRes '['Sub '5 '2]].
+

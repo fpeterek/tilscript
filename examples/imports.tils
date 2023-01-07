@@ -1,0 +1,5 @@
+import "fns.tils".
+
+
+defn Sub(x: Int, y: Int) -> Int = ['- x y].
+

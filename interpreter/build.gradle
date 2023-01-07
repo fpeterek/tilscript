@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
     id 'antlr'
     id 'java'
 }
@@ -15,10 +15,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.21'
 
     implementation 'org.json:json:20220320'
-    implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'org.apache.commons:commons-text:1.10.0'
 
     implementation 'org.fpeterek.tilscript:common:1.0'
     implementation 'org.fpeterek.tilscript:stdlib:1.0'

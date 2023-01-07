@@ -660,7 +660,8 @@ class Interpreter: InterpreterInterface {
     }
 
     private fun importSymbolsFromInterpretedFile(file: String) {
-        val ctx = interpretedFiles[file] ?: die("Interpreter error: file '$file' has not been interpreted")
+        val abs = absoluteFile(file).absolutePath
+        val ctx = interpretedFiles[abs] ?: die("Interpreter error: file '$abs' has not been interpreted")
 
         ctx.declarations.forEach {
             if (it is VariableDefinition) {
