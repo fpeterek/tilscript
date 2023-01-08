@@ -1,26 +1,48 @@
 package org.fpeterek.tilscript.stdlib
 
-import org.fpeterek.tilscript.common.interpreterinterface.BuiltinVariadicFunction
 import org.fpeterek.tilscript.common.interpreterinterface.DefaultFunction
 import org.fpeterek.tilscript.common.interpreterinterface.FnCallContext
 import org.fpeterek.tilscript.common.interpreterinterface.InterpreterInterface
 import org.fpeterek.tilscript.common.sentence.*
 import org.fpeterek.tilscript.common.types.GenericType
 import org.fpeterek.tilscript.common.SrcPosition
+import org.fpeterek.tilscript.common.die
 
 object TupleFunctions {
 
-    object MkTuple : BuiltinVariadicFunction(
-        "MkTuple",
+    object OneTuple : DefaultFunction(
+        "OneTuple",
         GenericType(1),
         listOf(
-            Variable("placeholder", SrcPosition(-1, -1), GenericType(2))
-        ),
-        acceptsNil = false
+            Variable("fst", SrcPosition(-1, -1), GenericType(2)),
+        )
     ) {
 
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             TilTuple(args, ctx.position)
+
+    }
+
+    object MkTuple : DefaultFunction(
+        "MkTuple",
+        GenericType(1),
+        listOf(
+            Variable("fst", SrcPosition(-1, -1), GenericType(2)),
+            Variable("rest", SrcPosition(-1, -1), GenericType(3))
+        )
+    ) {
+
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            val prepend = args[0]
+            val rest = args[1]
+
+            if (rest !is TilTuple) {
+                die("Second argument of MkTuple must be a tuple", rest.position)
+            }
+
+            return TilTuple(listOf(prepend) + rest.values, ctx.position)
+        }
 
     }
 

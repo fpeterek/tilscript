@@ -2,7 +2,6 @@ package org.fpeterek.tilscript.stdlib
 
 import org.fpeterek.tilscript.common.interpreterinterface.SymbolRegistrar
 import org.fpeterek.tilscript.common.sentence.Symbol
-import org.fpeterek.tilscript.common.sentence.TilFunction
 import org.fpeterek.tilscript.common.types.TypeAlias
 import org.fpeterek.tilscript.stdlib.constructions.*
 
@@ -32,6 +31,7 @@ object StdlibRegistrar : SymbolRegistrar {
         LogicFunctions.Or,
         LogicFunctions.Implies,
 
+        TupleFunctions.OneTuple,
         TupleFunctions.MkTuple,
         TupleFunctions.Get,
 

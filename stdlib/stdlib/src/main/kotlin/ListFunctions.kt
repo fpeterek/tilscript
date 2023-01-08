@@ -128,7 +128,7 @@ object ListFunctions {
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) = when (args[0]) {
-            is TypeRef -> (args[0] as TypeRef).let { type -> NilList(type.type, ctx.position) }
+            is TypeRef -> NilList((args[0] as TypeRef).type, ctx.position)
             else -> Nil(
                 ctx.position,
                 reason="Cannot construct an empty list of a non-concrete type"

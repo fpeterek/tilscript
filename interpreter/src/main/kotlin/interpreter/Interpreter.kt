@@ -267,36 +267,24 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretIf(args: List<Construction>, ctx: FnCallContext): Construction {
 
-        if (args.size % 2 != 0) {
-            die("If expects an even number of arguments", ctx.position)
+        val cond = interpret(args[1])
+
+        if (cond is Nil) {
+            return cond
         }
 
-        var i = 0
-
-        while (i < args.size) {
-
-            val cond = interpret(args[i])
-
-            if (cond is Nil) {
-                return cond
-            }
-
-            if (!(cond.constructionType matches Types.Bool)) {
-                die("Condition must be a Bool (received: ${cond.constructionType})", ctx.position)
-            }
-
-            if (cond !is Bool) {
-                return Nil(ctx.position, reason="Condition must not be symbolic")
-            }
-
-            if (cond.value) {
-                return interpret(args[i+1])
-            }
-
-            i += 2
+        if (!(cond.constructionType matches Types.Bool)) {
+            die("Condition must be a Bool (received: ${cond.constructionType})", ctx.position)
         }
 
-        return Nil(ctx.position, reason="No condition matched")
+        if (cond !is Bool) {
+            return Nil(ctx.position, reason="Condition must not be symbolic")
+        }
+
+        return when (cond.value) {
+            true -> interpret(args[1])
+            else -> interpret(args[2])
+        }
     }
 
     private fun interpretFn(fn: FunctionInterface, args: List<Construction>, ctx: FnCallContext) = when {

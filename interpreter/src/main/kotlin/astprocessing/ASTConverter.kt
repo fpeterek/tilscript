@@ -1,5 +1,6 @@
 package org.fpeterek.tilscript.interpreter.astprocessing
 
+import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.interpreter.astprocessing.result.*
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Construction.*
 import org.fpeterek.tilscript.interpreter.astprocessing.result.ImportStatement
@@ -8,6 +9,7 @@ import org.fpeterek.tilscript.interpreter.interpreter.ScriptContext
 import org.fpeterek.tilscript.stdlib.*
 import org.fpeterek.tilscript.common.sentence.*
 import org.fpeterek.tilscript.common.sentence.Symbol
+import org.fpeterek.tilscript.common.sentence.Trivialization
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.types.TypeAlias as TilTypeAlias
 import org.fpeterek.tilscript.common.sentence.Construction as TilConstruction
@@ -172,11 +174,97 @@ class ASTConverter private constructor() {
         )
     }
 
-    private fun convertComposition(composition: Composition) = TilComposition(
-        function=convertConstruction(composition.fn),
-        args=composition.args.map(::convertConstruction),
-        srcPos=composition.position,
-    )
+    private fun convertComposition(composition: Composition): TilComposition {
+
+        val fn = convertConstruction(composition.fn)
+        val args = composition.args.map(::convertConstruction)
+
+        return if (fn is Trivialization && fn.construction is TilFunction) {
+            when ((fn.construction as TilFunction).name) {
+                "If"      -> convertIf(fn, args, composition)
+                "MkTuple" -> convertMkTuple(fn, args, composition)
+                "Progn"   -> convertProgn(fn, args, composition)
+                else      -> TilComposition(function=fn, args=args, srcPos=composition.position)
+            }
+        } else {
+            TilComposition(function=fn, args=args, srcPos=composition.position)
+        }
+    }
+
+    private fun convertIf(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
+        if (args.size % 2 == 1) {
+            return TilComposition(
+                function = fn,
+                args = args,
+                srcPos = comp.position,
+                reports = listOf(
+                    Report("If expansion expects If to receive an even number of arguments", fn.position)
+                )
+            )
+        }
+        if (args.size < 2) {
+            return TilComposition(
+                function = fn,
+                args = args,
+                srcPos = comp.position,
+                reports = listOf(Report("Empty If statements not allowed", fn.position))
+            )
+        }
+
+        var `if`: TilConstruction = Nil(srcPos = fn.position, reason="No If condition matched")
+
+        (args.indices.filter { it % 2 != 1 }.reversed()).forEach {
+            val cond = args[it]
+            val then = args[it+1]
+
+            `if` = TilComposition(fn, listOf(cond, then, `if`), srcPos=comp.position)
+        }
+
+        return `if` as TilComposition
+    }
+
+    private fun convertProgn(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
+        if (args.size < 2) {
+            return TilComposition(
+                function = fn,
+                args = args,
+                srcPos = comp.position,
+                reports = listOf(Report("Progn statements must contain at least 2 inner constructions", fn.position))
+            )
+        }
+
+        return args.reduceRight { el, acc ->
+            TilComposition(fn, listOf(el, acc), srcPos = comp.position)
+        } as TilComposition
+    }
+
+    private fun convertMkTuple(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
+        if (args.isEmpty()) {
+            return TilComposition(
+                function = fn,
+                args = args,
+                srcPos = comp.position,
+                reports = listOf(Report("MkTuple statements must not be empty", fn.position))
+            )
+        }
+
+        val endTuple = TilComposition(
+            function = TilTrivialization(
+                construction = TilFunction("OneTuple", srcPosition = fn.position),
+                srcPos = comp.position,
+            ),
+            args = listOf(args.last()),
+            srcPos = comp.position,
+        )
+
+        return args.dropLast(1).foldRight(endTuple) { el, acc ->
+            TilComposition(
+                function = fn,
+                args = listOf(el, acc),
+                srcPos = comp.position,
+            )
+        }
+    }
 
     private fun convertExecution(execution: Execution): TilConstruction = when (execution.order) {
         0    -> convertTilTrivialization(execution)

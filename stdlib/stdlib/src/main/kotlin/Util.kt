@@ -40,33 +40,30 @@ object Util {
             }
     }
 
-    object If : BuiltinVariadicFunction(
+    object If : DefaultFunction(
         "If",
         GenericType(1),
         listOf(
             Variable("cond", SrcPosition(-1, -1), Types.Bool),
-            Variable("value", SrcPosition(-1, -1), GenericType(1)),
+            Variable("ifTrue", SrcPosition(-1, -1), GenericType(1)),
+            Variable("ifFalse", SrcPosition(-1, -1), GenericType(1)),
         ),
-        acceptsNil = true
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
             die("If should never be invoked directly, instead, handling of If should be done by the interpreter", ctx.position)
         }
     }
 
-    object Progn : BuiltinVariadicFunction(
+    object Progn : DefaultFunction(
         "Progn",
-        GenericType(1),
+        GenericType(2),
         listOf(
-            Variable("placeholder", SrcPosition(-1, -1), GenericType(1)),
+            Variable("fst", SrcPosition(-1, -1), GenericType(1)),
+            Variable("snd", SrcPosition(-1, -1), GenericType(2)),
         ),
-        acceptsNil = false
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            when (args.isNotEmpty()) {
-                true -> args.last()
-                else -> Nil(ctx.position, reason="No arguments were passed to Progn")
-            }
+            args.last()
     }
 
     object Tr : DefaultFunction(
