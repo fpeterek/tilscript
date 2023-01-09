@@ -46,6 +46,20 @@ object TupleFunctions {
 
     }
 
+    // Since MkTuple gets expanded, we create an alias for the function which provides us with the original
+    // functionality of MkTuple
+    object PrependToTuple : DefaultFunction(
+        "PrependToTuple",
+        GenericType(1),
+        listOf(
+            Variable("fst", SrcPosition(-1, -1), GenericType(2)),
+            Variable("rest", SrcPosition(-1, -1), GenericType(3))
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            MkTuple(interpreter, args, ctx)
+    }
+
     object Get : DefaultFunction(
         "Get",
         GenericType(1),

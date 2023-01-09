@@ -267,7 +267,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretIf(args: List<Construction>, ctx: FnCallContext): Construction {
 
-        val cond = interpret(args[1])
+        val cond = interpret(args[0])
 
         if (cond is Nil) {
             return cond

@@ -33,6 +33,7 @@ object StdlibRegistrar : SymbolRegistrar {
 
         TupleFunctions.OneTuple,
         TupleFunctions.MkTuple,
+        TupleFunctions.PrependToTuple,
         TupleFunctions.Get,
 
         TextFunctions.HeadS,
