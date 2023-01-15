@@ -46,7 +46,7 @@ class TypeMatcher private constructor(val types: TypeRepository) {
         l is EmptyListType -> true
         r is EmptyListType -> true
         l is ListType && r is ListType -> match(l.type, r.type)
-        else -> throw RuntimeException("Interpreter error")
+        else -> throw RuntimeException("Error: Invalid state")
     }
 
     fun matchFn(fn: FunctionType, returned: Type, args: List<Type>): Pair<Boolean, List<Boolean>> =

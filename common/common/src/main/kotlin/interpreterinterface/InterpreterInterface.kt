@@ -20,8 +20,6 @@ interface InterpreterInterface {
 
     fun fnSignatureMatch(fn: FunctionType, returned: Type, args: List<Type>): Pair<Boolean, List<Boolean>>
 
-    fun ensureMatch(expected: Type, received: Type)
-
     fun createLocal(variable: Variable, value: Construction)
 
     fun getVariable(name: String): Variable?
