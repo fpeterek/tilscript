@@ -54,7 +54,6 @@ object Util {
     val TupleType.isGeneric        get() = types.any { it.isGeneric }
     val TypeAlias.isGeneric        get() = type.isGeneric
     val Unknown.isGeneric          get() = false
-    val EmptyListType.isGeneric    get() = false
 
     val Type.isGeneric: Boolean
         get() = when (this) {
@@ -63,8 +62,7 @@ object Util {
             is FunctionType     -> isGeneric
             is GenericType      -> isGeneric
             is ListType         -> isGeneric
-            is EmptyListType    -> isGeneric
-            is TupleType        -> isGeneric
+            is TupleType         -> isGeneric
             is TypeAlias        -> isGeneric
             is Unknown          -> isGeneric
         }

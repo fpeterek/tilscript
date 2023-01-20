@@ -20,6 +20,8 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     private fun matchTuples(l: TupleType, r: TupleType) = l.types.size == r.types.size &&
             l.types.asSequence().zip(r.types.asSequence()).all { (fst, snd) -> match(fst, snd) }
 
+    private fun matchLists(l: ListType, r: ListType) = match(l.type, r.type)
+
     private fun matchGenerics(l: GenericType, r: Type) = match(r, generics.getOrPut(l.argNumber) { r })
 
     private fun matchFunctions(l: FunctionType, r: FunctionType) =
@@ -35,18 +37,12 @@ class TypeMatcher private constructor(val types: TypeRepository) {
     private fun matchInternal(l: Type, r: Type) = when (l) {
         is AtomicType   -> matchAtomics(l, r as AtomicType)
         is FunctionType -> matchFunctions(l, r as FunctionType)
+        is ListType     -> matchLists(l, r as ListType)
         is TupleType    -> matchTuples(l, r as TupleType)
 
         ConstructionType, Unknown -> true
 
-        is GenericType, is TypeAlias, is ListType, is EmptyListType -> throw RuntimeException("Error: Invalid state")
-    }
-
-    private fun matchLists(l: Type, r: Type) = when {
-        l is EmptyListType -> true
-        r is EmptyListType -> true
-        l is ListType && r is ListType -> match(l.type, r.type)
-        else -> throw RuntimeException("Error: Invalid state")
+        is GenericType, is TypeAlias -> throw RuntimeException("Error: Invalid state")
     }
 
     fun matchFn(fn: FunctionType, returned: Type, args: List<Type>): Pair<Boolean, List<Boolean>> =
@@ -54,8 +50,6 @@ class TypeMatcher private constructor(val types: TypeRepository) {
 
     fun matchFnArgs(fn: FunctionType, args: List<Type>): List<Boolean> =
         fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
-
-    private val Type.isList get() = this is EmptyListType || this is ListType
 
     fun match(l: Type, r: Type): Boolean = when {
         l is Unknown || r is Unknown -> true
@@ -68,8 +62,6 @@ class TypeMatcher private constructor(val types: TypeRepository) {
 
         l is TypeAlias -> matchAlias(l, r)
         r is TypeAlias -> matchAlias(r, l)
-
-        l.isList && r.isList -> matchLists(l, r)
 
         l.javaClass != r.javaClass -> false
         else -> matchInternal(l, r)

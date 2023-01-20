@@ -339,12 +339,6 @@ class Interpreter: InterpreterInterface {
 
     override fun typesMatch(t1: Type, t2: Type) = t1 matches t2
 
-    override fun ensureMatch(expected: Type, received: Type) {
-        if (!(expected matches received)) {
-            die("Type mismatch (expected: $expected, received: $received)")
-        }
-    }
-
     override fun createLocal(variable: Variable, value: Construction) {
 
         if (variable.name in currentFrame) {
