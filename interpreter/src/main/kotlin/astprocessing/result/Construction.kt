@@ -18,6 +18,10 @@ sealed class Construction(srcPos: SrcPosition) : IntermediateResult(srcPos) {
         constructor(varName: VarName, srcPos: SrcPosition) : this(varName.name, srcPos)
     }
 
+    class AttributeRef(val names: List<String>, srcPos: SrcPosition) : Construction(srcPos) {
+        constructor(varNames: List<VarName>, srcPos: SrcPosition) : this(varNames.map { it.name }, srcPos)
+    }
+
     class Closure(
         val vars: List<TypedVar>,
         val construction: Construction,

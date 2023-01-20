@@ -40,6 +40,7 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         ctx.typeDefinition()   != null -> visitTypeDefinition(ctx.typeDefinition())
         ctx.entityDefinition() != null -> visitEntityDefinition(ctx.entityDefinition())
         ctx.importStatement()  != null -> visitImportStatement(ctx.importStatement())
+        ctx.structDefinition() != null -> visitStructDefinition(ctx.structDefinition())
 
         else -> invalidState()
     }
@@ -99,6 +100,12 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         ctx.position(),
     )
 
+    override fun visitStructDefinition(ctx: TILScriptParser.StructDefinitionContext) = StructDef(
+        name = visitEntityName(ctx.entityName()).name,
+        vars = ctx.typedVariable().map(::visitTypedVariable),
+        srcPos = ctx.position(),
+    )
+
     override fun visitDataType(ctx: TILScriptParser.DataTypeContext): DataType = when {
         ctx.builtinType()  != null -> visitBuiltinType(ctx.builtinType())
         ctx.listType()     != null -> visitListType(ctx.listType())
@@ -129,7 +136,15 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
     override fun visitCompoundType(ctx: TILScriptParser.CompoundTypeContext) =
         DataType.ClassType(ctx.dataType().map { visitDataType(it) }, ctx.position())
 
-    override fun visitVariable(ctx: TILScriptParser.VariableContext) =
+    override fun visitVariable(ctx: TILScriptParser.VariableContext) = when {
+        ctx.variableName() != null -> varRefFromCtx(ctx)
+        else                       -> visitStructAttribute(ctx.structAttribute())
+    }
+
+    override fun visitStructAttribute(ctx: TILScriptParser.StructAttributeContext) =
+        Construction.AttributeRef(ctx.variableName().map { visitVariableName(it) }, ctx.position())
+
+    private fun varRefFromCtx(ctx: TILScriptParser.VariableContext) =
         Construction.VarRef(visitVariableName(ctx.variableName()), ctx.position())
 
     override fun visitTrivialization(ctx: TILScriptParser.TrivializationContext) = Construction.Execution(

@@ -14,7 +14,14 @@ sentenceContent : globalVarDecl
                 | typeDefinition
                 | entityDefinition
                 | construction
-                | importStatement;
+                | importStatement
+                | structDefinition;
+
+structDefinition :
+STRUCT entityName OPEN_CUR
+    typedVariable
+    (COMMA typedVariable)*
+CLOSE_CUR;
 
 importStatement : IMPORT string;
 
@@ -46,7 +53,9 @@ userType : typeName;
 
 compoundType : OPEN_PAR dataType (dataType)* CLOSE_PAR;
 
-variable : variableName;
+variable : variableName | structAttribute;
+
+structAttribute : variableName TERMINATOR variableName (TERMINATOR variableName)*;
 
 trivialization : TRIVIALIZE (construction | entity | dataType);
 
@@ -141,6 +150,7 @@ BUILTIN_TYPE : 'Bool'
 
 ANY : 'Any' LESS DIGIT* GREATER;
 
+STRUCT      : 'struct';
 EXEC        : '^' [12];
 LAMBDA      : '\\';
 TRIVIALIZE  : '\'';
