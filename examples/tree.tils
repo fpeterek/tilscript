@@ -1,0 +1,29 @@
+import "fns.tils".
+
+-- This won't work, I will need to implement structs
+
+typedef Tree = Tuple<Int, List<Tree>>.
+
+let tree: Tree =
+    ['MkTuple '1
+        {
+            ['MkTuple '2 ['EmptyListOf 'Tree]], 
+            ['MkTuple '3 { ['MkTuple '4 ['EmptyListOf 'Tree]] }]
+        }].
+
+
+def MaxOf(l: Int, r: Int) -> Int =
+    ['If
+        ['< l r] l
+        'True    r].
+
+
+defn Depth(tree: Tree) -> Int =
+    ['If
+        ['IsEmpty ['Get tree 1]] 1
+        'True     ['MaxOf ['Head ['Depth ['Get tree 1]]] ['Head ['Head ['Depth ['Get tree 1]]]]]].
+
+
+['PrintRes '['Depth tree]].
+['PrintRes 'tree]
+
