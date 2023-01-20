@@ -3,18 +3,16 @@ import "fns.tils".
 ['PrintRes '{ 'Time, 'List<Int>, 'Tuple<World, Real> }].
 
 ['PrintRes '['EmptyListOf 'World]].
-['PrintRes '['EmptyList]].
 
 ['PrintRes '['TypeOf ['EmptyListOf 'World]]].
-['PrintRes '['TypeOf ['EmptyList]]].
 
-['PrintRes '['Cons '1 ['EmptyList]]].
+['PrintRes '['Cons '1 ['EmptyListOf 'Int]]].
 
-['PrintRes '['IsEmpty ['EmptyList]]].
+['PrintRes '['IsEmpty ['EmptyListOf 'Int]]].
 
 defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
     ['If
-        ['IsEmpty list] ['EmptyList]
+        ['IsEmpty list] ['EmptyListOf ['FunctionImageType fn]]
         'True ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]].
 
 ['Println ['TypeOf [\x: Int -> Int: ['* x x]]]].

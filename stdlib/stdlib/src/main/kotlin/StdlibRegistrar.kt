@@ -15,7 +15,6 @@ object StdlibRegistrar : SymbolRegistrar {
         ListFunctions.Tail,
         ListFunctions.IsEmpty,
         ListFunctions.ListOfOne,
-        ListFunctions.EmptyList,
 
         Util.Print,
         Util.Println,
@@ -89,6 +88,7 @@ object StdlibRegistrar : SymbolRegistrar {
         FunctionFunctions.GetFunction,
         FunctionFunctions.FunctionName,
         FunctionFunctions.FunctionType,
+        FunctionFunctions.FunctionImageType,
 
         CompositionFunctions.Compose,
         CompositionFunctions.CompositionConstructions,

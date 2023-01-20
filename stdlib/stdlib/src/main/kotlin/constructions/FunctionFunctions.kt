@@ -8,13 +8,15 @@ import org.fpeterek.tilscript.common.sentence.*
 import org.fpeterek.tilscript.common.types.ConstructionType
 import org.fpeterek.tilscript.common.types.FunctionType as TilFunctionType
 import org.fpeterek.tilscript.common.SrcPosition
+import org.fpeterek.tilscript.common.types.FunctionType
+import org.fpeterek.tilscript.common.types.GenericType
 
 object FunctionFunctions {
     private val noPos get() = SrcPosition(-1, -1)
 
     object CreateFunctionRef : DefaultFunction(
         "CreateFunctionRef",
-        ConstructionType,
+        GenericType(1),
         listOf(
             Variable("name", noPos, Types.Text),
             Variable("type", noPos, Types.Type),
@@ -42,7 +44,7 @@ object FunctionFunctions {
         "FunctionName",
         Types.Text,
         listOf(
-            Variable("fn", noPos, ConstructionType),
+            Variable("fn", noPos, GenericType(1)),
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
@@ -61,7 +63,7 @@ object FunctionFunctions {
         "FunctionType",
         Types.Type,
         listOf(
-            Variable("fn", noPos, ConstructionType),
+            Variable("fn", noPos, GenericType(1)),
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
@@ -76,9 +78,28 @@ object FunctionFunctions {
         }
     }
 
+    object FunctionImageType : DefaultFunction(
+        "FunctionImageType",
+        Types.Type,
+        listOf(
+            Variable("fn", noPos, GenericType(1)),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+            val cons = args[0]
+
+            if (cons !is TilFunction) {
+                return Nil(ctx.position, reason = "FunctionImageType expects a function (received: ${cons.javaClass.name})")
+            }
+
+            return TypeRef((cons.constructedType as org.fpeterek.tilscript.common.types.FunctionType).imageType, ctx.position)
+        }
+    }
+
     object GetFunction : DefaultFunction(
         "GetFunction",
-        ConstructionType,
+        GenericType(1),
         listOf(
             Variable("name", noPos, Types.Text),
         ),

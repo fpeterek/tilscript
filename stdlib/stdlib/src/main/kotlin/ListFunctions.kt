@@ -135,13 +135,4 @@ object ListFunctions {
             )
         }
     }
-
-    object EmptyList : DefaultFunction(
-        "EmptyList",
-        ListType(GenericType(1)),
-        emptyList(),
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            NilList(GenericType(1), ctx.position)
-    }
 }
