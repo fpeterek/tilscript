@@ -44,6 +44,4 @@ class FunctionType(
 
     val arity
         get() = argTypes.size
-
-    override fun toString() = name
 }

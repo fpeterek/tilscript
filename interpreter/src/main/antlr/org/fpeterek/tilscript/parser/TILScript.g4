@@ -55,7 +55,7 @@ compoundType : OPEN_PAR dataType (dataType)* CLOSE_PAR;
 
 variable : variableName | structAttribute;
 
-structAttribute : variableName TERMINATOR variableName (TERMINATOR variableName)*;
+structAttribute : variableName ARROW variableName (ARROW variableName)*;
 
 trivialization : TRIVIALIZE (construction | entity | dataType);
 

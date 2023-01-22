@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.common.types.FunctionType
 import org.fpeterek.tilscript.common.types.Type
 import org.fpeterek.tilscript.common.types.TypeAlias
 import org.fpeterek.tilscript.common.SrcPosition
+import org.fpeterek.tilscript.common.types.StructType
 
 
 sealed class Declaration(srcPos: SrcPosition, reports: List<Report>) : Sentence(srcPos, reports)
@@ -37,6 +38,21 @@ class TypeDefinition(
         TypeDefinition(alias, position, reports + iterable)
 
     override fun toString() = "${alias.name} := ${alias.type}"
+}
+
+class StructDefinition(
+    val struct: StructType, srcPos: SrcPosition, reports: List<Report> = listOf(),
+) : Declaration(srcPos, reports) {
+
+    override fun withReport(report: Report) = withReports(listOf(report))
+
+    override fun withReports(iterable: Iterable<Report>) =
+        StructDefinition(struct, position, reports + iterable)
+
+    private fun attrString() =
+        struct.attributes.asSequence().map { "${it.name}: ${it.constructedType}" }.joinToString(",")
+
+    override fun toString() = "struct ${struct.name} { ${attrString()} }."
 }
 
 class VariableDeclaration(

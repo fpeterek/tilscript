@@ -1,6 +1,7 @@
 package org.fpeterek.tilscript.common.reporting
 
 import org.fpeterek.tilscript.common.sentence.*
+import org.fpeterek.tilscript.common.types.StructType
 
 
 object Reporter {
@@ -43,6 +44,15 @@ object Reporter {
     private fun containsReports(importStatement: ImportStatement): Boolean =
         importStatement.hasReports
 
+    private fun containsReports(attrRef: AttributeReference): Boolean =
+        attrRef.hasReports
+
+    private fun containsReports(structDef: StructDefinition): Boolean =
+        structDef.hasReports
+
+    private fun containsReports(structCons: StructConstructor): Boolean =
+        structCons.hasReports || structCons.args.any { it.hasReports }
+
     private fun containsReports(def: Declaration): Boolean = when (def) {
         is FunctionDeclaration -> containsReports(def)
         is LiteralDeclaration  -> containsReports(def)
@@ -50,16 +60,19 @@ object Reporter {
         is VariableDeclaration -> containsReports(def)
         is FunctionDefinition  -> containsReports(def)
         is VariableDefinition  -> containsReports(def)
+        is StructDefinition    -> containsReports(def)
     }
 
     private fun containsReports(construction: Construction): Boolean = when (construction) {
-        is Closure        -> containsReports(construction)
-        is Composition    -> containsReports(construction)
-        is Execution      -> containsReports(construction)
-        is Value          -> containsReports(construction)
-        is TilFunction    -> containsReports(construction)
-        is Trivialization -> containsReports(construction)
-        is Variable       -> containsReports(construction)
+        is Closure            -> containsReports(construction)
+        is Composition        -> containsReports(construction)
+        is Execution          -> containsReports(construction)
+        is Value              -> containsReports(construction)
+        is TilFunction        -> containsReports(construction)
+        is Trivialization     -> containsReports(construction)
+        is Variable           -> containsReports(construction)
+        is AttributeReference -> containsReports(construction)
+        is StructConstructor  -> containsReports(construction)
     }
 
     fun containsReports(sentence: Sentence): Boolean = when (sentence) {
@@ -106,6 +119,15 @@ object Reporter {
     private fun reportsAsList(importStatement: ImportStatement): List<Report> =
         importStatement.reports
 
+    private fun reportsAsList(attrRef: AttributeReference): List<Report> =
+        attrRef.reports
+
+    private fun reportsAsList(structDef: StructDefinition): List<Report> =
+        structDef.reports
+
+    private fun reportsAsList(structCons: StructConstructor): List<Report> =
+        structCons.reports + structCons.args.flatMap { it.reports }
+
     private fun reportsAsList(def: Declaration): List<Report> = when (def) {
         is FunctionDeclaration -> reportsAsList(def)
         is LiteralDeclaration  -> reportsAsList(def)
@@ -113,16 +135,19 @@ object Reporter {
         is VariableDeclaration -> reportsAsList(def)
         is FunctionDefinition  -> reportsAsList(def)
         is VariableDefinition  -> reportsAsList(def)
+        is StructDefinition    -> reportsAsList(def)
     }
 
     private fun reportsAsList(construction: Construction): List<Report> = when (construction) {
-        is Closure        -> reportsAsList(construction)
-        is Composition    -> reportsAsList(construction)
-        is Execution      -> reportsAsList(construction)
-        is Value          -> reportsAsList(construction)
-        is TilFunction    -> reportsAsList(construction)
-        is Trivialization -> reportsAsList(construction)
-        is Variable       -> reportsAsList(construction)
+        is Closure            -> reportsAsList(construction)
+        is Composition        -> reportsAsList(construction)
+        is Execution          -> reportsAsList(construction)
+        is Value              -> reportsAsList(construction)
+        is TilFunction        -> reportsAsList(construction)
+        is Trivialization     -> reportsAsList(construction)
+        is Variable           -> reportsAsList(construction)
+        is AttributeReference -> reportsAsList(construction)
+        is StructConstructor  -> reportsAsList(construction)
     }
 
     fun reportsAsList(sentence: Sentence): List<Report> = when (sentence) {

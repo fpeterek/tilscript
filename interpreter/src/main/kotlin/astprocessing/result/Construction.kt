@@ -26,10 +26,10 @@ sealed class Construction(srcPos: SrcPosition) : IntermediateResult(srcPos) {
         val vars: List<TypedVar>,
         val construction: Construction,
         val returnType: DataType?,
-        srcPos: SrcPosition) :
-        Construction(srcPos) {
+        srcPos: SrcPosition
+    ) : Construction(srcPos) {
         constructor(vars: TypedVars, construction: Construction, returnType: DataType?, srcPos: SrcPosition) :
-                this(vars.vars, construction, returnType, srcPos)
+            this(vars.vars, construction, returnType, srcPos)
     }
 
     class Execution(val order: Int, val construction: IntermediateResult, srcPos: SrcPosition) :

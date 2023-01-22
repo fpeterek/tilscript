@@ -68,6 +68,10 @@ object EqualityOperator : OperatorFunction(
         private infix fun TypeRef.eq(other: TypeRef) =
             type matches other.type
 
+        private infix fun Struct.eq(other: Struct) =
+            structType matches other.structType and
+                    this.attributes.zip(other.attributes).all { it.first eq it.second }
+
         private infix fun Value.eq(other: Value): Boolean = when (this) {
             is Bool      -> this eq (other as Bool)
             is Integral  -> this eq (other as Integral)
@@ -80,6 +84,7 @@ object EqualityOperator : OperatorFunction(
             is TilTuple  -> this eq (other as TilTuple)
             is Timestamp -> this eq (other as Timestamp)
             is TypeRef   -> this eq (other as TypeRef)
+            is Struct    -> this eq (other as Struct)
             is World     -> true
         }
 

@@ -9,8 +9,21 @@ import org.fpeterek.tilscript.common.types.GenericType
 import org.fpeterek.tilscript.common.types.ListType
 import org.fpeterek.tilscript.common.types.Util.isGeneric
 import org.fpeterek.tilscript.common.SrcPosition
+import org.fpeterek.tilscript.common.die
 
 object ListFunctions {
+
+    object ListOf : DefaultFunction(
+        "ListOf",
+        ListType(GenericType(1)),
+        listOf(
+            Variable("placeholder", SrcPosition(-1, -1), GenericType(1))
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            throw RuntimeException(
+                "Function ListOf serves only as syntactic sugar and should never be called directly.")
+    }
 
     object ListOfOne : DefaultFunction(
         "ListOfOne",

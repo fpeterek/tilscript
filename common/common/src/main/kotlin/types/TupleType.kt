@@ -6,6 +6,4 @@ class TupleType(val types: List<Type>) : Type() {
 
     override val name
         get() = "Tuple<${types.joinToString(separator = ", ")}>"
-
-    override fun toString() = name
 }

@@ -5,6 +5,7 @@ import org.fpeterek.tilscript.common.sentence.isexecutable.NonExecutable
 import org.fpeterek.tilscript.common.types.Primitives
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.SrcPosition
+import org.fpeterek.tilscript.common.die
 
 sealed class Value(
     srcPos: SrcPosition,
@@ -15,6 +16,36 @@ sealed class Value(
     override fun withReport(report: Report): Value = withReports(listOf(report))
     abstract override fun withReports(iterable: Iterable<Report>): Value
 
+}
+
+class Struct(
+    val attributes: List<Variable>,
+    srcPos: SrcPosition,
+    type: StructType,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, type, reports) {
+
+    init {
+        attributes.forEach {
+            if (it.value == null) {
+                throw RuntimeException("Interpreter Error: Struct attributes must have a value")
+            }
+        }
+    }
+
+    val attrMap = attributes.associateBy { it.name }
+    val structType get() = constructedType as StructType
+
+    operator fun get(attr: String) = attrMap[attr]
+    fun has(attr: String) = structType.has(attr)
+
+    override fun withReports(iterable: Iterable<Report>) =
+        Struct(attributes, position, structType, reports + iterable)
+
+    private fun attrString() =
+        attributes.asSequence().map { "${it.name}: ${it.value}" }.joinToString(" ")
+
+    override fun toString() = "{${structType.name} ${attrString()}}"
 }
 
 class Symbol(
