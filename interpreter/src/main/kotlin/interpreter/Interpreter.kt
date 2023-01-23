@@ -323,18 +323,47 @@ class Interpreter: InterpreterInterface {
         }
     }
 
+    private fun interpret(attrRef: AttributeReference): Construction {
+
+        var value = getVariable(attrRef.attrs.first())
+            ?: die("Variable ${attrRef.attrs.first()} does not exist", attrRef.position)
+
+
+        attrRef.attrs.asSequence().drop(1).forEach {
+            if (value.value == null) {
+                die("Variable ${attrRef.attrs.first()} has no value", attrRef.position)
+            }
+            if (value.value is Symbol) {
+                die("Cannot access attribute of a symbolic value", attrRef.position)
+            }
+            if (value.value !is Struct) {
+                die("Non-struct values do not have attributes", attrRef.position)
+            }
+
+            if (!(value.value as Struct).has(it)) {
+                die("Struct ${(value.value as Struct).structType} has no attribute $it")
+            }
+
+            value = (value.value as Struct)[it]!!
+        }
+
+        return value
+    }
+
     override fun interpret(construction: Construction): Construction = when (construction) {
-        is Closure        -> interpret(construction)
-        is Composition    -> interpret(construction)
-        is Execution      -> interpret(construction)
-        is Trivialization -> interpret(construction)
+        is Closure            -> interpret(construction)
+        is Composition        -> interpret(construction)
+        is Execution          -> interpret(construction)
+        is Trivialization     -> interpret(construction)
+        is AttributeReference -> interpret(construction)
+        is Variable           -> interpret(construction)
+
         // Values cannot be executed as they by themselves do not construct anything
         // Nil also only ever constructs nil, but Nil is a Value
-        is Value          -> nil
+        is Value       -> Nil(construction.position, reason = "Values cannot be executed")
         // Functions too cannot be executed, functions can only be applied using compositions
         // Functions must be constructed using trivializations or closures
-        is TilFunction    -> nil
-        is Variable       -> interpret(construction)
+        is TilFunction -> Nil(construction.position, reason = "Functions cannot be executed")
     }
 
     override fun typesMatch(t1: Type, t2: Type) = t1 matches t2
@@ -484,6 +513,26 @@ class Interpreter: InterpreterInterface {
         topLevelFrame.putVar(varDef.variable.withValue(value))
     }
 
+    private fun interpret(structDefinition: StructDefinition) {
+        val struct = structDefinition.struct
+
+        if (struct.name in typeRepo) {
+            if (!(struct matches typeRepo[struct.name]!!)) {
+                die("Conflicting redefinition of struct ${struct.name}", structDefinition.position)
+            }
+
+            return
+        }
+
+        struct.attributes.forEach {
+            if (it.constructedType.isGeneric) {
+                die("Struct attributes cannot be of a generic type", it.position)
+            }
+        }
+
+        typeRepo.process(struct)
+    }
+
     private fun interpret(declaration: Declaration) {
         when (declaration) {
             is FunctionDeclaration -> interpret(declaration)
@@ -492,6 +541,7 @@ class Interpreter: InterpreterInterface {
             is TypeDefinition      -> interpret(declaration)
             is VariableDeclaration -> interpret(declaration)
             is VariableDefinition  -> interpret(declaration)
+            is StructDefinition    -> interpret(declaration)
         }
     }
 

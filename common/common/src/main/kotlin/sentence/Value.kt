@@ -262,12 +262,12 @@ class ListCell(
 
     private fun tailStr(): String = when (tail) {
         is EmptyList -> ""
-        else -> ", ${tail.contentsStr()}"
+        else -> " ${tail.contentsStr()}"
     }
 
     override fun contentsStr(): String = "$head${tailStr()}"
 
-    override fun toString() = "{ ${contentsStr()} }"
+    override fun toString() = "['ListOf${contentsStr()}]"
 
     override fun toKotlinList() = listOf(head) + tail.toKotlinList()
 }
@@ -282,7 +282,7 @@ class EmptyList(
 
     override fun contentsStr() = ""
 
-    override fun toString() = "{}"
+    override fun toString() = "['EmptyListOf '${valueType}]"
 
     override fun hashCode() = valueType.hashCode()
 

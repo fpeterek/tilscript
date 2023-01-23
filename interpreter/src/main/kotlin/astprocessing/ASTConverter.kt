@@ -10,6 +10,7 @@ import org.fpeterek.tilscript.stdlib.*
 import org.fpeterek.tilscript.common.sentence.*
 import org.fpeterek.tilscript.common.sentence.Symbol
 import org.fpeterek.tilscript.common.sentence.Trivialization
+import org.fpeterek.tilscript.common.sentence.Variable
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.types.TypeAlias as TilTypeAlias
 import org.fpeterek.tilscript.common.sentence.Construction as TilConstruction
@@ -84,6 +85,8 @@ class ASTConverter private constructor() {
         def.position,
     )
 
+    private fun invalidState(): Nothing = throw RuntimeException("Invalid parser state")
+
     private fun convertSentence(sentence: IntermediateResult) = when (sentence) {
         is Construction    -> convertConstruction(sentence)
         is GlobalVarDecl   -> convertGlobalVarDecl(sentence)
@@ -92,8 +95,47 @@ class ASTConverter private constructor() {
         is FunDefinition   -> convertDefn(sentence)
         is GlobalVarDef    -> convertGlobalVarDef(sentence)
         is ImportStatement -> convertImportStatement(sentence)
+        is StructDef       -> convertStructDef(sentence)
 
-        else -> throw RuntimeException("Invalid parser state")
+        is DataType   -> invalidState()
+        is Entity     -> invalidState()
+        is EntityName -> invalidState()
+        is Numeric    -> invalidState()
+        is Sentences  -> invalidState()
+        is TypeName   -> invalidState()
+        is TypedVar   -> invalidState()
+        is TypedVars  -> invalidState()
+        is VarName    -> invalidState()
+        is org.fpeterek.tilscript.interpreter.astprocessing.result.Symbol -> invalidState()
+    }
+
+    private fun convertStructDef(structDef: StructDef): StructDefinition {
+
+        val defined = mutableSetOf<String>()
+        val reports = mutableListOf<Report>()
+
+        structDef.vars.forEach {
+            if (it.name in defined) {
+                reports.add(Report("Redefinition of attribute ${it.name}", it.position))
+            }
+            defined.add(it.name)
+
+            if (it.type == null) {
+                reports.add(Report("Missing type in attribute definition", it.position))
+            }
+        }
+
+        val vars = structDef.vars.map {
+            Variable(
+                it.name,
+                it.position,
+                if (it.type != null) { convertDataType(it.type) } else { Unknown }
+            )
+        }
+
+        val type = StructType(structDef.name, vars)
+
+        return StructDefinition(type, structDef.position, reports)
     }
 
     private fun convertConstruction(construction: Construction): TilConstruction = when (construction) {
@@ -101,25 +143,13 @@ class ASTConverter private constructor() {
         is Composition     -> convertComposition(construction)
         is Execution       -> convertExecution(construction)
         is VarRef          -> convertVarRef(construction)
-        is ListInitializer -> convertListInitializer(construction)
+        is AttributeRef    -> convertAttrRef(construction)
     }
 
+    private fun convertAttrRef(ref: AttributeRef): TilConstruction =
+        AttributeReference(attrs = ref.names, srcPos = ref.position)
+
     private fun convertImportStatement(imp: ImportStatement) = TilImport(imp.file, imp.position)
-
-    private fun listEnd(init: ListInitializer) = TilComposition(
-        TilTrivialization(ListFunctions.ListOfOne.tilFunction, init.position, constructedType = ListFunctions.ListOfOne.signature),
-        args = listOf(convertConstruction(init.values.last())),
-        srcPos = init.position,
-    ) as TilConstruction
-
-    private fun convertListInitializer(init: ListInitializer): TilConstruction = init.values.asReversed().asSequence().drop(1)
-        .fold(listEnd(init)) { acc, cons ->
-            TilComposition(
-                TilTrivialization(ListFunctions.Cons.tilFunction, init.position, constructedType = ListFunctions.Cons.signature),
-                args = listOf(convertConstruction(cons), acc),
-                srcPos = init.position
-            )
-        }
 
     private fun convertGlobalVarDecl(def: GlobalVarDecl) = convertDataType(def.type).let { type ->
         VariableDeclaration(
@@ -184,12 +214,29 @@ class ASTConverter private constructor() {
                 "If"      -> convertIf(fn, args, composition)
                 "MkTuple" -> convertMkTuple(fn, args, composition)
                 "Progn"   -> convertProgn(fn, args, composition)
+                "ListOf"  -> convertListOf(composition)
                 else      -> TilComposition(function=fn, args=args, srcPos=composition.position)
             }
         } else {
             TilComposition(function=fn, args=args, srcPos=composition.position)
         }
     }
+
+    private fun listEnd(comp: Composition) = TilComposition(
+        TilTrivialization(ListFunctions.ListOfOne.tilFunction, comp.position, constructedType = ListFunctions.ListOfOne.signature),
+        args = listOf(convertConstruction(comp.args.last())),
+        srcPos = comp.position,
+    )
+
+    private fun convertListOf(comp: Composition): TilComposition = comp.args.asReversed().asSequence().drop(1)
+        .fold(listEnd(comp)) { acc, cons ->
+            TilComposition(
+                TilTrivialization(ListFunctions.Cons.tilFunction, comp.position, constructedType = ListFunctions.Cons.signature),
+                args = listOf(convertConstruction(cons), acc),
+                srcPos = comp.position
+            )
+        }
+
 
     private fun convertIf(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
         if (args.size % 2 == 1) {

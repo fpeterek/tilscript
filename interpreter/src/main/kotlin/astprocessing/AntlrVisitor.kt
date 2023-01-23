@@ -66,7 +66,6 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         ctx.nExecution()      != null -> visitNExecution(ctx.nExecution())
         ctx.composition()     != null -> visitComposition(ctx.composition())
         ctx.trivialization()  != null -> visitTrivialization(ctx.trivialization())
-        ctx.listInitializer() != null -> visitListInitializer(ctx.listInitializer())
 
         else -> invalidState()
     }.let {
@@ -75,9 +74,6 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
             else -> it.extensionalize(ctx.WT().position())
         }
     }
-
-    override fun visitListInitializer(ctx: TILScriptParser.ListInitializerContext) =
-        ListInitializer(ctx.construction().map(::visitConstruction), ctx.position())
 
     override fun visitGlobalVarDecl(ctx: TILScriptParser.GlobalVarDeclContext) = GlobalVarDecl(
         ctx.variableName().map { visitVariableName(it) },
@@ -137,8 +133,9 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         DataType.ClassType(ctx.dataType().map { visitDataType(it) }, ctx.position())
 
     override fun visitVariable(ctx: TILScriptParser.VariableContext) = when {
-        ctx.variableName() != null -> varRefFromCtx(ctx)
-        else                       -> visitStructAttribute(ctx.structAttribute())
+        ctx.variableName() != null    -> varRefFromCtx(ctx)
+        ctx.structAttribute() != null -> visitStructAttribute(ctx.structAttribute())
+        else                          -> invalidState()
     }
 
     override fun visitStructAttribute(ctx: TILScriptParser.StructAttributeContext) =

@@ -34,11 +34,17 @@ class TypeMatcher private constructor(val types: TypeRepository) {
 
     private fun matchAlias(alias: TypeAlias, other: Type) = match(alias.type, other)
 
+    private fun matchStructs(l: StructType, r: StructType) =
+        l.name == r.name && l.attributes.zip(r.attributes).all {
+            it.first.name == it.second.name && match(it.first.constructedType, it.second.constructedType)
+        }
+
     private fun matchInternal(l: Type, r: Type) = when (l) {
         is AtomicType   -> matchAtomics(l, r as AtomicType)
         is FunctionType -> matchFunctions(l, r as FunctionType)
         is ListType     -> matchLists(l, r as ListType)
         is TupleType    -> matchTuples(l, r as TupleType)
+        is StructType   -> matchStructs(l, r as StructType)
 
         ConstructionType, Unknown -> true
 
@@ -52,6 +58,8 @@ class TypeMatcher private constructor(val types: TypeRepository) {
         fn.argTypes.zip(args).map { (exp, rec) -> match(exp, rec) }
 
     fun match(l: Type, r: Type): Boolean = when {
+        l === r -> true
+
         l is Unknown || r is Unknown -> true
 
         l is GenericType && r is GenericType && l.argNumber !in generics && r.argNumber !in generics -> true

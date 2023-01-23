@@ -33,9 +33,7 @@ funDefinition : DEFN entityName OPEN_PAR typedVariables? CLOSE_PAR ARROW dataTyp
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 
-construction : (trivialization | variable | closure | nExecution | composition | listInitializer) WT?;
-
-listInitializer : OPEN_CUR construction (COMMA construction)* CLOSE_CUR;
+construction : (trivialization | variable | closure | nExecution | composition) WT?;
 
 globalVarDecl : LET variableName (COMMA variableName)* COLON dataType;
 
