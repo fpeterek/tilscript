@@ -25,6 +25,23 @@ class Struct(
     reports: List<Report> = listOf(),
 ) : Value(srcPos, type, reports) {
 
+    companion object {
+        // I hate type erasure
+        fun fromConstructionList(
+            attributes: List<Construction>,
+            srcPos: SrcPosition,
+            type: StructType,
+            reports: List<Report> = listOf(),
+        ) = Struct(
+            attributes.zip(type.attributes.map { it.name }).map {
+                Variable(it.second, value = it.first, srcPos = it.first.position)
+            },
+            srcPos,
+            type,
+            reports
+        )
+    }
+
     init {
         attributes.forEach {
             if (it.value == null) {

@@ -6,12 +6,10 @@ import org.fpeterek.tilscript.common.interpreterinterface.*
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.common.reporting.ReportFormatter
 import org.fpeterek.tilscript.common.sentence.*
-import org.fpeterek.tilscript.common.types.FunctionType
-import org.fpeterek.tilscript.common.types.TupleType
-import org.fpeterek.tilscript.common.types.Type
-import org.fpeterek.tilscript.common.types.Unknown
+import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.types.Util.isGeneric
 import org.fpeterek.tilscript.stdlib.*
+import org.fpeterek.tilscript.stdlib.Util
 import java.io.File
 import java.nio.file.Paths
 
@@ -350,6 +348,44 @@ class Interpreter: InterpreterInterface {
         return value
     }
 
+    private fun interpret(cons: StructConstructor): Construction {
+
+        val type = typeRepo[cons.struct.name]
+
+        if (type == null || type !is StructType) {
+            die("Cannot construct a non-struct type ${cons.struct.name}", cons.position)
+        }
+
+        if (cons.args.size != type.attributes.size) {
+            die("Invalid number of arguments in constructor of struct ${cons.struct.name}", cons.position)
+        }
+
+        val interpreted = mutableListOf<Construction>()
+
+        for (arg in cons.args) {
+            val value = interpret(arg)
+
+            if (value is Nil) {
+                return value
+            }
+
+            interpreted.add(value)
+        }
+
+        interpreted.zip(type.attributes).forEach {
+            val (con, exp) = it
+
+            if (!typesMatch(con.constructedType, exp.constructedType)) {
+                die("Type mismatch in constructor of struct ${cons.struct.name} " +
+                        "expected: ${exp.constructedType}, received: ${con.constructedType})",
+                    con.position)
+            }
+        }
+
+        // I hate type erasure with utmost passion
+        return Struct.fromConstructionList(interpreted, cons.position, type)
+    }
+
     override fun interpret(construction: Construction): Construction = when (construction) {
         is Closure            -> interpret(construction)
         is Composition        -> interpret(construction)
@@ -357,6 +393,7 @@ class Interpreter: InterpreterInterface {
         is Trivialization     -> interpret(construction)
         is AttributeReference -> interpret(construction)
         is Variable           -> interpret(construction)
+        is StructConstructor  -> interpret(construction)
 
         // Values cannot be executed as they by themselves do not construct anything
         // Nil also only ever constructs nil, but Nil is a Value

@@ -20,6 +20,7 @@ import org.fpeterek.tilscript.common.sentence.Closure as TilClosure
 import org.fpeterek.tilscript.common.sentence.Variable as TilVariable
 import org.fpeterek.tilscript.common.sentence.Trivialization as TilTrivialization
 import org.fpeterek.tilscript.common.sentence.ImportStatement as TilImport
+import org.fpeterek.tilscript.common.sentence.StructConstructor as TilStructCons
 
 
 class ASTConverter private constructor() {
@@ -139,12 +140,19 @@ class ASTConverter private constructor() {
     }
 
     private fun convertConstruction(construction: Construction): TilConstruction = when (construction) {
-        is Closure         -> convertClosure(construction)
-        is Composition     -> convertComposition(construction)
-        is Execution       -> convertExecution(construction)
-        is VarRef          -> convertVarRef(construction)
-        is AttributeRef    -> convertAttrRef(construction)
+        is Closure           -> convertClosure(construction)
+        is Composition       -> convertComposition(construction)
+        is Execution         -> convertExecution(construction)
+        is VarRef            -> convertVarRef(construction)
+        is AttributeRef      -> convertAttrRef(construction)
+        is StructConstructor -> convertStructCons(construction)
     }
+
+    private fun convertStructCons(cons: StructConstructor): TilStructCons = TilStructCons(
+        convertDataType(cons.type),
+        cons.args.map(::convertConstruction),
+        cons.position,
+    )
 
     private fun convertAttrRef(ref: AttributeRef): TilConstruction =
         AttributeReference(attrs = ref.names, srcPos = ref.position)

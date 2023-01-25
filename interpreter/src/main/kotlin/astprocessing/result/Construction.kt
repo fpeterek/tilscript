@@ -37,4 +37,10 @@ sealed class Construction(srcPos: SrcPosition) : IntermediateResult(srcPos) {
 
     class Composition(val fn: Construction, val args: List<Construction>, srcPos: SrcPosition) :
         Construction(srcPos)
+
+    class StructConstructor(
+        val type: DataType,
+        val args: List<Construction>,
+        srcPos: SrcPosition,
+    ) : Construction(srcPos)
 }

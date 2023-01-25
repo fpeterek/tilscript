@@ -4,13 +4,13 @@ import org.fpeterek.tilscript.common.SrcPosition
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.common.sentence.isexecutable.Executable
 import org.fpeterek.tilscript.common.types.ConstructionType
-import org.fpeterek.tilscript.common.types.StructType
+import org.fpeterek.tilscript.common.types.Type
 
 class StructConstructor(
-    val struct: StructType,
+    val struct: Type,
     val args: List<Construction>,
     srcPos: SrcPosition,
-    reports: List<Report>,
+    reports: List<Report> = listOf(),
 ) : Construction(struct, ConstructionType, srcPos, reports), Executable {
 
     override fun withReport(report: Report) = withReports(listOf(report))
