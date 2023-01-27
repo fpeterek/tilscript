@@ -147,7 +147,10 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
     }
 
     override fun visitStructAttribute(ctx: TILScriptParser.StructAttributeContext) =
-        Construction.AttributeRef(ctx.variableName().map { visitVariableName(it) }, ctx.position())
+        Construction.AttributeRef.fromVarNames(
+            ctx.variableName().map { visitVariableName(it) },
+            ctx.position()
+        )
 
     private fun varRefFromCtx(ctx: TILScriptParser.VariableContext) =
         Construction.VarRef(visitVariableName(ctx.variableName()), ctx.position())

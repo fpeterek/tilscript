@@ -8,6 +8,7 @@ import org.fpeterek.tilscript.common.reporting.ReportFormatter
 import org.fpeterek.tilscript.common.sentence.*
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.types.Util.isGeneric
+import org.fpeterek.tilscript.common.types.Util.trivialize
 import org.fpeterek.tilscript.stdlib.*
 import org.fpeterek.tilscript.stdlib.Util
 import java.io.File
@@ -546,6 +547,10 @@ class Interpreter: InterpreterInterface {
                     "(expected: ${varDef.constructsType}, received: ${value.constructedType})", varDef.position)
         }
 
+        if (value is Nil) {
+            die("Nil constructed when initializing variable", value.position)
+        }
+
         scriptContext.putVar(varDef.name, value)
         topLevelFrame.putVar(varDef.variable.withValue(value))
     }
@@ -593,7 +598,7 @@ class Interpreter: InterpreterInterface {
                 val res = interpret(sentence)
                 if (res is Nil) {
                     report(res)
-                    die("Nil constructed by a top level construction. Aborting execution.")
+                    die("Nil constructed by a top level construction. Aborting execution.", res.position)
                 }
             }
             is Declaration     -> interpret(sentence)
@@ -736,7 +741,7 @@ class Interpreter: InterpreterInterface {
             if (it is VariableDefinition) {
                 val value = ctx.getVar(it.name) ?: die("Interpreter error: definition of variable ${it.name} has not been evaluated")
 
-                val def = VariableDefinition(it.name, value.constructedType, value, it.position, listOf())
+                val def = VariableDefinition(it.name, value.constructedType, value.trivialize(), it.position, listOf())
 
                 interpret(def)
             } else {

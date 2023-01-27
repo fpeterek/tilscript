@@ -46,8 +46,8 @@ let c: Int = '2.
 ['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '1 '2 '3]]].
 ['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '3 '2 '1]]].
 
-['PrintRes '['= { '1, '2, '3 } { '1, '2, '3 }]].
-['PrintRes '['= { '1, '2, '3 } { '3, '2, '1 }]].
+['PrintRes '['= ['ListOf '1 '2 '3 ] ['ListOf '1 '2 '3 ]]].
+['PrintRes '['= ['ListOf '1 '2 '3 ] ['ListOf '3 '2 '1 ]]].
 
 ['PrintRes '['= 'PrintRes 'PrintRes]].
 ['PrintRes '['= 'PrintRes 'Add]].

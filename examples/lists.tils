@@ -17,8 +17,8 @@ defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
 
 ['Println ['TypeOf [\x: Int -> Int: ['* x x]]]].
 
-['Println ['Map { '1, '2, '3 } [\x: Int -> Int: ['* x x]] ]].
+['Println ['Map ['ListOf '1 '2 '3 ] [\x: Int -> Int: ['* x x]] ]].
 
 defn Square(x: Int) -> Int = ['* x x].
 
-['Println ['Map { '1, '2, '3 } 'Square]].
+['Println ['Map ['ListOf '1 '2 '3 ] 'Square]].

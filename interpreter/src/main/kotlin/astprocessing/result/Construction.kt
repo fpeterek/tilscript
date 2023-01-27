@@ -19,7 +19,10 @@ sealed class Construction(srcPos: SrcPosition) : IntermediateResult(srcPos) {
     }
 
     class AttributeRef(val names: List<String>, srcPos: SrcPosition) : Construction(srcPos) {
-        constructor(varNames: List<VarName>, srcPos: SrcPosition) : this(varNames.map { it.name }, srcPos)
+        companion object {
+            fun fromVarNames(varNames: List<VarName>, srcPos: SrcPosition) =
+                AttributeRef(varNames.map { it.name }, srcPos)
+        }
     }
 
     class Closure(

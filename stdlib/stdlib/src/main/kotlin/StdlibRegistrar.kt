@@ -15,6 +15,7 @@ object StdlibRegistrar : SymbolRegistrar {
         ListFunctions.Tail,
         ListFunctions.IsEmpty,
         ListFunctions.ListOfOne,
+        ListFunctions.ListOf,
 
         Util.Print,
         Util.Println,

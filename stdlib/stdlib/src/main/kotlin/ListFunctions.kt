@@ -21,8 +21,10 @@ object ListFunctions {
         )
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            throw RuntimeException(
-                "Function ListOf serves only as syntactic sugar and should never be called directly.")
+            die(
+                "Function ListOf serves only as syntactic sugar and should never be called directly.",
+                ctx.position
+            )
     }
 
     object ListOfOne : DefaultFunction(

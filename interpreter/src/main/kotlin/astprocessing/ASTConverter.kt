@@ -245,7 +245,6 @@ class ASTConverter private constructor() {
             )
         }
 
-
     private fun convertIf(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
         if (args.size % 2 == 1) {
             return TilComposition(

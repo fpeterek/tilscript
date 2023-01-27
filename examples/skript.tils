@@ -5,6 +5,10 @@ import "fns.tils".
 ['/ '4 '2].
 ['/ '6 '2].
 
+['Println '"Hello, World!"].
+
+['PrintRes '['/ '4 '2]].
+
 ['Println fromConstruction].
 
 
@@ -48,13 +52,13 @@ typedef Float = Real.
 
 ['PrintRes '['Tr ['Divisible '19 '2]]].
 
-['PrintRes '{ '1, '2, '3 }].
+['PrintRes '['ListOf '1 '2 '3 ]].
 
-['PrintRes '{ 'Time, 'List<Int>, 'Tuple<World, Real> }].
+['PrintRes '['ListOf 'Time 'List<Int> 'Tuple<World, Real> ]].
 
 ['PrintRes '['NullaryFn]].
 
 ['Println callsite].
 
-['PrintRes '['TypeOf ['CreateEmptyList 'Time]]].
+['PrintRes '['TypeOf ['EmptyListOf 'Time]]].
 

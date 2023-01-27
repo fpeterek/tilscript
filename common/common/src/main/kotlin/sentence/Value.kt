@@ -282,9 +282,9 @@ class ListCell(
         else -> " ${tail.contentsStr()}"
     }
 
-    override fun contentsStr(): String = "$head${tailStr()}"
+    override fun contentsStr(): String = "'$head${tailStr()}"
 
-    override fun toString() = "['ListOf${contentsStr()}]"
+    override fun toString() = "['ListOf ${contentsStr()}]"
 
     override fun toKotlinList() = listOf(head) + tail.toKotlinList()
 }
