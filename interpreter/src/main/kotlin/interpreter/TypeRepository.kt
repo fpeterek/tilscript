@@ -1,9 +1,6 @@
 package org.fpeterek.tilscript.interpreter.interpreter
 
-import org.fpeterek.tilscript.common.types.AtomicType
-import org.fpeterek.tilscript.common.types.FunctionType
-import org.fpeterek.tilscript.common.types.Type
-import org.fpeterek.tilscript.common.types.TypeAlias
+import org.fpeterek.tilscript.common.types.*
 
 
 class TypeRepository {
@@ -16,6 +13,10 @@ class TypeRepository {
 
     private fun addAlias(alias: TypeAlias) {
         types[alias.name] = alias
+    }
+
+    private fun addType(type: StructType) {
+        types[type.name] = type
     }
 
     fun process(type: AtomicType) = when (type.name) {
@@ -33,9 +34,15 @@ class TypeRepository {
         functionType.argTypes.map(::process)
     )
 
+    fun process(type: StructType) = when (type.name) {
+        !in types -> type.apply(::addType)
+        else -> type
+    }
+
     fun process(type: Type) = when (type) {
-        is TypeAlias -> process(type)
+        is TypeAlias  -> process(type)
         is AtomicType -> process(type)
+        is StructType -> process(type)
         else -> type
     }
 

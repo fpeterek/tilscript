@@ -1,5 +1,6 @@
 package org.fpeterek.tilscript.interpreter.astprocessing
 
+import org.fpeterek.tilscript.common.die
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.interpreter.astprocessing.result.*
 import org.fpeterek.tilscript.interpreter.astprocessing.result.Construction.*
@@ -126,15 +127,19 @@ class ASTConverter private constructor() {
             }
         }
 
-        val vars = structDef.vars.map {
-            Variable(
-                it.name,
-                it.position,
-                if (it.type != null) { convertDataType(it.type) } else { Unknown }
+        val type = StructType(structDef.name)
+
+        structDef.vars.forEach {
+            type.addAttribute(
+                Variable(
+                    it.name,
+                    it.position,
+                    convertDataType(it.type ?: die("Type of struct attribute must be known", it.position))
+                )
             )
         }
 
-        val type = StructType(structDef.name, vars)
+        repo.process(type)
 
         return StructDefinition(type, structDef.position, reports)
     }

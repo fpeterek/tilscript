@@ -555,8 +555,53 @@ class Interpreter: InterpreterInterface {
         topLevelFrame.putVar(varDef.variable.withValue(value))
     }
 
+    private fun declareStruct(structDefinition: StructDefinition) {
+        if (structDefinition.struct.name !in typeRepo) {
+            typeRepo.process(StructType(structDefinition.struct.name))
+        }
+    }
+
     private fun interpret(structDefinition: StructDefinition) {
-        val struct = structDefinition.struct
+        val unprocessed = structDefinition.struct
+
+        // Catch conflicting redefinition early
+        // If the struct has been declared, but not defined, it will not be frozen yet,
+        // we want to modify the struct inside the repository
+        // If the struct has been frozen, it means the struct is already well-defined, and we just
+        // need to detect conflicting definitions
+        // The freezing mechanism allows for implementation of structs with cyclic references
+        val struct = when (unprocessed.name) {
+             in typeRepo -> {
+                 val fromRepo = typeRepo[unprocessed.name]!!
+
+                 when {
+                     fromRepo!is StructType -> die("Conflicting redefinition of type ${unprocessed.name}", structDefinition.position)
+                     !fromRepo.frozen -> fromRepo
+                     else -> StructType(unprocessed.name)
+                 }
+             }
+            else -> StructType(unprocessed.name)
+        }
+
+        unprocessed.attributes.forEach {
+            if (it.constructedType.name !in typeRepo) {
+                die("Unknown type ${it.constructedType}", it.position)
+            }
+            if (it.constructedType.isGeneric) {
+                die("Struct attributes cannot be of a generic type", it.position)
+            }
+
+            // When converting AST, type can be marked as atomic instead of struct if the struct
+            // is unknown at the time of parsing
+            // Thus, we must convert atomic types to structs when necessary
+            val type = when (it.constructedType) {
+                is AtomicType -> typeRepo[it.name]!!
+                else -> it.constructedType
+            }
+            val attr = Variable(it.name, type = type, srcPos = it.position)
+
+            struct.addAttribute(attr)
+        }
 
         if (struct.name in typeRepo) {
             if (!(struct matches typeRepo[struct.name]!!)) {
@@ -566,13 +611,8 @@ class Interpreter: InterpreterInterface {
             return
         }
 
-        struct.attributes.forEach {
-            if (it.constructedType.isGeneric) {
-                die("Struct attributes cannot be of a generic type", it.position)
-            }
-        }
-
-        typeRepo.process(struct)
+        struct.freeze()
+//        typeRepo.process(struct)
     }
 
     private fun interpret(declaration: Declaration) {
@@ -657,8 +697,20 @@ class Interpreter: InterpreterInterface {
         }
         .forEach(::tryInterpret)
 
+    private fun declareStructs(sentences: List<Sentence>) = sentences
+        .asSequence()
+        .filterIsInstance<StructDefinition>()
+        .forEach(::declareStruct)
+
+    private fun defineStructs(sentences: List<Sentence>) = sentences
+        .asSequence()
+        .filterIsInstance<StructDefinition>()
+        .forEach(::interpret)
+
     private fun interpret(sentences: List<Sentence>) {
+        declareStructs(sentences)
         interpretTypeAliases(sentences)
+        defineStructs(sentences)
         interpretDefinitions(sentences)
         interpretRest(sentences)
     }
