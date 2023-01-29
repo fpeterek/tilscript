@@ -49,6 +49,11 @@ class ASTConverter private constructor() {
 
     private fun convert(file: String, sentences: Sentences): ScriptContext {
 
+        sentences.sentences
+            .asSequence()
+            .filterIsInstance<StructDefinition>()
+            .forEach(::defineStructs)
+
         // We run definitions/declarations first to ensure they are processed first and the symbols get into
         // the repos before analyzing any constructions
         // We discard the results because we do not need them and because the analysis will likely be wrong
@@ -66,6 +71,10 @@ class ASTConverter private constructor() {
             filename=file,
             sentences=sentences.sentences.map(::convertSentence),
         )
+    }
+
+    private fun defineStructs(def: StructDefinition) {
+        repo.process(StructType(def.struct.name))
     }
 
     private fun convertDefn(def: FunDefinition): FunctionDefinition {

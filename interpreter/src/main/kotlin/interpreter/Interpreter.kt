@@ -346,7 +346,7 @@ class Interpreter: InterpreterInterface {
             value = (value.value as Struct)[it]!!
         }
 
-        return value
+        return value.value ?: Nil(attrRef.position, reason = "Struct attribute is Nil")
     }
 
     private fun interpret(cons: StructConstructor): Construction {
@@ -358,7 +358,8 @@ class Interpreter: InterpreterInterface {
         }
 
         if (cons.args.size != type.attributes.size) {
-            die("Invalid number of arguments in constructor of struct ${cons.struct.name}", cons.position)
+            die("Invalid number of arguments in constructor of struct ${cons.struct.name} " +
+                    "(expected: ${type.attributes.size}, received: ${cons.args.size})", cons.position)
         }
 
         val interpreted = mutableListOf<Construction>()
@@ -532,7 +533,7 @@ class Interpreter: InterpreterInterface {
             val declared = topLevelFrame[varDef.name]!!
 
             if (declared.value != null) {
-                die("Redefinition of variable '${varDef.name}' with a new value", varDef.position)
+                die("Redefinition of variable '${varDef.name}' with a var value", varDef.position)
             }
 
             if (!(declared.constructedType matches varDef.constructsType)) {
@@ -584,7 +585,8 @@ class Interpreter: InterpreterInterface {
         }
 
         unprocessed.attributes.forEach {
-            if (it.constructedType.name !in typeRepo) {
+            if ((it.constructedType is AtomicType || it.constructedType is StructType || it.constructedType is TypeAlias)
+                    && it.constructedType.name !in typeRepo) {
                 die("Unknown type ${it.constructedType}", it.position)
             }
             if (it.constructedType.isGeneric) {
@@ -595,7 +597,7 @@ class Interpreter: InterpreterInterface {
             // is unknown at the time of parsing
             // Thus, we must convert atomic types to structs when necessary
             val type = when (it.constructedType) {
-                is AtomicType -> typeRepo[it.name]!!
+                is AtomicType -> typeRepo[it.constructedType.name]!!
                 else -> it.constructedType
             }
             val attr = Variable(it.name, type = type, srcPos = it.position)
@@ -607,12 +609,9 @@ class Interpreter: InterpreterInterface {
             if (!(struct matches typeRepo[struct.name]!!)) {
                 die("Conflicting redefinition of struct ${struct.name}", structDefinition.position)
             }
-
-            return
         }
 
         struct.freeze()
-//        typeRepo.process(struct)
     }
 
     private fun interpret(declaration: Declaration) {
@@ -693,7 +692,8 @@ class Interpreter: InterpreterInterface {
             it is FunctionDefinition  ||
             it is VariableDeclaration ||
             it is TypeDefinition      ||
-            it is LiteralDeclaration
+            it is LiteralDeclaration  ||
+            it is StructDefinition
         }
         .forEach(::tryInterpret)
 
@@ -724,7 +724,12 @@ class Interpreter: InterpreterInterface {
 
         val reg = Class.forName(registrar).constructors.first().newInstance() as SymbolRegistrar
 
-        reg.functions.asSequence().forEach {
+        val structs = reg.structs.map { it.toDefinition() }
+
+        structs.forEach(::declareStruct)
+        structs.forEach(::interpret)
+
+        reg.functions.forEach {
             if (it !is DefaultFunction) {
                 die("Only instances of DefaultFunction can be registered")
             }

@@ -60,7 +60,7 @@ class Struct(
         Struct(attributes, position, structType, reports + iterable)
 
     private fun attrString() =
-        attributes.asSequence().map { "${it.name}: ${it.value}" }.joinToString(" ")
+        attributes.asSequence().map { "${it.name}=${it.value}" }.joinToString(" ")
 
     override fun toString() = "{${structType.name} ${attrString()}}"
 }
@@ -282,7 +282,7 @@ class ListCell(
         else -> " ${tail.contentsStr()}"
     }
 
-    override fun contentsStr(): String = "'$head${tailStr()}"
+    override fun contentsStr(): String = "$head${tailStr()}"
 
     override fun toString() = "['ListOf ${contentsStr()}]"
 

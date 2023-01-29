@@ -71,6 +71,18 @@ class TypeMatcher private constructor(val types: TypeRepository) {
         l is TypeAlias -> matchAlias(l, r)
         r is TypeAlias -> matchAlias(r, l)
 
+        // I know this is a bad solution, but I do not have the time to rewrite everything
+        // This is essentially matching by name, which can cause problems at times.
+        // A smarter, safer solution would require a larger rewrite
+        // Sometimes struct types can be marked as primitive types due to a lack of contextual information
+        // Since the user can't define custom primitive types, we can use this hack to match incorrectly classified types
+        l is AtomicType && r is StructType -> l.name == r.name
+        r is AtomicType && l is StructType -> l.name == r.name
+
+        // Same as above
+        l is AtomicType && l.name in types && types[l.name]!! is TypeAlias -> match(types[l.name]!!, r)
+        r is AtomicType && r.name in types && types[r.name]!! is TypeAlias -> match(types[r.name]!!, l)
+
         l.javaClass != r.javaClass -> false
         else -> matchInternal(l, r)
     }
