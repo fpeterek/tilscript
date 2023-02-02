@@ -55,9 +55,11 @@ object Util {
     val TypeAlias.isGeneric        get() = type.isGeneric
     val Unknown.isGeneric          get() = false
     val StructType.isGeneric       get() = false
+    val TypeName.isGeneric         get() = false
 
     val Type.isGeneric: Boolean
         get() = when (this) {
+            is TypeName         -> isGeneric
             is AtomicType       -> isGeneric
             is ConstructionType -> isGeneric
             is FunctionType     -> isGeneric

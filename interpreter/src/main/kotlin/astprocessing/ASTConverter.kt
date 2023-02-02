@@ -13,6 +13,7 @@ import org.fpeterek.tilscript.common.sentence.Symbol
 import org.fpeterek.tilscript.common.sentence.Trivialization
 import org.fpeterek.tilscript.common.sentence.Variable
 import org.fpeterek.tilscript.common.types.*
+import org.fpeterek.tilscript.common.types.TypeName as UnknownTypeName
 import org.fpeterek.tilscript.common.types.TypeAlias as TilTypeAlias
 import org.fpeterek.tilscript.common.sentence.Construction as TilConstruction
 import org.fpeterek.tilscript.common.sentence.Execution as TilExecution
@@ -415,7 +416,7 @@ class ASTConverter private constructor() {
         else -> convertAtomicType(type)
     }
 
-    private fun convertAtomicType(type: DataType.PrimitiveType) = AtomicType(name=type.name)
+    private fun convertAtomicType(type: DataType.PrimitiveType) = UnknownTypeName(name=type.name)
         .apply { repo.process(this) }
 
     private val DataType.PrimitiveType.isGenericType

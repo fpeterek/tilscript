@@ -18,8 +18,8 @@ struct Tree {
 let myTree: Tree = {Tree
     '1
     ['ListOf 
-        {Tree '2 ['EmptyListOf 'Tree]}
-        {Tree '3 ['ListOf {Tree '4 ['EmptyListOf 'Tree]}]}]}.
+        {Tree '2 {List<Tree> }}
+        {Tree '3 ['ListOf {Tree '4 {List<Tree> } }]}]}.
 
 defn MaxOf(fst: Int, snd: Int) -> Int = 
     ['If
@@ -36,7 +36,7 @@ defn Max(lst: List<Int>) -> Int = ['MaxInt ['Tail lst] ['Head lst]].
 
 defn Depths(trees: List<Tree>) -> List<Int> =
     ['If
-        ['IsEmpty trees] ['EmptyListOf 'Int]
+        ['IsEmpty trees] {List<Int> }
         'True ['Cons 
                     ['Depth ['Head trees]] 
                     ['Depths ['Tail trees]]]].

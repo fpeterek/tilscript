@@ -2,7 +2,7 @@ package org.fpeterek.tilscript.interpreter.interpreter
 
 import org.fpeterek.tilscript.common.types.*
 
-class TypeMatcher private constructor(val types: TypeRepository) {
+class TypeMatcher private constructor(private val types: TypeRepository) {
 
     companion object {
         fun match(l: Type, r: Type, types: TypeRepository) =
@@ -39,12 +39,15 @@ class TypeMatcher private constructor(val types: TypeRepository) {
             it.first.name == it.second.name && match(it.first.constructedType, it.second.constructedType)
         }
 
+    private fun matchTypeNames(l: TypeName, r: TypeName) = l.name == r.name
+
     private fun matchInternal(l: Type, r: Type) = when (l) {
         is AtomicType   -> matchAtomics(l, r as AtomicType)
         is FunctionType -> matchFunctions(l, r as FunctionType)
         is ListType     -> matchLists(l, r as ListType)
         is TupleType    -> matchTuples(l, r as TupleType)
         is StructType   -> matchStructs(l, r as StructType)
+        is TypeName     -> matchTypeNames(l, r as TypeName)
 
         ConstructionType, Unknown -> true
 
@@ -76,12 +79,12 @@ class TypeMatcher private constructor(val types: TypeRepository) {
         // A smarter, safer solution would require a larger rewrite
         // Sometimes struct types can be marked as primitive types due to a lack of contextual information
         // Since the user can't define custom primitive types, we can use this hack to match incorrectly classified types
-        l is AtomicType && r is StructType -> l.name == r.name
-        r is AtomicType && l is StructType -> l.name == r.name
+        l is TypeName && r is StructType -> l.name == r.name
+        r is TypeName && l is StructType -> l.name == r.name
 
         // Same as above
-        l is AtomicType && l.name in types && types[l.name]!! is TypeAlias -> match(types[l.name]!!, r)
-        r is AtomicType && r.name in types && types[r.name]!! is TypeAlias -> match(types[r.name]!!, l)
+        l is TypeName && l.name in types && types[l.name]!! is TypeAlias -> match(types[l.name]!!, r)
+        r is TypeName && r.name in types && types[r.name]!! is TypeAlias -> match(types[r.name]!!, l)
 
         l.javaClass != r.javaClass -> false
         else -> matchInternal(l, r)

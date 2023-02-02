@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.common.interpreterinterface.*
 import org.fpeterek.tilscript.common.reporting.Report
 import org.fpeterek.tilscript.common.reporting.ReportFormatter
 import org.fpeterek.tilscript.common.sentence.*
+import org.fpeterek.tilscript.common.sentence.EmptyList
 import org.fpeterek.tilscript.common.types.*
 import org.fpeterek.tilscript.common.types.Util.isGeneric
 import org.fpeterek.tilscript.common.types.Util.trivialize
@@ -349,7 +350,22 @@ class Interpreter: InterpreterInterface {
         return value.value ?: Nil(attrRef.position, reason = "Struct attribute is Nil")
     }
 
+    private fun constructList(cons: StructConstructor): Construction {
+
+        if (cons.args.isNotEmpty()) {
+            die("Constructor syntax can only be used to construct empty lists. Use 'ListOf to construct a non-empty list.")
+        }
+
+        val type = (cons.struct as ListType).type
+
+        return EmptyList(valueType = type, srcPos = cons.position)
+    }
+
     private fun interpret(cons: StructConstructor): Construction {
+
+        if (cons.struct is ListType) {
+            return constructList(cons)
+        }
 
         val type = typeRepo[cons.struct.name]
 
@@ -585,7 +601,8 @@ class Interpreter: InterpreterInterface {
         }
 
         unprocessed.attributes.forEach {
-            if ((it.constructedType is AtomicType || it.constructedType is StructType || it.constructedType is TypeAlias)
+            if ((it.constructedType is AtomicType || it.constructedType is StructType ||
+                    it.constructedType is TypeAlias || it.constructedType is TypeName)
                     && it.constructedType.name !in typeRepo) {
                 die("Unknown type ${it.constructedType}", it.position)
             }
@@ -593,11 +610,8 @@ class Interpreter: InterpreterInterface {
                 die("Struct attributes cannot be of a generic type", it.position)
             }
 
-            // When converting AST, type can be marked as atomic instead of struct if the struct
-            // is unknown at the time of parsing
-            // Thus, we must convert atomic types to structs when necessary
             val type = when (it.constructedType) {
-                is AtomicType -> typeRepo[it.constructedType.name]!!
+                is TypeName -> typeRepo[it.constructedType.name]!!
                 else -> it.constructedType
             }
             val attr = Variable(it.name, type = type, srcPos = it.position)
