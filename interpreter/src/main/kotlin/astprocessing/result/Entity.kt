@@ -6,10 +6,12 @@ sealed class Entity(srcPos: SrcPosition) : IntermediateResult(srcPos) {
 
     companion object {
         fun from(ir: IntermediateResult) = when (ir) {
-            is Numeric -> Number(ir.value, ir.position)
-            is Symbol -> FnOrEntity(ir.symbol, ir.position)
-            is EntityName -> FnOrEntity(ir.name, ir.position)
-            is StringLit -> ir
+            is Numeric          -> Number(ir.value, ir.position)
+            is Symbol           -> FnOrEntity(ir.symbol, ir.position)
+            is EntityName       -> FnOrEntity(ir.name, ir.position)
+            is StringLit        -> ir
+            is Construction.Nil -> FnOrEntity("Nil", ir.position)
+
             else -> throw RuntimeException("Parser error: unexpected type ${ir.javaClass}")
         }
     }

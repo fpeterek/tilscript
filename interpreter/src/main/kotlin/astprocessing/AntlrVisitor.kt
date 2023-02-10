@@ -60,7 +60,7 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         srcPos=ctx.position(),
     )
 
-    override fun visitConstruction(ctx: TILScriptParser.ConstructionContext): Construction = when {
+    override fun visitNonNilConstruction(ctx: TILScriptParser.NonNilConstructionContext): Construction = when {
         ctx.variable()          != null -> visitVariable(ctx.variable())
         ctx.closure()           != null -> visitClosure(ctx.closure())
         ctx.nExecution()        != null -> visitNExecution(ctx.nExecution())
@@ -74,6 +74,13 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
             null -> it
             else -> it.extensionalize(ctx.WT().position())
         }
+    }
+
+    override fun visitConstruction(ctx: TILScriptParser.ConstructionContext): Construction = when {
+        ctx.nonNilConstruction() != null -> visitNonNilConstruction(ctx.nonNilConstruction())
+        ctx.nil()                != null -> visitNil(ctx.nil())
+
+        else -> invalidState()
     }
 
     override fun visitStructConstructor(ctx: TILScriptParser.StructConstructorContext): Construction =
@@ -158,10 +165,11 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
     override fun visitTrivialization(ctx: TILScriptParser.TrivializationContext) = Construction.Execution(
         order=0,
         construction = when {
-            ctx.entity()       != null -> visitEntity(ctx.entity())
-            ctx.construction() != null -> visitConstruction(ctx.construction())
-            ctx.dataType()     != null -> visitDataType(ctx.dataType())
-            else                       -> invalidState()
+            ctx.nonNilEntity()       != null -> visitNonNilEntity(ctx.nonNilEntity())
+            ctx.nonNilConstruction() != null -> visitNonNilConstruction(ctx.nonNilConstruction())
+            ctx.dataType()           != null -> visitDataType(ctx.dataType())
+
+            else -> invalidState()
         },
         srcPos=ctx.position(),
     )
@@ -218,7 +226,7 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         ctx.position()
     )
 
-    override fun visitEntity(ctx: TILScriptParser.EntityContext) = Entity.from(
+    override fun visitNonNilEntity(ctx: TILScriptParser.NonNilEntityContext) = Entity.from(
         when {
             ctx.entityName() != null -> visitEntityName(ctx.entityName())
             ctx.number()     != null -> visitNumber(ctx.number())
@@ -228,6 +236,16 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
             else -> invalidState()
         }
     )
+
+    override fun visitEntity(ctx: TILScriptParser.EntityContext) =
+        when {
+            ctx.nil()          != null -> Entity.from(visitNil(ctx.nil()))
+            ctx.nonNilEntity() != null -> visitNonNilEntity(ctx.nonNilEntity())
+
+            else -> invalidState()
+        }
+
+    override fun visitNil(ctx: TILScriptParser.NilContext) = Construction.Nil(srcPos = ctx.position()).apply { println("Visiting nil") }
 
     private fun String.unescape() = StringEscapeUtils.unescapeJava(this)
 

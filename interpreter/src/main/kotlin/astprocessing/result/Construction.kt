@@ -14,6 +14,8 @@ sealed class Construction(srcPos: SrcPosition) : IntermediateResult(srcPos) {
         srcPos
     )
 
+    class Nil(srcPos: SrcPosition) : Construction(srcPos)
+
     class VarRef(val name: String, srcPos: SrcPosition) : Construction(srcPos) {
         constructor(varName: VarName, srcPos: SrcPosition) : this(varName.name, srcPos)
     }

@@ -1,0 +1,3 @@
+-- Doesn't fail to parse but constructs Nil
+['ListOf '1 Nil].
+

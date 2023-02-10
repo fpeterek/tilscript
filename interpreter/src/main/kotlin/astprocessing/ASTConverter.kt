@@ -9,6 +9,7 @@ import org.fpeterek.tilscript.interpreter.interpreter.TypeRepository
 import org.fpeterek.tilscript.interpreter.interpreter.ScriptContext
 import org.fpeterek.tilscript.stdlib.*
 import org.fpeterek.tilscript.common.sentence.*
+import org.fpeterek.tilscript.common.sentence.Nil
 import org.fpeterek.tilscript.common.sentence.Symbol
 import org.fpeterek.tilscript.common.sentence.Trivialization
 import org.fpeterek.tilscript.common.sentence.Variable
@@ -161,6 +162,7 @@ class ASTConverter private constructor() {
         is VarRef            -> convertVarRef(construction)
         is AttributeRef      -> convertAttrRef(construction)
         is StructConstructor -> convertStructCons(construction)
+        is Construction.Nil  -> Nil(construction.position)
     }
 
     private fun convertStructCons(cons: StructConstructor): TilStructCons = TilStructCons(

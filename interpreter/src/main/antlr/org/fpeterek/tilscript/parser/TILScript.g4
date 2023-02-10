@@ -33,7 +33,8 @@ funDefinition : DEFN entityName OPEN_PAR typedVariables? CLOSE_PAR ARROW dataTyp
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 
-construction : (trivialization | variable | closure | nExecution | composition | structConstructor) WT?;
+nonNilConstruction : (trivialization | variable | closure | nExecution | composition | structConstructor) WT?;
+construction : (nonNilConstruction | nil);
 
 structConstructor : OPEN_CUR dataType construction* CLOSE_CUR;
 
@@ -57,7 +58,7 @@ variable : variableName | structAttribute;
 
 structAttribute : variableName ARROW variableName (ARROW variableName)*;
 
-trivialization : TRIVIALIZE (construction | entity | dataType);
+trivialization : TRIVIALIZE (nonNilConstruction | nonNilEntity | dataType);
 
 composition : OPEN_BRA construction (construction | (construction))* CLOSE_BRA;
 
@@ -73,7 +74,8 @@ optTypedVariable : variableName (COLON dataType)?;
 
 typedVariable : variableName COLON dataType;
 
-entity : entityName | number | symbol | string;
+entity : nonNilEntity | nil;
+nonNilEntity : entityName | number | symbol | string;
 
 typeName : ucname;
 
@@ -96,6 +98,8 @@ ucname : UCNAME;
 lcname : LCNAME;
 
 string: STRING_LITERAL;
+
+nil : NIL;
 
 // String literals were kindly borrowed from over here
 // https://github.com/antlr/grammars-v4/blob/master/c/C.g4
@@ -178,6 +182,7 @@ DEFN        : 'defn';
 DEF         : 'def';
 LET         : 'let';
 IMPORT      : 'import';
+NIL         : 'Nil';
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
