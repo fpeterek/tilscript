@@ -1,12 +1,12 @@
-import "fns.tils".
+Import "fns.tils".
 
-let x: World.
-let y: World.
-let z: Time.
+x -> World.
+y -> World.
+z -> Time.
 
-let a: Int = '1.
-let b: Int = '1.
-let c: Int = '2.
+a -> Int := '1.
+b -> Int := '1.
+c -> Int := '2.
 
 ['PrintRes '['= 'x 'x]].
 ['PrintRes '['= 'x 'y]].
@@ -25,23 +25,23 @@ let c: Int = '2.
 
 ['PrintRes
   '['=
-    '[\x: Int, y: Int -> Int: ['+ x y]]
-    '[\x: Int, y: Int -> Int: ['+ x y]]]].
+    '[\x: Int, y: Int -> Int ['+ x y]]
+    '[\x: Int, y: Int -> Int ['+ x y]]]].
 
 ['PrintRes
   '['=
-    '[\x: Int, y: Int -> Int: ['+ x y]]
-    '[\x: Int, y: Int -> Int: ['+ y x]]]].
+    '[\x: Int, y: Int -> Int ['+ x y]]
+    '[\x: Int, y: Int -> Int ['+ y x]]]].
 
 ['PrintRes
   '['=
-    [\x: Int, y: Int -> Int: ['+ x y]]
-    [\x: Int, y: Int -> Int: ['+ x y]]]].
+    [\x: Int, y: Int -> Int ['+ x y]]
+    [\x: Int, y: Int -> Int ['+ x y]]]].
 
 ['PrintRes
   '['=
-    [\x: Int, y: Int -> Int: ['+ x y]]
-    [\x: Int, y: Int -> Int: ['+ y x]]]].
+    [\x: Int, y: Int -> Int ['+ x y]]
+    [\x: Int, y: Int -> Int ['+ y x]]]].
 
 ['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '1 '2 '3]]].
 ['PrintRes '['= ['MkTuple '1 '2 '3] ['MkTuple '3 '2 '1]]].

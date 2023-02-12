@@ -1,21 +1,21 @@
 
-defn Divisible(num: Int, divisor: Int) -> Bool =
+Defn Divisible(num: Int, divisor: Int) -> Bool :=
     ['If
         ['= num '0] 'True
         ['< num '0] 'False
         'True       ['Divisible ['- num divisor] divisor]].
 
-defn PrintRes(cons: Construction) -> Bool =
+Defn PrintRes(cons: Construction) -> Bool :=
     ['Progn
         ['Print cons]
         ['Print '": "]
         ['Println ^2 cons]
         'True].
 
-defn DruhaMocnina(x: Int) -> Int = ['* x x].
+Defn DruhaMocnina(x: Int) -> Int := ['* x x].
 
-defn Add(x: Int, y: Int) -> Int = ['+ x y].
+Defn Add(x: Int, y: Int) -> Int := ['+ x y].
 
-defn NullaryFn() -> Time = ['Now].
+Defn NullaryFn() -> Time := ['Now].
 
-defn CreateEmptyList(type: Type) -> List<Any<1>> = ['EmptyListOf type].
+Defn CreateEmptyList(type: Type) -> List(Any1) := ['EmptyListOf type].

@@ -203,18 +203,6 @@ class AntlrVisitor(private val filename: String) : TILScriptBaseVisitor<Intermed
         srcPos=ctx.position(),
     )
 
-    override fun visitOptTypedVariable(ctx: TILScriptParser.OptTypedVariableContext): TypedVar {
-
-        val variable = visitVariableName(ctx.variableName()).name
-
-        val type = when {
-            ctx.dataType() == null -> null
-            else -> visitDataType(ctx.dataType())
-        }
-
-        return TypedVar(variable, type, ctx.position())
-    }
-
     override fun visitTypedVariables(ctx: TILScriptParser.TypedVariablesContext?) = when (ctx) {
         null -> TypedVars(listOf(), SrcPosition(-1, -1))
         else -> TypedVars(ctx.typedVariable().map(::visitTypedVariable), ctx.position())

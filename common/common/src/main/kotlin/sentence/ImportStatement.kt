@@ -14,6 +14,6 @@ class ImportStatement(
     override fun withReports(iterable: Iterable<Report>) =
         ImportStatement(file, position, reports + iterable)
 
-    override fun toString() = "import \"$file\""
+    override fun toString() = "Import \"$file\""
 
 }

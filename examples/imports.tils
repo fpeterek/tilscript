@@ -1,5 +1,5 @@
-import "fns.tils".
+Import "fns.tils".
 
 
-defn Sub(x: Int, y: Int) -> Int = ['- x y].
+Defn Sub(x: Int, y: Int) -> Int := ['- x y].
 

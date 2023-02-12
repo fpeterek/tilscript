@@ -27,5 +27,5 @@ class AttributeReference(
     override fun withReports(iterable: Iterable<Report>) =
         AttributeReference(attrs, position, constructedType, reports + iterable)
 
-    override fun toString() = attrs.joinToString("->")
+    override fun toString() = attrs.joinToString("::")
 }

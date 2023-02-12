@@ -37,7 +37,7 @@ class TypeDefinition(
     override fun withReports(iterable: Iterable<Report>) =
         TypeDefinition(alias, position, reports + iterable)
 
-    override fun toString() = "${alias.name} := ${alias.type}"
+    override fun toString() = "TypeDef ${alias.name} := ${alias.type}"
 }
 
 class StructDefinition(
@@ -52,7 +52,7 @@ class StructDefinition(
     private fun attrString() =
         struct.attributes.asSequence().map { "${it.name}: ${it.constructedType}" }.joinToString(",")
 
-    override fun toString() = "struct ${struct.name} { ${attrString()} }."
+    override fun toString() = "Struct ${struct.name} { ${attrString()} }."
 }
 
 class VariableDeclaration(
@@ -89,7 +89,7 @@ class VariableDefinition(
         name, constructsType, construction, position, reports + iterable
     )
 
-    override fun toString() = "let $name -> $constructsType = $construction"
+    override fun toString() = "$name -> $constructsType := $construction"
 }
 
 class FunctionDeclaration(
@@ -137,5 +137,5 @@ class FunctionDefinition(
     override fun withReport(report: Report) = withReports(listOf(report))
 
     override fun toString() =
-        "defn $name(${args.joinToString(", ")}) -> ${constructsType.name} = $construction"
+        "Defn $name(${args.joinToString(", ")}) -> ${constructsType.name} := $construction"
 }

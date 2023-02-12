@@ -1,5 +1,5 @@
-import "imports.tils".
-import "fns.tils".
+Import "imports.tils".
+Import "fns.tils".
 
 
 ['PrintRes '['Sub '5 '2]].

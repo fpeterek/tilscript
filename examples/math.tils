@@ -1,6 +1,6 @@
-import "class://org.fpeterek.tilscript.math.Registrar".
+Import "class://org.fpeterek.tilscript.math.Registrar".
 
-import "fns.tils".
+Import "fns.tils".
 
 ['PrintRes '['Sin 'Pi]].
 

@@ -1,4 +1,4 @@
-import "fns.tils".
+Import "fns.tils".
 
 ['PrintRes '['TextToInt '"123"]].
 -- ['PrintRes '['TextToInt '"123a"]].

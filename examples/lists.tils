@@ -1,6 +1,6 @@
-import "fns.tils".
+Import "fns.tils".
 
-['PrintRes '{ 'Time, 'List<Int>, 'Tuple<World, Real> }].
+['PrintRes '['ListOf 'Time 'List(Int) 'Tuple(World, Real) ]].
 
 ['PrintRes '['EmptyListOf 'World]].
 
@@ -10,15 +10,15 @@ import "fns.tils".
 
 ['PrintRes '['IsEmpty ['EmptyListOf 'Int]]].
 
-defn Map(list: List<Any<1>>, fn: (Any<2> Any<1>)) -> List<Any<2>> =
+Defn Map(list: List(Any1), fn: (Any2 Any1)) -> List(Any2) :=
     ['If
         ['IsEmpty list] ['EmptyListOf ['FunctionImageType fn]]
         'True ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]].
 
-['Println ['TypeOf [\x: Int -> Int: ['* x x]]]].
+['Println ['TypeOf [\x: Int -> Int ['* x x]]]].
 
-['Println ['Map ['ListOf '1 '2 '3 ] [\x: Int -> Int: ['* x x]] ]].
+['Println ['Map ['ListOf '1 '2 '3 ] [\x: Int -> Int ['* x x]] ]].
 
-defn Square(x: Int) -> Int = ['* x x].
+Defn Square(x: Int) -> Int := ['* x x].
 
 ['Println ['Map ['ListOf '1 '2 '3 ] 'Square]].

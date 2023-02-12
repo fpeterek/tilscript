@@ -1,8 +1,8 @@
-import "fns.tils".
+Import "fns.tils".
 
-let t1: Time = ['ToTime '12].
-let t2: Time = ['ToTime '13].
-let t3: Time = ['ToTime '12].
+t1 -> Time := ['ToTime '12].
+t2 -> Time := ['ToTime '13].
+t3 -> Time := ['ToTime '12].
 
 ['PrintRes '['Now]].
 ['PrintRes '['TypeOf ['Now]]].

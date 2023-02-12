@@ -1,11 +1,11 @@
-import "fns.tils".
+Import "fns.tils".
 
 
-let tuple: Tuple<Int, Real, Text> = ['MkTuple '1 '2.0 '"3"].
+tuple -> Tuple(Int, Real, Text) := ['MkTuple '1 '2.0 '"3"].
 
-let tuple2: Tuple<Int, Real, Text> = ['PrependToTuple '1 ['MkTuple '2.0 '"3"]].
+tuple2 -> Tuple(Int, Real, Text) := ['PrependToTuple '1 ['MkTuple '2.0 '"3"]].
 
-let tuple3: Tuple<Int, Real, Text> = ['PrependToTuple '1 ['PrependToTuple '2.0 ['OneTuple '"3"]]].
+tuple3 -> Tuple(Int, Real, Text) := ['PrependToTuple '1 ['PrependToTuple '2.0 ['OneTuple '"3"]]].
 
 ['PrintRes 'tuple].
 ['PrintRes 'tuple2].

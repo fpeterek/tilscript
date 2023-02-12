@@ -35,7 +35,7 @@ class Execution(
     override fun withReports(iterable: Iterable<Report>) =
         Execution(construction, executionOrder, position, constructedType, reports + iterable)
 
-    override fun toString() = "$executionOrder^$construction"
+    override fun toString() = "^$executionOrder$construction"
     override fun hashCode(): Int {
         var result = construction.hashCode()
         result = 31 * result + executionOrder

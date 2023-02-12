@@ -1,5 +1,4 @@
-
-import "fns.tils".
+Import "fns.tils".
 
 ['PrintRes '['IsComposition '['Divisible '3 '5]]].
 
@@ -10,4 +9,4 @@ import "fns.tils".
 ['PrintRes '['ExecutionOrder '^1 '1]].
 ['PrintRes '['ExecutionOrder '^2 '1]].
 
-['PrintRes '['ClosureArgs '[\x: Int, y: Int -> Int: ['+ x y]]]].
+['PrintRes '['ClosureArgs '[\x: Int, y: Int -> Int ['+ x y]]]].

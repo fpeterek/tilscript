@@ -21,15 +21,16 @@ structDefinition :
 STRUCT entityName OPEN_CUR
     typedVariable
     (COMMA typedVariable)*
+    COMMA? // Allow for trailing comma
 CLOSE_CUR;
 
 importStatement : IMPORT string;
 
 terminator : TERMINATOR;
 
-typeDefinition : TYPEDEF typeName EQUAL dataType;
+typeDefinition : TYPEDEF typeName ASSIGN dataType;
 
-funDefinition : DEFN entityName OPEN_PAR typedVariables? CLOSE_PAR ARROW dataType EQUAL construction;
+funDefinition : DEFN entityName OPEN_PAR typedVariables? CLOSE_PAR ARROW dataType ASSIGN construction;
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 
@@ -38,17 +39,17 @@ construction : (nonNilConstruction | nil);
 
 structConstructor : OPEN_CUR dataType construction* CLOSE_CUR;
 
-globalVarDecl : LET variableName (COMMA variableName)* COLON dataType;
+globalVarDecl : variableName (COMMA variableName)* ARROW dataType;
 
-globalVarDef : LET variableName COLON dataType EQUAL construction;
+globalVarDef : variableName ARROW dataType ASSIGN construction;
 
 dataType : (builtinType | listType | tupleType | userType | compoundType) TW?;
 
 builtinType : BUILTIN_TYPE;
 
-listType : LIST LESS dataType GREATER;
+listType : LIST OPEN_PAR dataType CLOSE_PAR;
 
-tupleType : TUPLE LESS dataType (COMMA dataType)* GREATER;
+tupleType : TUPLE OPEN_PAR dataType (COMMA dataType)* CLOSE_PAR;
 
 userType : typeName;
 
@@ -56,21 +57,19 @@ compoundType : OPEN_PAR dataType (dataType)* CLOSE_PAR;
 
 variable : variableName | structAttribute;
 
-structAttribute : variableName ARROW variableName (ARROW variableName)*;
+structAttribute : variableName DOUBLE_COLON variableName (DOUBLE_COLON variableName)*;
 
 trivialization : TRIVIALIZE (nonNilConstruction | nonNilEntity | dataType);
 
-composition : OPEN_BRA construction (construction | (construction))* CLOSE_BRA;
+composition : OPEN_BRA construction (construction)* CLOSE_BRA;
 
-closure : OPEN_BRA lambdaVariables (ARROW dataType)? COLON (construction | (construction)) CLOSE_BRA;
+closure : OPEN_BRA lambdaVariables (ARROW dataType)? (construction) CLOSE_BRA;
 
 lambdaVariables : LAMBDA typedVariables;
 
 nExecution : EXEC (construction | entity);
 
 typedVariables : typedVariable (COMMA typedVariable)*;
-
-optTypedVariable : variableName (COLON dataType)?;
 
 typedVariable : variableName COLON dataType;
 
@@ -152,37 +151,38 @@ BUILTIN_TYPE : 'Bool'
              | 'Construction'
              | ANY;
 
-ANY : 'Any' LESS DIGIT* GREATER;
+ANY : 'Any' DIGIT+;
 
-STRUCT      : 'struct';
-EXEC        : '^' [12];
-LAMBDA      : '\\';
-TRIVIALIZE  : '\'';
-OPEN_BRA    : '[';
-CLOSE_BRA   : ']';
-OPEN_PAR    : '(';
-CLOSE_PAR   : ')';
-OPEN_CUR    : '{';
-CLOSE_CUR   : '}';
-LESS        : '<';
-GREATER     : '>';
-ARROW       : '->';
-TERMINATOR  : '.';
-COMMA       : ',';
-COLON       : ':';
-PLUS        : '+';
-MINUS       : '-';
-EQUAL       : '=';
-FS          : '/';
-ASTERISK    : '*';
-TYPEDEF     : 'typedef';
-LIST        : 'List';
-TUPLE       : 'Tuple';
-DEFN        : 'defn';
-DEF         : 'def';
-LET         : 'let';
-IMPORT      : 'import';
-NIL         : 'Nil';
+STRUCT       : 'Struct';
+EXEC         : '^' [12];
+LAMBDA       : '\\';
+TRIVIALIZE   : '\'';
+OPEN_BRA     : '[';
+CLOSE_BRA    : ']';
+OPEN_PAR     : '(';
+CLOSE_PAR    : ')';
+OPEN_CUR     : '{';
+CLOSE_CUR    : '}';
+LESS         : '<';
+GREATER      : '>';
+ARROW        : '->';
+TERMINATOR   : '.';
+COMMA        : ',';
+DOUBLE_COLON : '::';
+COLON        : ':';
+PLUS         : '+';
+MINUS        : '-';
+ASSIGN       : ':=';
+EQUAL        : '=';
+FS           : '/';
+ASTERISK     : '*';
+TYPEDEF      : 'TypeDef';
+LIST         : 'List';
+TUPLE        : 'Tuple';
+DEFN         : 'Defn';
+LET          : 'Let';
+IMPORT       : 'Import';
+NIL          : 'Nil';
 
 UCNAME : [A-Z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;
 LCNAME : [a-z] ([A-Za-z_0-9ěščřýáďéíňóúůťžĚŠČŘÝÁĎÉÍŇÓÚŮŤŽ])*;

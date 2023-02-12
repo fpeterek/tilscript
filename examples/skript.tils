@@ -1,6 +1,6 @@
-import "symbols.tils".
-import "vars/vars.tils".
-import "fns.tils".
+Import "symbols.tils".
+Import "vars/vars.tils".
+Import "fns.tils".
 
 ['/ '4 '2].
 ['/ '6 '2].
@@ -26,11 +26,11 @@ import "fns.tils".
 
 ['* '3 '4].
 
-['Println [\w: World -> (((Bool Indiv Construction) Time) World):
-                [\t:Time -> ((Bool Indiv Construction) Time):
+['Println [\w: World -> (((Bool Indiv Construction) Time) World)
+                [\t:Time -> ((Bool Indiv Construction) Time)
                         ['Seek@wt 'Tilman '['Lastdec 'Pi]]]]].
 
-['Println '[\y:Int: [\x:Int: ['+ y  x]]]].
+['Println '[\y:Int [\x:Int ['+ y  x]]]].
 
 ['Println '['DruhaMocnina '2]].
 ['Println list].
@@ -43,9 +43,9 @@ import "fns.tils".
 ['PrintRes '['= 'Float 'Real]].
 ['PrintRes '['TestFn '5]].
 
-defn TestFn(a: Int) -> Float = ['+ ['ToReal a] '0.5].
+Defn TestFn(a: Int) -> Float := ['+ ['ToReal a] '0.5].
 
-typedef Float = Real.
+TypeDef Float := Real.
 
 ['PrintRes '['Divisible '4 '2]].
 ['PrintRes '['Divisible '5 '2]].
@@ -54,7 +54,7 @@ typedef Float = Real.
 
 ['PrintRes '['ListOf '1 '2 '3 ]].
 
-['PrintRes '['ListOf 'Time 'List<Int> 'Tuple<World, Real> ]].
+['PrintRes '['ListOf 'Time 'List(Int) 'Tuple(World, Real) ]].
 
 ['PrintRes '['NullaryFn]].
 
