@@ -1,0 +1,16 @@
+
+x -> (Int Int) := 'Fn1.
+
+Defn Fn1(limit: Int) -> Int :=
+    ['If 
+        ['= limit '0] ['Progn ['Println '"Fn1 received zero"] '0]
+        'True ['Fn2 ['- limit '1]]].
+
+Defn Fn2(limit: Int) -> Int :=
+    ['If 
+        ['= limit '0] ['Progn ['Println '"Fn2 received zero"] '0]
+        'True ['Fn1 ['- limit '1]]].
+
+['Fn1 '5].
+['Fn1 '6].
+['Println x].
