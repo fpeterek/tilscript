@@ -151,7 +151,8 @@ BUILTIN_TYPE : 'Bool'
              | 'Construction'
              | ANY;
 
-ANY : 'Any' DIGIT+;
+// TODO: Test
+ANY : 'Any' (DIGIT | (NONZERO DIGIT+));
 
 STRUCT       : 'Struct';
 EXEC         : '^' [12];
