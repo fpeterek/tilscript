@@ -61,7 +61,7 @@ structAttribute : variableName DOUBLE_COLON variableName (DOUBLE_COLON variableN
 
 trivialization : TRIVIALIZE (nonNilConstruction | nonNilEntity | dataType);
 
-composition : OPEN_BRA construction (construction)* CLOSE_BRA;
+composition : OPEN_BRA construction (construction)+ CLOSE_BRA;
 
 closure : OPEN_BRA lambdaVariables (ARROW dataType)? (construction) CLOSE_BRA;
 
