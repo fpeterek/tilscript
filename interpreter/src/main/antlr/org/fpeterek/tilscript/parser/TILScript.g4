@@ -30,7 +30,7 @@ terminator : TERMINATOR;
 
 typeDefinition : TYPEDEF typeName ASSIGN dataType;
 
-funDefinition : DEFN entityName OPEN_PAR typedVariables? CLOSE_PAR ARROW dataType ASSIGN construction;
+funDefinition : DEFN entityName OPEN_PAR typedVariables CLOSE_PAR ARROW dataType ASSIGN construction;
 
 entityDefinition : entityName (COMMA entityName)* FS dataType;
 

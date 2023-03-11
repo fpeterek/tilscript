@@ -61,6 +61,14 @@ class Interpreter: InterpreterInterface {
         StdlibRegistrar.types.forEach(typeRepo::process)
         StdlibRegistrar.values.forEach(symbolRepo::define)
 
+        StdlibRegistrar.variables.forEach {
+            if (it.value != null) {
+                interpret(it.toDefinition())
+            } else {
+                interpret(it.toDeclaration())
+            }
+        }
+
         StdlibRegistrar.functions.forEach { fn ->
             symbolRepo.define(fn.tilFunction)
             functions[fn.name] = fn.tilFunction
@@ -748,6 +756,14 @@ class Interpreter: InterpreterInterface {
                 die("Only instances of DefaultFunction can be registered")
             }
             defineFn(it.name, it.tilFunction)
+        }
+
+        reg.variables.forEach {
+            if (it.value != null) {
+                interpret(it.toDefinition())
+            } else {
+                interpret(it.toDeclaration())
+            }
         }
 
         reg.aliases.forEach { interpret(it.toDefinition()) }

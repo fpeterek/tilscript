@@ -12,6 +12,7 @@ object TimeFunctions {
         "Now",
         Types.Time,
         listOf(
+            Variable("ds", srcPos = SrcPosition(-1, -1), type = Types.DeviceState)
         ),
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =

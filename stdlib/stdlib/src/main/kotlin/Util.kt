@@ -7,6 +7,8 @@ import org.fpeterek.tilscript.common.types.GenericType
 import org.fpeterek.tilscript.common.SrcPosition
 import org.fpeterek.tilscript.common.die
 
+import kotlin.random.Random as KtRandom
+
 object Util {
 
     object Print : NilAcceptingFunction(
@@ -88,15 +90,6 @@ object Util {
             TypeRef(args[0].constructionType, ctx.position)
     }
 
-    object GetWorld : DefaultFunction(
-        "GetWorld",
-        Types.World,
-        listOf()
-    ) {
-        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
-            World(ctx.position)
-    }
-
     object IsNil : NilAcceptingFunction(
         "IsNil",
         Types.Bool,
@@ -106,5 +99,27 @@ object Util {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             Bool(value = args[0] is Nil, srcPos = ctx.position)
+    }
+
+    object RandomInt : DefaultFunction(
+        "RandomInt",
+        Types.Int,
+        listOf(
+            Variable("ds", srcPos = SrcPosition(-1, -1), type = Types.DeviceState)
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Integral(value = KtRandom.nextLong(), srcPos = ctx.position)
+    }
+
+    object Random : DefaultFunction(
+        "Random",
+        Types.Real,
+        listOf(
+            Variable("ds", srcPos = SrcPosition(-1, -1), type = Types.DeviceState)
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Real(value = KtRandom.nextDouble(), srcPos = ctx.position)
     }
 }

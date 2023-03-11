@@ -16,6 +16,4 @@ Defn DruhaMocnina(x: Int) -> Int := ['* x x].
 
 Defn Add(x: Int, y: Int) -> Int := ['+ x y].
 
-Defn NullaryFn() -> Time := ['Now].
-
 Defn CreateEmptyList(type: Type) -> List(Any1) := ['EmptyListOf type].
