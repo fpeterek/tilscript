@@ -56,7 +56,7 @@ TypeDef Float := Real.
 
 ['PrintRes '['ListOf 'Time 'List(Int) 'Tuple(World, Real) ]].
 
-['PrintRes '['NullaryFn]].
+['PrintRes '['Now deviceState]].
 
 ['Println callsite].
 

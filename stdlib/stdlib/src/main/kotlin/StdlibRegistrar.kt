@@ -1,7 +1,11 @@
 package org.fpeterek.tilscript.stdlib
 
+import org.fpeterek.tilscript.common.SrcPosition
 import org.fpeterek.tilscript.common.interpreterinterface.SymbolRegistrar
+import org.fpeterek.tilscript.common.sentence.DeviceState
 import org.fpeterek.tilscript.common.sentence.Symbol
+import org.fpeterek.tilscript.common.sentence.Variable
+import org.fpeterek.tilscript.common.sentence.World
 import org.fpeterek.tilscript.common.types.StructType
 import org.fpeterek.tilscript.common.types.TypeAlias
 import org.fpeterek.tilscript.stdlib.constructions.*
@@ -24,8 +28,9 @@ object StdlibRegistrar : SymbolRegistrar {
         Util.Progn,
         Util.Tr,
         Util.TypeOf,
-        Util.GetWorld,
         Util.IsNil,
+        Util.Random,
+        Util.RandomInt,
 
         LogicFunctions.Not,
         LogicFunctions.And,
@@ -36,6 +41,7 @@ object StdlibRegistrar : SymbolRegistrar {
         TupleFunctions.MkTuple,
         TupleFunctions.PrependToTuple,
         TupleFunctions.Get,
+        TupleFunctions.TupleLen,
 
         TextFunctions.HeadS,
         TextFunctions.TailS,
@@ -116,4 +122,19 @@ object StdlibRegistrar : SymbolRegistrar {
     override val functionDeclarations get() = FunctionDeclarations.builtinFunctions
 
     override val structs = emptyList<StructType>()
+
+    override val variables = listOf(
+        Variable(
+            name="w",
+            srcPos = SrcPosition(-1, -1),
+            type = Types.World,
+            value = World(SrcPosition(-1, -1))
+        ),
+        Variable(
+            name="deviceState",
+            srcPos = SrcPosition(-1, -1),
+            type = Types.DeviceState,
+            value = DeviceState(SrcPosition(-1, -1))
+        ),
+    )
 }

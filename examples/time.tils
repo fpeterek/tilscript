@@ -4,8 +4,8 @@ t1 -> Time := ['ToTime '12].
 t2 -> Time := ['ToTime '13].
 t3 -> Time := ['ToTime '12].
 
-['PrintRes '['Now]].
-['PrintRes '['TypeOf ['Now]]].
+['PrintRes '['Now deviceState]].
+['PrintRes '['TypeOf ['Now deviceState]]].
 
 ['PrintRes 't1].
 ['PrintRes 't2].

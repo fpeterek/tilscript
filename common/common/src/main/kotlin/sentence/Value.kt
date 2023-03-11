@@ -122,6 +122,21 @@ class World(
     override fun hashCode() = toString().hashCode()
 }
 
+class DeviceState(
+    srcPos: SrcPosition,
+    reports: List<Report> = listOf(),
+) : Value(srcPos, Primitives.DeviceState, reports) {
+
+    override fun equals(other: Any?) = other != null && other is DeviceState
+
+    override fun withReports(iterable: Iterable<Report>) =
+        DeviceState(position, reports + iterable)
+
+    override fun toString() = "DeviceState"
+
+    override fun hashCode() = toString().hashCode()
+}
+
 class Timestamp(
     val time: Long,
     srcPos: SrcPosition,

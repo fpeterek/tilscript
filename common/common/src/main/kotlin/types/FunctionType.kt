@@ -7,6 +7,12 @@ class FunctionType(
     val argTypes: List<Type>,
 ) : Type() {
 
+    init {
+        if (argTypes.isEmpty()) {
+            throw RuntimeException("Function arity must be at least one.")
+        }
+    }
+
     companion object {
 
         operator fun invoke(vararg signature: Type) = this(signature.toList())

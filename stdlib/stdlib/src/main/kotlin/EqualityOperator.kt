@@ -73,19 +73,20 @@ object EqualityOperator : OperatorFunction(
                     this.attributes.zip(other.attributes).all { it.first eq it.second }
 
         private infix fun Value.eq(other: Value): Boolean = when (this) {
-            is Bool      -> this eq (other as Bool)
-            is Integral  -> this eq (other as Integral)
-            is Nil       -> false
-            is Real      -> this eq (other as Real)
-            is Symbol    -> this eq (other as Symbol)
-            is Text      -> this eq (other as Text)
-            is EmptyList -> this eq (other as EmptyList)
-            is ListCell  -> this eq (other as ListCell)
-            is TilTuple  -> this eq (other as TilTuple)
-            is Timestamp -> this eq (other as Timestamp)
-            is TypeRef   -> this eq (other as TypeRef)
-            is Struct    -> this eq (other as Struct)
-            is World     -> true
+            is Bool        -> this eq (other as Bool)
+            is Integral    -> this eq (other as Integral)
+            is Nil         -> false
+            is Real        -> this eq (other as Real)
+            is Symbol      -> this eq (other as Symbol)
+            is Text        -> this eq (other as Text)
+            is EmptyList   -> this eq (other as EmptyList)
+            is ListCell    -> this eq (other as ListCell)
+            is TilTuple    -> this eq (other as TilTuple)
+            is Timestamp   -> this eq (other as Timestamp)
+            is TypeRef     -> this eq (other as TypeRef)
+            is Struct      -> this eq (other as Struct)
+            is World       -> true
+            is DeviceState -> true
         }
 
         private infix fun Closure.eq(other: Closure) =
