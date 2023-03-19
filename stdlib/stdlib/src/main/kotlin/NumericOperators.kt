@@ -39,8 +39,13 @@ object NumericOperators {
                 die("Invalid argument type for operator $name, (received: $t1, expected Real or Int)", args[0].position)
             }
 
-            if (args.any { it !is Integral && it !is Real }) {
-                return Nil(ctx.position, reason="Cannot perform arithmetic operations on symbolic values")
+            args.forEach {
+                if (it is Nil) {
+                    return it
+                }
+                if (it !is Integral && it !is Real) {
+                    return Nil(it.position, reason="Cannot perform arithmetic operations on symbolic values")
+                }
             }
 
             return when (args[0]) {
