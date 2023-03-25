@@ -11,9 +11,9 @@ Import "fns.tils".
 ['PrintRes '['IsEmpty ['EmptyListOf 'Int]]].
 
 Defn Map(list: List(Any1), fn: (Any2 Any1)) -> List(Any2) :=
-    ['If
-        ['IsEmpty list] ['EmptyListOf ['FunctionImageType fn]]
-        'True ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]].
+    ['If ['IsEmpty list]
+        ['EmptyListOf ['FunctionImageType fn]]
+        ['Cons [fn ['Head list]] ['Map ['Tail list] fn]]].
 
 ['Println ['TypeOf [\x: Int -> Int ['* x x]]]].
 

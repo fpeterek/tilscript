@@ -56,6 +56,20 @@ object Util {
         }
     }
 
+    object Cond : DefaultFunction(
+        "Cond",
+        GenericType(1),
+        listOf(
+            Variable("cond", SrcPosition(-1, -1), Types.Bool),
+            Variable("ifTrue", SrcPosition(-1, -1), GenericType(1)),
+            Variable("ifFalse", SrcPosition(-1, -1), GenericType(1)),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+            die("Cond should never be invoked", ctx.position)
+        }
+    }
+
     object Progn : DefaultFunction(
         "Progn",
         GenericType(2),

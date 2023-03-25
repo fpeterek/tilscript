@@ -25,6 +25,7 @@ object StdlibRegistrar : SymbolRegistrar {
         Util.Print,
         Util.Println,
         Util.If,
+        Util.Cond,
         Util.Progn,
         Util.Tr,
         Util.TypeOf,

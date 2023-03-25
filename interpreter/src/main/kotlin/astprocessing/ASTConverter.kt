@@ -14,6 +14,7 @@ import org.fpeterek.tilscript.common.sentence.Symbol
 import org.fpeterek.tilscript.common.sentence.Trivialization
 import org.fpeterek.tilscript.common.sentence.Variable
 import org.fpeterek.tilscript.common.types.*
+import org.fpeterek.tilscript.stdlib.Util
 import org.fpeterek.tilscript.common.types.TypeName as UnknownTypeName
 import org.fpeterek.tilscript.common.types.TypeAlias as TilTypeAlias
 import org.fpeterek.tilscript.common.sentence.Construction as TilConstruction
@@ -236,7 +237,7 @@ class ASTConverter private constructor() {
 
         return if (fn is Trivialization && fn.construction is TilFunction) {
             when ((fn.construction as TilFunction).name) {
-                "If"      -> convertIf(fn, args, composition)
+                "Cond"    -> convertIf(fn, args, composition)
                 "MkTuple" -> convertMkTuple(fn, args, composition)
                 "Progn"   -> convertProgn(fn, args, composition)
                 "ListOf"  -> convertListOf(composition)
@@ -269,7 +270,7 @@ class ASTConverter private constructor() {
                 args = args,
                 srcPos = comp.position,
                 reports = listOf(
-                    Report("If expansion expects If to receive an even number of arguments", fn.position)
+                    Report("Cond expansion expects Cond to receive an even number of arguments", fn.position)
                 )
             )
         }
@@ -278,17 +279,19 @@ class ASTConverter private constructor() {
                 function = fn,
                 args = args,
                 srcPos = comp.position,
-                reports = listOf(Report("Empty If statements not allowed", fn.position))
+                reports = listOf(Report("Empty Cond statements not allowed", fn.position))
             )
         }
 
-        var `if`: TilConstruction = Nil(srcPos = fn.position, reason="No If condition matched")
+        var `if`: TilConstruction = Nil(srcPos = fn.position, reason="No condition matched")
+
+        val ifFn = Trivialization(Util.If.tilFunction, comp.position)
 
         (args.indices.filter { it % 2 != 1 }.reversed()).forEach {
             val cond = args[it]
             val then = args[it+1]
 
-            `if` = TilComposition(fn, listOf(cond, then, `if`), srcPos=comp.position)
+            `if` = TilComposition(ifFn, listOf(cond, then, `if`), srcPos=comp.position)
         }
 
         return `if` as TilComposition

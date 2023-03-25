@@ -22,29 +22,27 @@ myTree -> Tree := {Tree
         {Tree '3 ['ListOf {Tree '4 {List(Tree) } }]}]}.
 
 Defn MaxOf(fst: Int, snd: Int) -> Int := 
-    ['If
-        ['> fst snd] fst
-        'True snd].
+    ['If ['> fst snd] fst snd].
 
 Defn MaxInt(lst: List(Int), max: Int) -> Int :=
-    ['If
-        ['IsEmpty lst] max
-        'True ['MaxInt ['Tail lst] ['MaxOf ['Head lst] max]]].
+    ['If ['IsEmpty lst]
+        max
+        ['MaxInt ['Tail lst] ['MaxOf ['Head lst] max]]].
 
 
 Defn Max(lst: List(Int)) -> Int := ['MaxInt ['Tail lst] ['Head lst]].
 
 Defn Depths(trees: List(Tree)) -> List(Int) :=
-    ['If
-        ['IsEmpty trees] {List(Int) }
-        'True ['Cons 
-                    ['Depth ['Head trees]] 
-                    ['Depths ['Tail trees]]]].
+    ['If ['IsEmpty trees]
+        {List(Int) }
+        ['Cons 
+            ['Depth ['Head trees]] 
+            ['Depths ['Tail trees]]]].
 
 Defn Depth(tree: Tree) -> Int := 
-    ['If 
-        ['IsEmpty tree::subtrees] '1
-        'True ['+ '1 ['Max ['Depths tree::subtrees]]]].
+    ['If ['IsEmpty tree::subtrees]
+        '1
+        ['+ '1 ['Max ['Depths tree::subtrees]]]].
 
 ['PrintRes 'myTree::subtrees].
 ['PrintRes '['Depth myTree]].

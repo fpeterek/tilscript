@@ -1,6 +1,6 @@
 
 Defn Divisible(num: Int, divisor: Int) -> Bool :=
-    ['If
+    ['Cond
         ['= num '0] 'True
         ['< num '0] 'False
         'True       ['Divisible ['- num divisor] divisor]].

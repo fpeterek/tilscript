@@ -275,6 +275,10 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretIf(args: List<Construction>, ctx: FnCallContext): Construction {
 
+        if (args.size != 3) {
+            die("If expects exactly three arguments (received ${args.size})", ctx.position)
+        }
+
         val cond = interpret(args[0])
 
         if (cond is Nil) {
@@ -572,9 +576,9 @@ class Interpreter: InterpreterInterface {
                     "(expected: ${varDef.constructsType}, received: ${value.constructedType})", varDef.position)
         }
 
-        if (value is Nil) {
-            die("Nil constructed when initializing variable", value.position)
-        }
+        // if (value is Nil) {
+        //     die("Nil constructed when initializing variable", value.position)
+        // }
 
         scriptContext.putVar(varDef.name, value)
         topLevelFrame.putVar(varDef.variable.withValue(value))
