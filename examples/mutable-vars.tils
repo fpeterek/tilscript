@@ -1,0 +1,9 @@
+Import "fns.tils".
+
+x -> Int := '5.
+
+['PrintRes 'x].
+
+x -> Int := ['+ x '3].
+
+['PrintRes 'x].

@@ -237,7 +237,7 @@ class ASTConverter private constructor() {
 
         return if (fn is Trivialization && fn.construction is TilFunction) {
             when ((fn.construction as TilFunction).name) {
-                "Cond"    -> convertIf(fn, args, composition)
+                "Cond"    -> convertCond(fn, args, composition)
                 "MkTuple" -> convertMkTuple(fn, args, composition)
                 "Progn"   -> convertProgn(fn, args, composition)
                 "ListOf"  -> convertListOf(composition)
@@ -263,7 +263,7 @@ class ASTConverter private constructor() {
             )
         }
 
-    private fun convertIf(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
+    private fun convertCond(fn: Trivialization, args: List<TilConstruction>, comp: Composition): TilComposition {
         if (args.size % 2 == 1) {
             return TilComposition(
                 function = fn,

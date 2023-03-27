@@ -560,9 +560,9 @@ class Interpreter: InterpreterInterface {
         if (varDef.name in topLevelFrame) {
             val declared = topLevelFrame[varDef.name]!!
 
-            if (declared.value != null) {
-                die("Redefinition of variable '${varDef.name}' with a var value", varDef.position)
-            }
+//            if (declared.value != null) {
+//                die("Redefinition of variable '${varDef.name}' with a var value", varDef.position)
+//            }
 
             if (!(declared.constructedType matches varDef.constructsType)) {
                 die("Redeclaration of variable '${varDef.name}' with a different type", varDef.position)
@@ -714,7 +714,6 @@ class Interpreter: InterpreterInterface {
     private fun interpretRest(sentences: List<Sentence>) = sentences
         .asSequence()
         .filterNot {
-            it is FunctionDeclaration ||
             it is FunctionDefinition  ||
             it is VariableDeclaration ||
             it is TypeDefinition      ||
