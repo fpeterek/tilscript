@@ -689,9 +689,7 @@ class Interpreter: InterpreterInterface {
 
     private fun interpretTypeAliases(sentences: List<Sentence>) = sentences
         .asSequence()
-        .filter {
-            it is TypeDefinition
-        }
+        .filterIsInstance<TypeDefinition>()
         .forEach(::tryInterpret)
 
     private fun interpretDefinitions(sentences: List<Sentence>) = sentences
@@ -718,7 +716,8 @@ class Interpreter: InterpreterInterface {
             it is VariableDeclaration ||
             it is TypeDefinition      ||
             it is LiteralDeclaration  ||
-            it is StructDefinition
+            it is StructDefinition    ||
+            it is ImportStatement
         }
         .forEach(::tryInterpret)
 
@@ -732,7 +731,12 @@ class Interpreter: InterpreterInterface {
         .filterIsInstance<StructDefinition>()
         .forEach(::interpret)
 
+    private fun interpretImports(sentences: List<Sentence>) = sentences
+        .filterIsInstance<ImportStatement>()
+        .forEach(::interpret)
+
     private fun interpret(sentences: List<Sentence>) {
+        interpretImports(sentences)
         declareStructs(sentences)
         interpretTypeAliases(sentences)
         defineStructs(sentences)
