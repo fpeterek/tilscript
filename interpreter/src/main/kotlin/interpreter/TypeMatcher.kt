@@ -35,9 +35,10 @@ class TypeMatcher private constructor(private val types: TypeRepository) {
     private fun matchAlias(alias: TypeAlias, other: Type) = match(alias.type, other)
 
     private fun matchStructs(l: StructType, r: StructType) =
-        l.name == r.name && l.attributes.zip(r.attributes).all {
-            it.first.name == it.second.name && match(it.first.constructedType, it.second.constructedType)
-        }
+        l.name == r.name && l.attributes.size == r.attributes.size &&
+            l.attributes.zip(r.attributes).all {
+                it.first.name == it.second.name && match(it.first.constructedType, it.second.constructedType)
+            }
 
     private fun matchTypeNames(l: TypeName, r: TypeName) = l.name == r.name
 
