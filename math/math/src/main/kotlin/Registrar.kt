@@ -16,7 +16,8 @@ class Registrar : SymbolRegistrar {
             Tan,
             Ln,
             Log,
-            Round
+            Round,
+            Sqrt,
         )
 
     override val aliases get() = emptyList<TypeAlias>()

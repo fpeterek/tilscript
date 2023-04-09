@@ -171,3 +171,24 @@ object Round : DefaultFunction(
     }
 
 }
+
+object Sqrt : DefaultFunction(
+    "Sqrt",
+    Primitives.Real,
+    listOf(
+        Variable("x", SrcPosition(-1, -1), Primitives.Real)
+    )
+) {
+
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+        val x = args[0]
+
+        if (x !is Real) {
+            return Nil(ctx.position, reason="Cannot round a symbolic value")
+        }
+
+        return Real(sqrt(x.value), ctx.position)
+    }
+
+}
