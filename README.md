@@ -2,6 +2,14 @@
 
 ### Run
 
+## tilscript.sh
+
+```sh
+./bin/tilscript.sh examples/skript.tils
+```
+
+## Manually
+
 Load .jar libraries
 
 ```sh
