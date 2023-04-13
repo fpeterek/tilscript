@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DIR_NAME=`dirname $0`
-LIBS=`ls $DIR_NAME/libs | tr '\n' ':' | sed 's/,$//'`
+LIBS=`ls $DIR_NAME/libs/*.jar | tr '\n' ':' | sed 's/,$//'`
 JAR_NAME="$DIR_NAME/tilscript.jar"
 
 if [ -z '$LIBS' ]; then
