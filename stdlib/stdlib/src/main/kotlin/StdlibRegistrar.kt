@@ -33,6 +33,7 @@ object StdlibRegistrar : SymbolRegistrar {
         Util.Exit,
         Util.Random,
         Util.RandomInt,
+        Util.NilAt,
 
         LogicFunctions.Not,
         LogicFunctions.And,
@@ -81,6 +82,8 @@ object StdlibRegistrar : SymbolRegistrar {
         IsConstruction.IsList,
         IsConstruction.IsValue,
         IsConstruction.IsTuple,
+        IsConstruction.IsConstruction,
+        IsConstruction.IsStruct,
 
         VariableFunctions.ConsVariable,
         VariableFunctions.GetVariable,

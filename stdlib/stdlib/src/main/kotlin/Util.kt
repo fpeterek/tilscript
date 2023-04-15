@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.common.types.ConstructionType
 import org.fpeterek.tilscript.common.types.GenericType
 import org.fpeterek.tilscript.common.SrcPosition
 import org.fpeterek.tilscript.common.die
+import org.fpeterek.tilscript.common.types.TupleType
 import kotlin.system.exitProcess
 
 import kotlin.random.Random as KtRandom
@@ -154,5 +155,29 @@ object Util {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             Real(value = KtRandom.nextDouble(), srcPos = ctx.position)
+    }
+
+    object NilAt : DefaultFunction(
+        "NilAt",
+        Types.Int,
+        listOf(
+            Variable("reason", srcPos = SrcPosition(-1, -1), type = Types.Text),
+            Variable("callsite", srcPos = SrcPosition(-1, -1), type = TupleType(Types.Text, Types.Int, Types.Int)),
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+            val reason = args.first()
+            val callsite = args[1]
+
+            if (reason !is Text || callsite !is TilTuple) {
+                die("NilAt arguments must not be symbolic")
+            }
+
+            val file = (callsite.values[0] as Text).value
+            val line = (callsite.values[1] as Integral).value.toInt()
+            val char = (callsite.values[2] as Integral).value.toInt()
+
+            return Nil(SrcPosition(line, char, file), reason=reason.value)
+        }
     }
 }

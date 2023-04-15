@@ -124,4 +124,27 @@ object IsConstruction {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             Bool(value = args[0].constructedType is TupleType, noPos)
     }
+
+    object IsConstruction : DefaultFunction(
+        "IsConstruction",
+        Types.Bool,
+        listOf(
+            Variable("name", noPos, GenericType(1))
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Bool(value = args[0] !is TilList && args[0] !is Symbol && args[0] !is Value && args[0] !is TilFunction &&
+                args[0] !is Struct && args[0] !is TilTuple, noPos)
+    }
+
+    object IsStruct : DefaultFunction(
+        "IsStruct",
+        Types.Bool,
+        listOf(
+            Variable("name", noPos, GenericType(1))
+        ),
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+            Bool(value = args[0] is Struct, noPos)
+    }
 }
