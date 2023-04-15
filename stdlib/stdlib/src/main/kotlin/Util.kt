@@ -6,6 +6,7 @@ import org.fpeterek.tilscript.common.types.ConstructionType
 import org.fpeterek.tilscript.common.types.GenericType
 import org.fpeterek.tilscript.common.SrcPosition
 import org.fpeterek.tilscript.common.die
+import kotlin.system.exitProcess
 
 import kotlin.random.Random as KtRandom
 
@@ -113,6 +114,24 @@ object Util {
     ) {
         override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
             Bool(value = args[0] is Nil, srcPos = ctx.position)
+    }
+
+    object Exit : DefaultFunction(
+        "Exit",
+        Types.Int,
+        listOf(
+            Variable("arg", SrcPosition(-1, -1), Types.Int)
+        )
+    ) {
+        override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+            val arg = args.first()
+
+            if (arg !is Integral) {
+                die("Argument of Exit must not be symbolic")
+            }
+
+            exitProcess(arg.value.toInt())
+        }
     }
 
     object RandomInt : DefaultFunction(

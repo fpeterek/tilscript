@@ -30,6 +30,7 @@ object StdlibRegistrar : SymbolRegistrar {
         Util.Tr,
         Util.TypeOf,
         Util.IsNil,
+        Util.Exit,
         Util.Random,
         Util.RandomInt,
 
