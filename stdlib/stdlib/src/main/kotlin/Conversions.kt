@@ -82,8 +82,8 @@ object Conversions {
             }
     }
 
-    object ToTime : DefaultFunction (
-        "ToTime",
+    object IntToTime : DefaultFunction (
+        "IntToTime",
         Types.Time,
         listOf(
             Variable("int", SrcPosition(-1, -1), Types.Int)
@@ -112,8 +112,8 @@ object Conversions {
             }
     }
 
-    object ToInt : DefaultFunction (
-        "ToInt",
+    object RealToInt : DefaultFunction (
+        "RealToInt",
         Types.Int,
         listOf(
             Variable("arg", SrcPosition(-1, -1), Types.Real)
@@ -127,8 +127,8 @@ object Conversions {
             }
     }
 
-    object ToReal : DefaultFunction (
-        "ToReal",
+    object IntToReal : DefaultFunction (
+        "IntToReal",
         Types.Real,
         listOf(
             Variable("arg", SrcPosition(-1, -1), Types.Int)

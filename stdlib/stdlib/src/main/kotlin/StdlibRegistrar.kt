@@ -59,12 +59,12 @@ object StdlibRegistrar : SymbolRegistrar {
 
         Conversions.IntToText,
         Conversions.RealToText,
-        Conversions.ToTime,
+        Conversions.IntToTime,
         Conversions.TextToInt,
         Conversions.TextToReal,
         Conversions.TimeToInt,
-        Conversions.ToReal,
-        Conversions.ToInt,
+        Conversions.IntToReal,
+        Conversions.RealToInt,
 
         ClosureFunctions.ConsClosure,
         ClosureFunctions.ClosureBody,
