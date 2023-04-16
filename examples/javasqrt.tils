@@ -1,0 +1,3 @@
+Import "class://org.fpeterek.tilscript.javamath.JavaMathRegistrar".
+
+['Println ['InvSqrt '4.0]].

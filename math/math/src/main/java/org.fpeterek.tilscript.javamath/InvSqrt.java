@@ -55,7 +55,8 @@ public class InvSqrt extends DefaultFunction {
       return new Nil(ctx.getPosition(), new ArrayList<>(), "Argument of InvSqrt must be greater than zero");
     }
 
-    return new Real(value, ctx.getPosition(), new ArrayList<>());
+    final double res = 1.0 / Math.sqrt(value);
+    return new Real(res, ctx.getPosition(), new ArrayList<>());
   }
 
 }
