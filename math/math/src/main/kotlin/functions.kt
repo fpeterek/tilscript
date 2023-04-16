@@ -105,6 +105,10 @@ object Ln : DefaultFunction(
 
         val x = args[0]
 
+        if (x is Symbol && x.value == "E" && interpreter.typesMatch(x.constructionType, Primitives.Real)) {
+            return Real(value = 1.0, srcPos = ctx.position)
+        }
+
         if (x is Symbol) {
             return Nil(ctx.position, reason="Cannot compute the logarithm of a symbolic value")
         }
@@ -151,6 +155,30 @@ object Log : DefaultFunction(
 
 }
 
+object Log10 : DefaultFunction(
+    "Log10",
+    Primitives.Real,
+    listOf(
+        Variable("x", SrcPosition(-1, -1), Primitives.Real),
+    )
+) {
+
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+        Log(interpreter, args + listOf(Real(10.0, SrcPosition(-1, -1))), ctx)
+}
+
+object Log2 : DefaultFunction(
+    "Log2",
+    Primitives.Real,
+    listOf(
+        Variable("x", SrcPosition(-1, -1), Primitives.Real),
+    )
+) {
+
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext) =
+        Log(interpreter, args + listOf(Real(2.0, SrcPosition(-1, -1))), ctx)
+}
+
 object Round : DefaultFunction(
     "Round",
     Primitives.Real,
@@ -186,6 +214,10 @@ object Sqrt : DefaultFunction(
 
         if (x !is Real) {
             return Nil(ctx.position, reason="Cannot round a symbolic value")
+        }
+
+        if (x.value < 0) {
+            return Nil(ctx.position, reason="Sqrt is undefined for values lower than zero")
         }
 
         return Real(sqrt(x.value), ctx.position)

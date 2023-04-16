@@ -16,6 +16,8 @@ class Registrar : SymbolRegistrar {
             Tan,
             Ln,
             Log,
+            Log2,
+            Log10,
             Round,
             Sqrt,
         )
