@@ -21,6 +21,11 @@ dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/myKotlin'
+    main.java.srcDirs += 'src/main/myJava'
+}
+
 test {
     useJUnitPlatform()
 }
