@@ -1,0 +1,37 @@
+Import "class://org.fpeterek.tilscript.math.Registrar".
+
+-- Funkci lze zkonstruovat provedením uzávěru
+[\x: Real, y: Real -> Real ['Sqrt ['+ ['* x x] ['* y y]]]].
+
+-- Takto zkonstruovanou funkci lze aplikovat
+-- Pro přehlednost uzávěr a argumenty uvádíme na více řádcích
+[[\x: Real, y: Real -> Real ['Sqrt ['+ ['* x x] ['* y y]]]]
+  '3.0
+  '4.0].
+
+-- Pro zpřehlednění můžeme funkci přiřadit proměnné
+hypotenuse -> (Real Real Real) :=
+  [\x: Real, y: Real -> Real
+    ['Sqrt ['+ ['* x x] ['* y y]]]].
+
+['Println ['Sqrt '25.0]].
+-- Jelikož je hypotenuse proměnná, netrivializujeme ji
+['Println [hypotenuse '3.0 '4.0]].
+
+-- Nyní si vytvoříme funkci pro výpis konstrukce
+-- a výsledku jejího provedení
+-- Funkci Progn využijeme, abychom provést více
+-- výpisů na výstup programu
+-- Proměnná cons v-konstruuje konstrukci
+-- Nejprve vypíše danou konstrukci
+-- Za konstrukci poté dopíšeme dvojtečku
+-- Nakonec musíme využít dvojí provedení, abychom provedli
+-- konstrukci konstruovanou proměnnou cons
+Defn PrettyPrint(cons: Construction) -> Any1 :=
+  ['Progn
+    ['Print cons]
+    ['Print '": "]
+    ['Println ^2 cons]].
+
+-- Nakonec stačí funkci aplikovat na konstrukci
+['PrettyPrint '[hypotenuse '3.0 '4.0]].

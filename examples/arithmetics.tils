@@ -1,0 +1,44 @@
+-- Import matematické knihovny
+Import "class://org.fpeterek.tilscript.math.Registrar".
+
+-- Aplikace funkce
+-- Nesmíme zapomenout, že definičním oborem logaritmu
+-- jsou reálná čísla, proto musíme zapsat literál reálného čísla
+-- Literály reálných čísel obsahují desetinnou tečku a alepoň jednu
+-- číslici před i za desetinnou tečkou
+['Log '27.0 '3.0].
+
+-- Výsledek kompozice využijeme jako argument jiné funkce
+['Log ['+ '20.0 '7.0] '3.0].
+
+-- Předchozí výsledky jsme však zbytečně zahodili
+-- Abychom mohli s výsledkem dále pracovat,
+-- uložíme jej do proměnné
+-- Alternativně můžeme výsledek vypsat na výstup programu
+
+x -> Real := ['Log ['+ '20.0 '7.0] '3.0].
+
+-- Čísla můžeme sčítat, odčítat, násobit, dělit i porovnávat
+
+-- Vypíše True
+['Println ['= ['+ '15 '5] ['- '24 '4]]].
+
+-- Vypíše False
+['Println ['= ['* '2 '3] ['/ '42 '6]]].
+
+-- Proměnnou můžeme provést
+['Println x].
+
+-- A využít jako argument funkce
+['Println ['Cos x]].
+
+-- Na výstup programu můžeme vypsat také konstrukci
+-- Zde aplikujeme funkci Print na konstrukci, abychom ji vypsali
+-- Využíváme Print, ne Println, abychom nevypsali sekvenci odřádkování
+['Print '['Cos x]].
+
+-- Oddělíme konstrukci od výsledku jejího provedení
+['Print '": "].
+
+-- A nakonec konstrukci provedeme a výsledek vypíšeme
+['Println ['Cos x]].
