@@ -220,7 +220,7 @@ object Sqrt : DefaultFunction(
             return Nil(ctx.position, reason="Sqrt is undefined for values lower than zero")
         }
 
-        return Real(1.0 / sqrt(x.value), ctx.position)
+        return Real(sqrt(x.value), ctx.position)
     }
 
 }
