@@ -1,7 +1,7 @@
 
 numbers -> List(Int) := ['ListOf '1 '6 '2 '5 '3 '4].
 
-Defn LessThanFive(num: Int) -> Bool := ['< num '5]. 
+Defn LessThanFive(num: Int) -> Bool := ['< num '5].
 
 Defn GetSmall(list: List(Int)) -> List(Int) :=
     ['If ['IsEmpty list]
@@ -18,7 +18,7 @@ Defn Filter(list: List(Int), pred: (Bool Int)) -> List(Int) :=
         ['If [pred ['Head list]]
             ['Cons ['Head list] ['Filter ['Tail list] pred]]
             ['Filter ['Tail list] pred]]].
-    
+
 ['Println ['Filter numbers 'LessThanFive]].
 
 Defn GetBig(list: List(Int)) -> List(Int) :=
@@ -29,7 +29,9 @@ Defn GetBig(list: List(Int)) -> List(Int) :=
 Defn Map(list: List(Int), transform: (Int Int)) -> List(Int) :=
     ['If ['IsEmpty list]
         list
-        ['Cons [transform ['Head list]] ['Map ['Tail list] transform]]].
+        ['Cons
+            [transform ['Head list]]
+            ['Map ['Tail list] transform]]].
 
 ['Println ['Map numbers [\x: Int -> Int ['* x x]]]].
 
