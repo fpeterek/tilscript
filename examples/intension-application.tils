@@ -1,0 +1,33 @@
+Import "class://org.fpeterek.tilscript.math.Registrar".
+Import "intensions.tils".
+
+Defn PrettyPrint(cons: Construction) -> Any1 :=
+    ['Progn
+        ['Print cons]
+        ['Print '": "]
+        ['Println ^2cons]].
+
+
+t -> Time := ['IntToTime '130].
+
+LastDigit/(Int Real).
+
+['PrettyPrint ''BestStudent@wt].
+
+['PrettyPrint '['IsComputing@wt 'Adela '['Ln '14.0]]].
+['PrettyPrint '['IsComputing@wt 'Karel '['/ '18 '6]]].
+
+t -> Time := ['IntToTime '250].
+
+['Println 'BestStudent@wt].
+
+['PrettyPrint '['IsComputing@wt 'Adela '['Ln '14.0]]].
+['PrettyPrint '['IsComputing@wt 'Adela '['Cos 'Pi]]].
+['PrettyPrint '['IsComputing@wt 'Karel '['/ '18 '6]]].
+
+t -> Time := ['IntToTime '600].
+
+['Println [['BestStudent w] t]].
+
+['PrettyPrint '['IsComputing@wt 'Vaclav '['LastDigit 'Pi]]].
+

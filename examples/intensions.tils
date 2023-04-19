@@ -1,0 +1,31 @@
+Import "class://org.fpeterek.tilscript.math.Registrar".
+
+Karel, Vaclav, Adela/Indiv.
+
+Defn BestStudent(w: World) -> (Indiv Time) :=
+    [\t: Time -> Indiv 
+        ['Cond
+            ['< ['TimeToInt t] '150] 'Vaclav
+            ['< ['TimeToInt t] '300] 'Karel
+            ['< ['TimeToInt t] '450] 'Vaclav
+            'True 'Adela]].
+
+Defn IsComputing150(i: Indiv, c: Construction) -> Bool :=
+    ['Or 
+        ['And ['= i 'Adela] ['= c '['Ln '14.0]]]
+        ['And ['= i 'Karel] ['= c '['* '4 '6]]]].
+
+Defn IsComputing300(i: Indiv, c: Construction) -> Bool :=
+    ['Or 
+        ['And ['= i 'Adela] ['= c '['Cos 'Pi]]]
+        ['And ['= i 'Karel] ['= c '['/ '18 '6]]]].
+
+Defn IsComputingRest(i: Indiv, c: Construction) -> Bool :=
+    'False.
+
+Defn IsComputing(w: World) -> ((Bool Indiv Construction) Time) :=
+    [\t: Time -> (Bool Indiv Construction)
+        ['Cond
+            ['< ['TimeToInt t] '150] 'IsComputing150
+            ['< ['TimeToInt t] '300] 'IsComputing300
+            'True 'IsComputingRest]].
