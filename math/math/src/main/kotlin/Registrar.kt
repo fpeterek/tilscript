@@ -12,7 +12,9 @@ class Registrar : SymbolRegistrar {
     override val functions
         get() = listOf(
             Sin,
+            Asin,
             Cos,
+            Acos,
             Tan,
             Ln,
             Log,

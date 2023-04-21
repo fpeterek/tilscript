@@ -1,14 +1,45 @@
-Import "fns.tils".
+Import "class://org.fpeterek.tilscript.math.Registrar".
 
-Struct TestStruct {
-    first: Int,
-    second: Real,
-    third: Text,
+
+Defn PrettyPrint(cons: Construction) -> Any1 :=
+    ['Progn
+        ['Print cons]
+        ['Print '": "]
+        ['Println ^2 cons]].
+
+
+Struct Polar {
+    dist: Real,
+    angle: Real,
 }.
 
-myStruct -> TestStruct := {TestStruct '1 '1.0 '"one"}.
+Struct Cart {
+    x: Real,
+    y: Real,
+}.
 
-['PrintRes 'myStruct].
+Defn GetAngle(x: Real, y: Real, len: Real) -> Real :=
+    ['Cond
+        ['And ['= x '0.0] ['> y '0.0]] ['/ pi '2.0]
+        ['And ['= x '0.0] ['< y '0.0]] ['+ pi ['/ pi '2.0]]
+        ['> y '0.0] ['Acos ['/ x len]]
+        'True ['Acos ['/ x len]]].
+
+Defn CartToPolar(cart: Cart) -> Polar :=
+    [[\dist: Real -> Polar
+        {Polar dist ['GetAngle cart::x cart::y dist] }]
+        ['Sqrt ['+ ['* cart::x cart::x] ['* cart::y cart::y]]] ].
+
+cart1 -> Cart := {Cart '2.0 '2.0}.
+cart2 -> Cart := {Cart '2.0 '0.0}.
+cart3 -> Cart := {Cart ['- '0.0 '3.0] '1.0}.
+cart4 -> Cart := {Cart '0.0 '2.0}.
+
+['Println ['CartToPolar cart1]].
+['Println ['CartToPolar cart2]].
+['Println ['CartToPolar cart3]].
+['Println ['CartToPolar cart4]].
+
 
 Struct Tree {
     value: Int,
@@ -44,5 +75,5 @@ Defn Depth(tree: Tree) -> Int :=
         '1
         ['+ '1 ['Max ['Depths tree::subtrees]]]].
 
-['PrintRes 'myTree::subtrees].
-['PrintRes '['Depth myTree]].
+['PrettyPrint 'myTree::subtrees].
+['PrettyPrint '['Depth myTree]].

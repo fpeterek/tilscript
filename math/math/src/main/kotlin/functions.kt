@@ -35,6 +35,29 @@ object Sin : DefaultFunction(
 
 }
 
+object Asin : DefaultFunction(
+    "Asin",
+    Primitives.Real,
+    listOf(
+        Variable("x", SrcPosition(-1, -1), Primitives.Real)
+    )
+) {
+
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+        val x = args[0]
+
+        if (x is Symbol) {
+            return Nil(ctx.position, reason="Cannot compute asin of a symbolic value")
+        }
+
+        x as Real
+
+        return Real(asin(x.value), ctx.position)
+    }
+
+}
+
 object Cos : DefaultFunction(
     "Cos",
     Primitives.Real,
@@ -58,6 +81,29 @@ object Cos : DefaultFunction(
         x as Real
 
         return Real(cos(x.value), ctx.position)
+    }
+
+}
+
+object Acos : DefaultFunction(
+    "Acos",
+    Primitives.Real,
+    listOf(
+        Variable("x", SrcPosition(-1, -1), Primitives.Real)
+    )
+) {
+
+    override fun apply(interpreter: InterpreterInterface, args: List<Construction>, ctx: FnCallContext): Construction {
+
+        val x = args[0]
+
+        if (x is Symbol) {
+            return Nil(ctx.position, reason="Cannot compute acos of a symbolic value")
+        }
+
+        x as Real
+
+        return Real(acos(x.value), ctx.position)
     }
 
 }

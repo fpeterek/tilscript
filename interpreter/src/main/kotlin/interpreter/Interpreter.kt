@@ -175,16 +175,11 @@ class Interpreter: InterpreterInterface {
 
     private fun createLambdaCapture() = LambdaContext(currentFrame)
 
-    private fun interpret(closure: Closure): TilFunction = withFrame {
-        // We want to put variables introduced by the closure on the stack even if we aren't calling the
-        // resulting function as of now to avoid capturing variables with the same name from a higher scope
-        // This is necessary because we use the call stack to create captures
-        // Addendum: Not anymore, as we no longer create captures
-//        closure.variables.forEach(currentFrame::putVar)
+    private fun interpret(closure: Closure): TilFunction {
 
         val lambda = LambdaFunction(closure.variables, closure.construction, createLambdaCapture(), returnType=closure.returnType)
 
-        TilFunction(
+        return TilFunction(
             "<Lambda>",
             closure.position,
             lambda.signature,
