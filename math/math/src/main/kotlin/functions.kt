@@ -53,6 +53,10 @@ object Asin : DefaultFunction(
 
         x as Real
 
+        if (x.value < -1.0 || x.value > 1.0) {
+            return Nil(ctx.position, reason="Asin is undefined on argument")
+        }
+
         return Real(asin(x.value), ctx.position)
     }
 
@@ -102,6 +106,10 @@ object Acos : DefaultFunction(
         }
 
         x as Real
+
+        if (x.value < -1.0 || x.value > 1.0) {
+            return Nil(ctx.position, reason="Acos is undefined on argument")
+        }
 
         return Real(acos(x.value), ctx.position)
     }
