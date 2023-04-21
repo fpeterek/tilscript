@@ -397,6 +397,7 @@ class Interpreter: InterpreterInterface {
             interpreted.add(value)
         }
 
+        // TODO: There might be a bug here
         interpreted.zip(type.attributes).forEach {
             val (con, exp) = it
 
