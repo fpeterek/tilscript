@@ -1,0 +1,32 @@
+Import "class://org.fpeterek.tilscript.math.Registrar".
+
+triple -> Tuple(Int, Text, Construction) :=
+    ['MkTuple ['+ '1 '3] ['IntToText '5] '['+ '3 '3]].
+
+['Println triple].
+
+Defn Fst(tuple: Any1) -> Any2 :=
+    ['Get tuple '0].
+
+Defn Snd(tuple: Any1) -> Any2 :=
+    ['Get tuple '1].
+
+['Println ['Fst triple]].
+['Println ['Snd triple]].
+
+quadruple -> Tuple(Real, Int, Text, Construction) :=
+    ['PrependToTuple '3.0 triple].
+
+['Println quadruple].
+
+TypeDef Vector2 := Tuple(Real, Real).
+
+Defn DotProduct(v1: Vector2, v2: Vector2) -> Real :=
+    ['+
+        ['* ['Fst v1] ['Fst v2]]
+        ['* ['Snd v1] ['Snd v2]]].
+
+v1 -> Vector2 := ['MkTuple '2.0 '3.0].
+v2 -> Vector2 := ['MkTuple '3.0 '2.0].
+
+['Println ['DotProduct v1 v2]].
