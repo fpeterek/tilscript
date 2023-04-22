@@ -20,10 +20,9 @@ Struct Cart {
 
 Defn GetAngle(x: Real, y: Real, len: Real) -> Real :=
     ['Cond
-        ['And ['= x '0.0] ['> y '0.0]] ['/ pi '2.0]
-        ['And ['= x '0.0] ['< y '0.0]] ['+ pi ['/ pi '2.0]]
+        ['= '0.0 len] '0.0
         ['> y '0.0] ['Acos ['/ x len]]
-        'True ['Acos ['/ x len]]].
+        'True ['- '360.0 ['Acos ['/ x len]]]].
 
 Defn CartToPolar(cart: Cart) -> Polar :=
     [[\dist: Real -> Polar
